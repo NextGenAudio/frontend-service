@@ -6,7 +6,7 @@ import { LibrariesPanel } from "./libraries-panel";
 import { PlaylistPanel } from "./playlist-panel";
 import { SongDetailsPanel } from "./song-details-panel";
 import { PlayerControls } from "./player-controls";
-import { TopBar } from "./topbar";
+
 
 export const MusicPlayer = () => {
   const [currentSong, setCurrentSong] = useState({
@@ -20,7 +20,7 @@ export const MusicPlayer = () => {
   return (
     <div className="h-screen bg-background text-foreground flex flex-col">
       {/* Top Navigation Bar with Polygon Header */}
-      <TopBar />
+   
       
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden">
