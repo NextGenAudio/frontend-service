@@ -47,26 +47,17 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
       <div className="absolute inset-0 bg-white/5 backdrop-blur-sm" />
 
       <div className="relative z-10 h-full flex flex-col">
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild>
-            <div className="p-4 cursor-pointer group transition-all duration-300 hover:bg-white/10 border-b border-white/10">
+  
+            <div className="p-4 cursor-pointer group transition-all duration-30  border-b border-white/10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden relative flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-52 h-52 rounded-xl overflow-hidden relative flex-shrink-0">
                     <img
                       src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop&crop=center"
                       alt="Playlist cover"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-[1px]" />
-                    <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />
-                  </div>
-                  <div className="hidden sm:block">
-                    <h2 className="text-xl font-bold text-white drop-shadow-lg">Playlist #1</h2>
-                    <p className="text-sm text-white/70">{songs.length} songs</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
+                    <div className="flex gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -74,22 +65,46 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
                       e.stopPropagation()
                       setShowVisualizer(!showVisualizer)
                     }}
-                    className="h-8 w-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-110"
+                    className="h-8 px-14 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-110"
                     title={showVisualizer ? "Hide Visualizer" : "Show Visualizer"}
                   >
                     <BarChart3
                       className={`h-4 w-4 transition-colors ${showVisualizer ? "text-orange-300" : "text-white/70"}`}
                     />
+                    Visualizer
                   </Button>
-                  <ChevronDown
-                    className={`h-4 w-4 text-white/70 transition-all duration-300 ${isOpen ? "rotate-180" : ""}`}
-                  />
+                
+                </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-[1px]" />
+                    <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />
+                  </div>
+                  <div className="hidden sm:block">
+                    <h2 className="text-8xl font-bold text-white drop-shadow-lg">Playlist #1</h2>
+                    <p className="text-base text-white/80">{songs.length} songs</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowVisualizer(!showVisualizer)
+                    }}
+                    className="h-8 px-14 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-110"
+                    title={showVisualizer ? "Hide Visualizer" : "Show Visualizer"}
+                  >
+                    <BarChart3
+                      className={`h-4 w-4 transition-colors ${showVisualizer ? "text-orange-300" : "text-white/70"}`}
+                    />
+                    Visualizer
+                  </Button>
+                
                 </div>
               </div>
             </div>
-          </CollapsibleTrigger>
 
-          <CollapsibleContent className="flex-1 overflow-auto">
+         
             {/* Glass Visualizer Area */}
             {showVisualizer && (
               <div className="p-4 border-b border-white/10">
@@ -161,7 +176,7 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-6 w-6 bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                      className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
                     >
                       <MoreHorizontal className="h-3 w-3 text-white/70" />
                     </Button>
@@ -169,8 +184,7 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
                 </div>
               ))}
             </div>
-          </CollapsibleContent>
-        </Collapsible>
+         
       </div>
     </div>
   )

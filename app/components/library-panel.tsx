@@ -51,14 +51,14 @@ export const LibrariesPanel = () => {
   ];
 
   return (
-    <div className="h-full relative rounded-l-[32px] overflow-hidden">
+    <div className="h-full relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-700/80 to-orange-600/90"></div>
       <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
 
       <div className="relative h-full flex flex-col">
         {/* <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild> */}
-            <div className="p-4 border-b border-white/20 cursor-pointer hover:bg-white/10 transition-all duration-300 backdrop-blur-sm">
+            <div className="p-4 border-b border-white/20 cursor-pointer  backdrop-blur-sm">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white drop-shadow-sm">
                   Libraries
@@ -77,7 +77,7 @@ export const LibrariesPanel = () => {
 
           {/* <CollapsibleContent className="flex-1"> */}
             <Tabs defaultValue="playlists" className="h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+              <TabsList className="grid  grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
                 <TabsTrigger
                   value="all"
                   className="data-[state=active]:bg-white/30  data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-xl"
