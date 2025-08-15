@@ -1,11 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/app/components/ui/resizable"
-import { LibraryPanel } from "@/app/components/library-panel"
-import { PlaylistPanel } from "@/app/components/playlist-panel"
-import { SongDetailsPanel } from "@/app/components/song-details-panel"
-import { FloatingPlayerControls } from "@/app/components/player-controls"
+import { useState } from "react";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/app/components/ui/resizable";
+import { LibraryPanel } from "@/app/components/library-panel";
+import { PlaylistPanel } from "@/app/components/playlist-panel";
+import { SongDetailsPanel } from "@/app/components/song-details-panel";
+import { FloatingPlayerControls } from "@/app/components/player-controls";
+import { ScrollArea } from "@radix-ui/themes";
 
 export function MusicPlayer() {
   const [currentSong, setCurrentSong] = useState({
@@ -14,7 +19,7 @@ export function MusicPlayer() {
     album: "Playlist #1",
     duration: "3:45",
     currentTime: "1:23",
-  })
+  });
 
   return (
     <>
@@ -37,8 +42,10 @@ export function MusicPlayer() {
             <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
 
             {/* Song Details Panel */}
-            <ResizablePanel defaultSize={25} minSize={10} maxSize={30}>
-              <SongDetailsPanel song={currentSong} />
+            <ResizablePanel defaultSize={25} minSize={20} maxSize={30}>
+       
+                <SongDetailsPanel song={currentSong} />
+           
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
@@ -46,5 +53,5 @@ export function MusicPlayer() {
 
       <FloatingPlayerControls song={currentSong} />
     </>
-  )
+  );
 }

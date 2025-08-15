@@ -8,6 +8,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/app/components/ui/collapsible";
+import { ScrollArea } from "@radix-ui/themes";
 
 interface Song {
   title: string;
@@ -22,11 +23,12 @@ interface GlassSongDetailsPanelProps {
 }
 
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
-  const [isOpen, setIsOpen] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
 
   return (
-    <div className="h-full overflow-y-auto relative overflow-hidden">
+    <div className="flex flex-col h-full">
+    <ScrollArea type="always" scrollbars="vertical" style={{ height: 180 }} >
+    <div className="overflow-y-auto relative overflow-hidden">
       {/* <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-amber-300/15 to-red-400/20" />
       <div className="absolute inset-0 backdrop-blur-xl bg-white/5" /> */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-700/80 to-gray-900/90"></div>
@@ -126,6 +128,8 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
           </div>
         </div>
       </div>
+    </div>
+    </ScrollArea>
     </div>
   );
 };

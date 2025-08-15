@@ -173,7 +173,7 @@ export const LibraryPanel = () => {
                       </div>
                       <Button
                         size="icon"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 bg-white/20 hover:bg-white/30 border border-white/30 text-white hover:scale-110 transition-all duration-200 hidden sm:flex backdrop-blur-sm"
+                        className="h-8 w-8 opacity-0 rounded-xl group-hover:opacity-100 bg-white/20 hover:bg-white/30 border border-white/30 text-white hover:scale-110 transition-all duration-200 hidden sm:flex backdrop-blur-sm"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
