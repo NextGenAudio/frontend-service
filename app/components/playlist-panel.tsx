@@ -43,7 +43,7 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
       {/* Glass background with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-pink-400/15 to-red-400/20 backdrop-blur-xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-gray-400/15 to-gray-400/20 backdrop-blur-xl" />
       <div className="absolute inset-0 bg-white/5 backdrop-blur-sm" />
 
       <div className="relative z-10 h-full flex flex-col">
@@ -134,7 +134,7 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
               {songs.map((song) => (
                 <div
                   key={song.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.02] hover:shadow-lg ${
+                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
                     currentSongId === song.id
                       ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
                       : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"

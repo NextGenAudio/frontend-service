@@ -9,7 +9,7 @@ import {
   CollapsibleTrigger,
 } from "@/app/components/ui/collapsible";
 
-export const LibrariesPanel = () => {
+export const LibraryPanel = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   const playlists = [
@@ -52,7 +52,7 @@ export const LibrariesPanel = () => {
 
   return (
     <div className="h-full relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-700/80 to-orange-600/90"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-700/80 to-gray-900/90"></div>
       <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
 
       <div className="relative h-full flex flex-col">
@@ -60,8 +60,8 @@ export const LibrariesPanel = () => {
           <CollapsibleTrigger asChild> */}
             <div className="p-4 border-b border-white/20 cursor-pointer  backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white drop-shadow-sm">
-                  Libraries
+                <h2 className="text-xl ml-3 pt-4 font-semibold text-white drop-shadow-sm">
+                  Your Library
                 </h2>
                 <div className="flex items-center gap-2">
                   <Button
@@ -80,19 +80,19 @@ export const LibrariesPanel = () => {
               <TabsList className="grid  grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
                 <TabsTrigger
                   value="all"
-                  className="data-[state=active]:bg-white/30  data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-xl"
+                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-[10px]"
                 >
                   All
                 </TabsTrigger>
                 <TabsTrigger
                   value="playlists"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-xl"
+                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-[10px]"
                 >
                   Playlists
                 </TabsTrigger>
                 <TabsTrigger
                   value="imports"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-xl"
+                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-[10px]"
                 >
                   Imports
                 </TabsTrigger>
@@ -123,7 +123,7 @@ export const LibrariesPanel = () => {
                       </div>
                       <Button
                         size="icon"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 bg-white/20 hover:bg-white/30 border border-white/30 text-white hover:scale-110 transition-all duration-200 hidden sm:flex backdrop-blur-sm"
+                        className="h-8 w-8 opacity-0 rounded-xl group-hover:opacity-100 bg-white/20 hover:bg-white/30 border border-white/30 text-white hover:scale-110 transition-all duration-200 hidden sm:flex backdrop-blur-sm"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
