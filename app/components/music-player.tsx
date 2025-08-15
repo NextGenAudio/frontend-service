@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/app/components/ui/resizable";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/app/components/ui/resizable";
 import { LibrariesPanel } from "./libraries-panel";
 import { PlaylistPanel } from "./playlist-panel";
 import { SongDetailsPanel } from "./song-details-panel";
 import { PlayerControls } from "./player-controls";
-
 
 export const MusicPlayer = () => {
   const [currentSong, setCurrentSong] = useState({
@@ -14,38 +17,37 @@ export const MusicPlayer = () => {
     artist: "nowplayingsong",
     album: "Playlist #1",
     duration: "3:45",
-    currentTime: "1:23"
+    currentTime: "1:23",
   });
 
   return (
-    <div className="h-screen bg-background text-foreground flex flex-col">
+    <div className="bg-slate-800 h-screen ml-28 rounded-[32px] bg-background text-foreground flex flex-col">
       {/* Top Navigation Bar with Polygon Header */}
-   
-      
+
       {/* Main Content Area */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 ">
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Libraries Panel */}
           <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
             <LibrariesPanel />
           </ResizablePanel>
-          
+
           <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
-          
+
           {/* Main Playlist Panel */}
           <ResizablePanel defaultSize={50} minSize={30}>
             <PlaylistPanel onSongSelect={setCurrentSong} />
           </ResizablePanel>
-          
+
           <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
-          
+
           {/* Song Details Panel */}
           <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
             <SongDetailsPanel song={currentSong} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-      
+
       {/* Bottom Player Controls */}
       <PlayerControls song={currentSong} />
     </div>
