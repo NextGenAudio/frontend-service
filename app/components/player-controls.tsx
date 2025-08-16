@@ -97,7 +97,7 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
 
   return (
     <TooltipProvider>
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[85%] max-w-6xl">
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[85%] max-w-[1800px]">
         <div className="relative bg-gradient-to-r from-orange-300/20 via-slate-400/15 to-slate-500/20 backdrop-blur-xl border border-orange-300/20 rounded-3xl px-6 py-5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] drop-shadow-2xl">
           <div className="absolute inset-0 bg-gradient-to-r from-orange-300/10 via-transparent to-orange-300/10 rounded-2xl animate-pulse" />
 
