@@ -1,10 +1,10 @@
 import Image from "next/image";
-import Index from "./pages/home";
-
+import {Landing}  from "./landing/page";
+import Login  from "./login/page";
 export default function Home() {
   return (
     <div>
-      <Index />
+      <Landing/>
     </div>
   );
 }

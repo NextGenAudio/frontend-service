@@ -29,7 +29,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
     <div className="h-full overflow-y-auto relative overflow-hidden">
       {/* <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-amber-300/15 to-red-400/20" />
       <div className="absolute inset-0 backdrop-blur-xl bg-white/5" /> */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-700/80 to-gray-900/90"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-800/80 to-gray-900/90"></div>
       <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
 
       <div className="relative h-full flex flex-col">
