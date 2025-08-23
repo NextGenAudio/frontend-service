@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Heart, Share2, MoreHorizontal, ChevronDown } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import Image from 'next/image';
 import {
   Collapsible,
   CollapsibleContent,
@@ -29,7 +30,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
     <div className="h-full overflow-y-auto relative overflow-hidden">
       {/* <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-amber-300/15 to-red-400/20" />
       <div className="absolute inset-0 backdrop-blur-xl bg-white/5" /> */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-800/80 to-gray-900/90"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/80 to-gray-900/90"></div>
       <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
 
       <div className="relative h-full flex flex-col">
@@ -43,18 +44,15 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         </div>
 
         <div className="space-y-6 mx-3">
-          <div className="aspect-square bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20 hover:bg-white/15 hover:scale-[1.02] transition-all duration-500 group">
+          <div className="overflow-hidden aspect-square bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20 hover:bg-white/15 hover:scale-[1.02] transition-all duration-500 group">
             <div className="text-center">
-              <div className="text-2xl font-bold mb-2 text-white/90 group-hover:text-white transition-colors duration-300">
-                {song.title}
-              </div>
-              <div className="text-sm text-white/60 group-hover:text-white/70 transition-colors duration-300">
-                Album Art
-              </div>
+              <Image src="/assets/marathondi-song.jpg" alt="Song Cover Image" width={500} height={500} />
+              
+              
             </div>
           </div>
 
-          <div className="text-center space-y-3 bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+          <div className="text-center space-y-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
             <h3 className="text-xl font-bold text-white/90">{song.title}</h3>
             <p className="text-white/70 font-medium">{song.artist}</p>
             <p className="text-sm text-white/60">{song.album}</p>
