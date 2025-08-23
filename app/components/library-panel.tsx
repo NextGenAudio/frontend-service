@@ -52,7 +52,7 @@ export const LibraryPanel = () => {
 
   return (
     <div className="h-full relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-700/80 to-gray-900/90"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-slate-800/80 to-gray-900/90"></div>
       <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
 
       <div className="relative h-full flex flex-col">

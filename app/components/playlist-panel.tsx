@@ -315,16 +315,20 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
                   }`}
                   onClick={() => handleSongClick(song)}
                 >
+                  <div className="font-medium truncate text-white drop-shadow-sm">
+                      {id+1}
+                    </div>
                   <div className="relative">
+                     
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         togglePlayPause();
                       }}
-                    >
+                    > 
                       {isPlaying && currentSongId === song.id ? (
                         <Pause className="h-4 w-4 text-white" />
                       ) : (
@@ -334,6 +338,7 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
                   </div>
 
                   <div className="flex-1 min-w-0">
+                   
                     <div className="font-medium truncate text-white drop-shadow-sm">
                       {song.title}
                     </div>
