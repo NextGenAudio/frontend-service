@@ -19,6 +19,7 @@ import {
 import { Button } from "@/app/components/ui/button"
 import { Slider } from "@/app/components/ui/slider"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/components/ui/tooltip"
+import Image from "next/image"
 
 interface Song {
   title: string
@@ -106,16 +107,18 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3 min-w-0 w-1/4">
                 <div className="relative group">
-                  <div className="w-12 h-12 bg-orange-300/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105">
-                    {song.albumArt ? (
-                      <img
-                        src={song.albumArt || "/placeholder.svg"}
+                  <div className="w-16 h-16 bg-orange-300/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105">
+                      <Image
+                        src="/assets/marathondi-song.jpg"
                         alt="Album art"
+                        width={68}
+                        height={68}
                         className="w-full h-full object-cover rounded-lg"
                       />
+                      {/* />
                     ) : (
                       <div className="text-sm text-orange-200/90 font-medium">♪</div>
-                    )}
+                    )} */}
                   </div>
 
                   {showVisualizer && (
