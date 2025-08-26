@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
+import { signIn } from "next-auth/react";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +31,7 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     // Simulate auth process
+
     setTimeout(() => {
       setIsLoading(false);
       console.log(`[v0] ${isSignUp ? "Sign up" : "Sign in"} attempted with:`, {
@@ -43,7 +45,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[url('/abstract-music-waves.png')] opacity-5 bg-cover bg-center" />
+      <div className="absolute inset-0 opacity-5 bg-cover bg-center" />
       <div className="absolute top-20 left-20 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-20 right-20 w-96 h-96 bg-amber-500/8 rounded-full blur-3xl animate-pulse delay-1000" />
       <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-orange-400/5 rounded-full blur-2xl animate-pulse delay-500" />
@@ -283,15 +285,17 @@ export default function Login() {
             {/* Social Login */}
             <div className="grid grid-cols-2 gap-4">
               <Button
+              onClick={()=>signIn("spofity",{callbackUrl:"/"})}
                 type="button"
                 variant="outline"
                 className="h-12 bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 hover:border-white/30 rounded-2xl transition-all duration-300 hover:scale-105"
               >
                 <Github className="w-5 h-5 mr-2" />
-                GitHub
+                Spotify
               </Button>
               <Button
                 type="button"
+                onClick={()=>signIn("google",{callbackUrl:"/"})}
                 variant="outline"
                 className="h-12 bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 hover:border-white/30 rounded-2xl transition-all duration-300 hover:scale-105"
               >
