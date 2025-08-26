@@ -1,5 +1,5 @@
 import { MusicPlayer } from "@/app/components/music-player";
-import { SideBar } from "../../components/sidebar";
+import { SideBar } from "../components/sidebar";
 
 const Home = () => {
   return (
