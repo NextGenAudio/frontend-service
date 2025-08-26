@@ -1,10 +1,29 @@
-"use client"
+"use client";
 
-import { Button } from "@/app/components/ui/button"
-import { Play, Music, Zap, Palette, Volume2, Headphones, Sparkles, Shield, Github, Twitter, Mail } from "lucide-react"
-import Link from "next/link"
-
+import { Button } from "@/app/components/ui/button";
+import {
+  Play,
+  Music,
+  Zap,
+  Palette,
+  Volume2,
+  Headphones,
+  Sparkles,
+  Shield,
+  Github,
+  Twitter,
+  Mail,
+  User,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import Image from "next/image";
+import ProfileAvatar from "../components/profile-avatar";
 export function Landing() {
+    const { status, data: session } = useSession();
+  if (status === "loading") {
+    return null; // or a loading spinner
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* Header */}
@@ -45,22 +64,32 @@ export function Landing() {
                   Contact
                 </a>
               </div>
-
-              <div className="flex items-center space-x-4">
-                <Link href="/login">
-                <Button
-                  variant="ghost"
-                  className="text-white/80 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300"
-                >
-                  Login
-                </Button>
-                </Link>
-                <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">
-                  Sign Up
-                </Button>
-              </div>
-
-             
+              {status === "unauthenticated" && (
+                <div className="flex items-center space-x-4">
+                  <Link href="/login">
+                    <Button
+                      variant="ghost"
+                      className="text-white/80 hover:text-white hover:bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">
+                    Sign Up
+                  </Button>
+                </div>
+              )}
+              {status === "authenticated" && (
+                <div className="flex items-center space-x-12">
+                  <span className="mr-4 text-sm font-medium text-orange-400 tracking-wider uppercase bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-400/30">
+                    {session?.user?.name}
+                  </span>
+                  <ProfileAvatar w={12} h={12} />
+                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">
+                    Logout
+                  </Button>
+                </div>
+              )}
             </nav>
           </div>
         </div>
@@ -87,8 +116,9 @@ export function Landing() {
               </div>
 
               <p className="text-xl text-white/80 leading-relaxed max-w-lg">
-                Experience music like never before with our revolutionary glassmorphism interface. Seamlessly blend
-                style and functionality in the ultimate audio experience.
+                Experience music like never before with our revolutionary
+                glassmorphism interface. Seamlessly blend style and
+                functionality in the ultimate audio experience.
               </p>
 
               {/* Feature Points */}
@@ -98,7 +128,8 @@ export function Landing() {
                     <Zap className="w-4 h-4 text-orange-400" />
                   </div>
                   <p className="text-white/80">
-                    Advanced glassmorphism UI with floating controls and immersive visuals
+                    Advanced glassmorphism UI with floating controls and
+                    immersive visuals
                   </p>
                 </div>
 
@@ -107,7 +138,8 @@ export function Landing() {
                     <Volume2 className="w-4 h-4 text-orange-400" />
                   </div>
                   <p className="text-white/80">
-                    Professional audio controls with equalizer, crossfade, and spatial audio
+                    Professional audio controls with equalizer, crossfade, and
+                    spatial audio
                   </p>
                 </div>
 
@@ -116,22 +148,23 @@ export function Landing() {
                     <Palette className="w-4 h-4 text-orange-400" />
                   </div>
                   <p className="text-white/80">
-                    Customizable themes with real-time visualizations and smooth animations
+                    Customizable themes with real-time visualizations and smooth
+                    animations
                   </p>
                 </div>
               </div>
 
               {/* CTA Button */}
-              
+
               <div className="pt-4">
                 <Link href="/player">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md px-8 py-6 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Try SoneX
-                </Button>
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md px-8 py-6 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Play className="w-5 h-5 mr-2" />
+                    Try SoneX
+                  </Button>
                 </Link>
               </div>
             </div>
@@ -157,7 +190,9 @@ export function Landing() {
                       {/* Top Panels */}
                       <div className="grid grid-cols-3 gap-3 h-60">
                         <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
-                          <div className="text-xs text-white/60 mb-2">Library</div>
+                          <div className="text-xs text-white/60 mb-2">
+                            Library
+                          </div>
                           <div className="space-y-1">
                             <div className="w-full h-2 bg-white/10 rounded"></div>
                             <div className="w-3/4 h-2 bg-white/10 rounded"></div>
@@ -165,7 +200,9 @@ export function Landing() {
                           </div>
                         </div>
                         <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
-                          <div className="text-xs text-white/60 mb-2">Playlist</div>
+                          <div className="text-xs text-white/60 mb-2">
+                            Playlist
+                          </div>
                           <div className="space-y-1">
                             <div className="w-full h-2 bg-orange-400/30 rounded"></div>
                             <div className="w-4/5 h-2 bg-white/10 rounded"></div>
@@ -173,7 +210,9 @@ export function Landing() {
                           </div>
                         </div>
                         <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
-                          <div className="text-xs text-white/60 mb-2">Details</div>
+                          <div className="text-xs text-white/60 mb-2">
+                            Details
+                          </div>
                           <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded mb-1"></div>
                           <div className="w-full h-1 bg-white/10 rounded"></div>
                         </div>
@@ -219,9 +258,12 @@ export function Landing() {
             <span className="text-sm font-medium text-orange-400 tracking-wider uppercase bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-400/30">
               Features
             </span>
-            <h2 className="text-4xl font-bold text-white mt-4 mb-4">Powerful Features</h2>
+            <h2 className="text-4xl font-bold text-white mt-4 mb-4">
+              Powerful Features
+            </h2>
             <p className="text-xl text-white/70 max-w-2xl mx-auto">
-              Discover the advanced capabilities that make SoundWave the ultimate music experience
+              Discover the advanced capabilities that make SoundWave the
+              ultimate music experience
             </p>
           </div>
 
@@ -230,9 +272,12 @@ export function Landing() {
               <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-4 shadow-lg">
                 <Headphones className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Immersive Audio</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Immersive Audio
+              </h3>
               <p className="text-white/70">
-                Experience crystal-clear sound with advanced audio processing and spatial audio support.
+                Experience crystal-clear sound with advanced audio processing
+                and spatial audio support.
               </p>
             </div>
 
@@ -240,9 +285,12 @@ export function Landing() {
               <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-4 shadow-lg">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Visual Effects</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Visual Effects
+              </h3>
               <p className="text-white/70">
-                Real-time audio visualizations and stunning glassmorphism interface effects.
+                Real-time audio visualizations and stunning glassmorphism
+                interface effects.
               </p>
             </div>
 
@@ -250,9 +298,12 @@ export function Landing() {
               <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-4 shadow-lg">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Privacy First</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Privacy First
+              </h3>
               <p className="text-white/70">
-                Your music library stays private with local storage and encrypted connections.
+                Your music library stays private with local storage and
+                encrypted connections.
               </p>
             </div>
           </div>
@@ -260,7 +311,10 @@ export function Landing() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-sm">
+      <section
+        id="about"
+        className="py-20 bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-sm"
+      >
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}
@@ -279,14 +333,17 @@ export function Landing() {
 
               <div className="space-y-6 text-white/80 text-lg leading-relaxed">
                 <p>
-                  SoundWave represents the pinnacle of modern music player design, combining cutting-edge glassmorphism
-                  aesthetics with professional-grade audio capabilities. Our vision is to create an immersive musical
-                  journey that transcends traditional boundaries.
+                  SoundWave represents the pinnacle of modern music player
+                  design, combining cutting-edge glassmorphism aesthetics with
+                  professional-grade audio capabilities. Our vision is to create
+                  an immersive musical journey that transcends traditional
+                  boundaries.
                 </p>
                 <p>
-                  Built with passion by music enthusiasts and design experts, SoundWave delivers an unparalleled user
-                  experience through innovative interface design, advanced audio processing, and seamless integration
-                  across all your devices.
+                  Built with passion by music enthusiasts and design experts,
+                  SoundWave delivers an unparalleled user experience through
+                  innovative interface design, advanced audio processing, and
+                  seamless integration across all your devices.
                 </p>
               </div>
 
@@ -319,10 +376,13 @@ export function Landing() {
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-6 shadow-lg">
                   <Music className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Our Mission</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  Our Mission
+                </h3>
                 <p className="text-white/80 leading-relaxed">
-                  To revolutionize how people interact with music through innovative design and cutting-edge technology,
-                  making every listening session a memorable experience.
+                  To revolutionize how people interact with music through
+                  innovative design and cutting-edge technology, making every
+                  listening session a memorable experience.
                 </p>
               </div>
 
@@ -330,10 +390,13 @@ export function Landing() {
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-6 shadow-lg">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Innovation First</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  Innovation First
+                </h3>
                 <p className="text-white/80 leading-relaxed">
-                  We push the boundaries of what's possible in music player design, constantly exploring new
-                  technologies and user interface paradigms.
+                  We push the boundaries of what's possible in music player
+                  design, constantly exploring new technologies and user
+                  interface paradigms.
                 </p>
               </div>
 
@@ -341,10 +404,12 @@ export function Landing() {
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-6 shadow-lg">
                   <Headphones className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">Audio Excellence</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  Audio Excellence
+                </h3>
                 <p className="text-white/80 leading-relaxed">
-                  Every feature is designed with audio quality in mind, ensuring your music sounds exactly as the artist
-                  intended.
+                  Every feature is designed with audio quality in mind, ensuring
+                  your music sounds exactly as the artist intended.
                 </p>
               </div>
             </div>
@@ -359,7 +424,9 @@ export function Landing() {
             <span className="text-sm font-medium text-orange-400 tracking-wider uppercase bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-400/30">
               Introducing SoneX
             </span>
-            <h2 className="text-4xl font-bold text-white">Architecting the future of</h2>
+            <h2 className="text-4xl font-bold text-white">
+              Architecting the future of
+            </h2>
             <h3 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
               Music Experience
             </h3>
@@ -379,23 +446,36 @@ export function Landing() {
                 <span className="text-xl font-bold">SoundWave</span>
               </div>
               <p className="text-white/60">
-                The next generation music player with glassmorphism design and professional audio features.
+                The next generation music player with glassmorphism design and
+                professional audio features.
               </p>
             </div>
 
             <div>
               <h4 className="text-white font-semibold mb-4">Product</h4>
               <div className="space-y-2">
-                <a href="#features" className="block text-white/60 hover:text-white transition-colors">
+                <a
+                  href="#features"
+                  className="block text-white/60 hover:text-white transition-colors"
+                >
                   Features
                 </a>
-                <a href="#about" className="block text-white/60 hover:text-white transition-colors">
+                <a
+                  href="#about"
+                  className="block text-white/60 hover:text-white transition-colors"
+                >
                   About
                 </a>
-                <a href="#download" className="block text-white/60 hover:text-white transition-colors">
+                <a
+                  href="#download"
+                  className="block text-white/60 hover:text-white transition-colors"
+                >
                   Download
                 </a>
-                <a href="#pricing" className="block text-white/60 hover:text-white transition-colors">
+                <a
+                  href="#pricing"
+                  className="block text-white/60 hover:text-white transition-colors"
+                >
                   Pricing
                 </a>
               </div>
@@ -404,13 +484,22 @@ export function Landing() {
             <div>
               <h4 className="text-white font-semibold mb-4">Support</h4>
               <div className="space-y-2">
-                <a href="#help" className="block text-white/60 hover:text-white transition-colors">
+                <a
+                  href="#help"
+                  className="block text-white/60 hover:text-white transition-colors"
+                >
                   Help Center
                 </a>
-                <a href="#contact" className="block text-white/60 hover:text-white transition-colors">
+                <a
+                  href="#contact"
+                  className="block text-white/60 hover:text-white transition-colors"
+                >
                   Contact
                 </a>
-                <a href="#docs" className="block text-white/60 hover:text-white transition-colors">
+                <a
+                  href="#docs"
+                  className="block text-white/60 hover:text-white transition-colors"
+                >
                   Documentation
                 </a>
               </div>
@@ -442,10 +531,13 @@ export function Landing() {
           </div>
 
           <div className="border-t border-white/20 mt-12 pt-8 text-center">
-            <p className="text-white/60">© 2024 SoundWave. All rights reserved. Built with glassmorphism and love.</p>
+            <p className="text-white/60">
+              © 2024 SoundWave. All rights reserved. Built with glassmorphism
+              and love.
+            </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

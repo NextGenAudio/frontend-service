@@ -16,6 +16,7 @@ import * as Avatar from "@radix-ui/react-avatar";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import ProfileAvatar from "./profile-avatar";
 
 export const SideBar = () => {
   const [activeItem, setActiveItem] = useState("Home");
@@ -112,21 +113,7 @@ export const SideBar = () => {
       </div>
 
       <div className="mt-auto mb-4">
-        <button
-          onClick={handleProfileClick}
-          className="group w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/20 overflow-hidden hover:scale-110 active:scale-95 transition-all duration-300 hover:bg-white/30 hover:border-white/30 hover:shadow-lg hover:shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-transparent cursor-pointer"
-        >
-          <div className="w-full h-full  from-orange-300 to-red-400 flex items-center justify-center group-hover:from-orange-200 group-hover:to-red-300 transition-all duration-300">
-            {status === "authenticated" ? (
-              <Image
-                className="w-5 h-5 text-white/80 group-hover:text-white group-hover:scale-110 transition-all duration-300"
-                src={`${session.user!.image}`}
-                alt="Profile"
-                fill
-              />
-            ) : null}
-          </div>
-        </button>
+        <ProfileAvatar w={14} h={14} />
       </div>
     </div>
   );
