@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react";
 import {
   Play,
   Pause,
@@ -15,86 +15,91 @@ import {
   Settings,
   BarChart3,
   List,
-} from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Slider } from "@/app/components/ui/slider"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/app/components/ui/tooltip"
-import Image from "next/image"
+} from "lucide-react";
+import { Button } from "@/app/components/ui/button";
+import { Slider } from "@/app/components/ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/app/components/ui/tooltip";
+import Image from "next/image";
 
 interface Song {
-  title: string
-  artist: string
-  album: string
-  duration: string
-  currentTime: string
-  liked?: boolean
-  albumArt?: string
+  title: string;
+  artist: string;
+  album: string;
+  duration: string;
+  currentTime: string;
+  liked?: boolean;
+  albumArt?: string;
 }
 
 interface PlayerControlsProps {
-  song: Song
+  song: Song;
 }
 
 export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
-  const [isPlaying, setIsPlaying] = useState(true)
-  const [isShuffle, setIsShuffle] = useState(false)
-  const [repeatMode, setRepeatMode] = useState(0)
-  const [volume, setVolume] = useState([75])
-  const [isMuted, setIsMuted] = useState(false)
-  const [progress, setProgress] = useState([40])
-  const [isLiked, setIsLiked] = useState(song.liked || false)
-  const [showQueue, setShowQueue] = useState(false)
-  const [crossfade, setCrossfade] = useState([3])
-  const [playbackSpeed, setPlaybackSpeed] = useState([1])
-  const [showEqualizer, setShowEqualizer] = useState(false)
-  const [showLyrics, setShowLyrics] = useState(false)
-  const [isMinimized, setIsMinimized] = useState(false)
-  const [showVisualizer, setShowVisualizer] = useState(false)
-  const progressRef = useRef<HTMLDivElement>(null)
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [repeatMode, setRepeatMode] = useState(0);
+  const [volume, setVolume] = useState([75]);
+  const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState([40]);
+  const [isLiked, setIsLiked] = useState(song.liked || false);
+  const [showQueue, setShowQueue] = useState(false);
+  const [crossfade, setCrossfade] = useState([3]);
+  const [playbackSpeed, setPlaybackSpeed] = useState([1]);
+  const [showEqualizer, setShowEqualizer] = useState(false);
+  const [showLyrics, setShowLyrics] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [showVisualizer, setShowVisualizer] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
 
-  const togglePlayPause = () => setIsPlaying(!isPlaying)
-  const toggleShuffle = () => setIsShuffle(!isShuffle)
-  const toggleRepeat = () => setRepeatMode((prev) => (prev + 1) % 3)
-  const toggleMute = () => setIsMuted(!isMuted)
-  const toggleLike = () => setIsLiked(!isLiked)
+  const togglePlayPause = () => setIsPlaying(!isPlaying);
+  const toggleShuffle = () => setIsShuffle(!isShuffle);
+  const toggleRepeat = () => setRepeatMode((prev) => (prev + 1) % 3);
+  const toggleMute = () => setIsMuted(!isMuted);
+  const toggleLike = () => setIsLiked(!isLiked);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return
+      if (e.target instanceof HTMLInputElement) return;
 
       switch (e.code) {
         case "Space":
-          e.preventDefault()
-          togglePlayPause()
-          break
+          e.preventDefault();
+          togglePlayPause();
+          break;
         case "ArrowRight":
           if (e.shiftKey) {
-            console.log("[v0] Skip forward")
+            console.log("[v0] Skip forward");
           }
-          break
+          break;
         case "ArrowLeft":
           if (e.shiftKey) {
-            console.log("[v0] Skip backward")
+            console.log("[v0] Skip backward");
           }
-          break
+          break;
         case "KeyL":
           if (e.ctrlKey || e.metaKey) {
-            e.preventDefault()
-            toggleLike()
+            e.preventDefault();
+            toggleLike();
           }
-          break
+          break;
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyPress)
-    return () => window.removeEventListener("keydown", handleKeyPress)
-  }, [])
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, []);
 
   return (
     <TooltipProvider>
@@ -108,14 +113,14 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
               <div className="flex items-center gap-3 min-w-0 w-1/4">
                 <div className="relative group">
                   <div className="w-16 h-16 bg-orange-300/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105">
-                      <Image
-                        src="/assets/marathondi-song.jpg"
-                        alt="Album art"
-                        width={68}
-                        height={68}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      {/* />
+                    <Image
+                      src="/assets/marathondi-song.jpg"
+                      alt="Album art"
+                      width={68}
+                      height={68}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    {/* />
                     ) : (
                       <div className="text-sm text-orange-200/90 font-medium">♪</div>
                     )} */}
@@ -139,8 +144,12 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-white truncate text-sm">{song.title}</div>
-                  <div className="text-xs text-orange-200/70 truncate">{song.artist}</div>
+                  <div className="font-medium text-white truncate text-sm">
+                    {song.title}
+                  </div>
+                  <div className="text-xs text-orange-200/70 truncate">
+                    {song.artist}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -150,11 +159,15 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         size="icon"
                         variant="ghost"
                         className={`h-7 w-7 rounded-full backdrop-blur-sm border border-orange-300/20 transition-all duration-300 hover:scale-110 hover:bg-orange-400/30 ${
-                          isLiked ? "text-red-400 bg-red-400/20" : "text-orange-200/80 hover:text-red-400"
+                          isLiked
+                            ? "text-red-400 bg-red-400/20"
+                            : "text-orange-200/80 hover:text-red-400"
                         }`}
                         onClick={toggleLike}
                       >
-                        <Heart className={`h-3 w-3 ${isLiked ? "fill-current" : ""}`} />
+                        <Heart
+                          className={`h-3 w-3 ${isLiked ? "fill-current" : ""}`}
+                        />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -187,7 +200,9 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         size="icon"
                         variant="ghost"
                         className={`h-8 w-8 rounded-full backdrop-blur-sm border border-orange-300/20 transition-all duration-300 hover:scale-110 hover:bg-orange-400/30 ${
-                          isShuffle ? "text-white bg-orange-400/30" : "text-orange-200/80 hover:text-white"
+                          isShuffle
+                            ? "text-white bg-orange-400/30"
+                            : "text-orange-200/80 hover:text-white"
                         }`}
                         onClick={toggleShuffle}
                       >
@@ -221,7 +236,11 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         className="h-12 w-12 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-300 hover:to-orange-400 text-white shadow-lg hover:shadow-orange-400/50 transition-all duration-300 hover:scale-110 border border-orange-300/30"
                         onClick={togglePlayPause}
                       >
-                        {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+                        {isPlaying ? (
+                          <Pause className="h-5 w-5" />
+                        ) : (
+                          <Play className="h-5 w-5 ml-0.5" />
+                        )}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -250,7 +269,9 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         size="icon"
                         variant="ghost"
                         className={`h-8 w-8 rounded-full backdrop-blur-sm border border-orange-300/20 transition-all duration-300 hover:scale-110 hover:bg-orange-400/30 relative ${
-                          repeatMode > 0 ? "text-white bg-orange-400/30" : "text-orange-200/80 hover:text-white"
+                          repeatMode > 0
+                            ? "text-white bg-orange-400/30"
+                            : "text-orange-200/80 hover:text-white"
                         }`}
                         onClick={toggleRepeat}
                       >
@@ -277,7 +298,9 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         size="icon"
                         variant="ghost"
                         className={`h-7 w-7 rounded-full backdrop-blur-sm border border-orange-300/20 transition-all duration-300 hover:scale-110 hover:bg-orange-400/30 ${
-                          showQueue ? "text-white bg-orange-400/30" : "text-orange-200/70 hover:text-orange-100"
+                          showQueue
+                            ? "text-white bg-orange-400/30"
+                            : "text-orange-200/70 hover:text-orange-100"
                         }`}
                         onClick={() => setShowQueue(!showQueue)}
                       >
@@ -295,7 +318,9 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         size="icon"
                         variant="ghost"
                         className={`h-7 w-7 rounded-full backdrop-blur-sm border border-orange-300/20 transition-all duration-300 hover:scale-110 hover:bg-orange-400/30 ${
-                          showVisualizer ? "text-white bg-orange-400/30" : "text-orange-200/70 hover:text-orange-100"
+                          showVisualizer
+                            ? "text-white bg-orange-400/30"
+                            : "text-orange-200/70 hover:text-orange-100"
                         }`}
                         onClick={() => setShowVisualizer(!showVisualizer)}
                       >
@@ -313,7 +338,9 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         size="icon"
                         variant="ghost"
                         className={`h-7 w-7 rounded-full backdrop-blur-sm border border-orange-300/20 transition-all duration-300 hover:scale-110 hover:bg-orange-400/30 ${
-                          showEqualizer ? "text-white bg-orange-400/30" : "text-orange-200/70 hover:text-orange-100"
+                          showEqualizer
+                            ? "text-white bg-orange-400/30"
+                            : "text-orange-200/70 hover:text-orange-100"
                         }`}
                         onClick={() => setShowEqualizer(!showEqualizer)}
                       >
@@ -335,7 +362,11 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
                         className="h-7 w-7 rounded-full backdrop-blur-sm border border-orange-300/20 text-orange-200/80 hover:text-white hover:scale-110 hover:bg-orange-400/30 transition-all duration-300"
                         onClick={toggleMute}
                       >
-                        {isMuted || volume[0] === 0 ? <VolumeX className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                        {isMuted || volume[0] === 0 ? (
+                          <VolumeX className="h-3 w-3" />
+                        ) : (
+                          <Volume2 className="h-3 w-3" />
+                        )}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -360,23 +391,27 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
               <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem] text-right">
                 {song.currentTime}
               </span>
-              <div className="flex-1 max-w-2xl relative group" ref={progressRef}>
+              <div
+                className="flex-1 max-w-2xl relative group"
+                ref={progressRef}
+              >
                 <Slider
                   value={progress}
                   onValueChange={setProgress}
                   max={100}
                   step={0.1}
-                  className="w-full [&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-orange-400 [&_[role=slider]]:to-orange-500 [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-300/30 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&_[role=slider]]:transition-all [&_[role=slider]]:duration-200 hover:[&_[role=slider]]:scale-125 [&_.slider-track]:bg-orange-300/30 [&_.slider-track]:h-2 [&_.slider-range]:bg-gradient-to-r [&_.slider-range]:from-orange-400 [&_.slider-range]:to-orange-500 [&_.slider-range]:h-2"
+                  className=""
                 />
                 <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
                 {song.duration}
               </span>
+           
             </div>
           </div>
         </div>
       </div>
     </TooltipProvider>
-  )
-}
+  );
+};

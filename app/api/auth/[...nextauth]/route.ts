@@ -14,12 +14,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       Spotify({
       clientId: process.env.AUTH_SPOTIFY_ID!,
       clientSecret: process.env.AUTH_SPOTIFY_SECRET!,
-      authorization: "https://accounts.spotify.com/authorize?scope=user-read-email user-read-private"
+      authorization: "https://accounts.spotify.com/authorize?scope=user-read-email user-read-private&response_type=token&show_dialog=true"
     })
   ],
   // You can add callbacks, pages, session strategies, etc.
  
 });
+
 
 // ✅ Export API route handlers (needed for App Router)
 export const { GET, POST } = handlers;

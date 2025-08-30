@@ -42,6 +42,8 @@ export default function Login() {
     }, 2000);
   };
 
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Effects */}
@@ -295,7 +297,7 @@ export default function Login() {
               </Button>
               <Button
                 type="button"
-                onClick={()=>signIn("google",{callbackUrl:"/"})}
+                onClick={() => signIn("google", { callbackUrl: "/" })}
                 variant="outline"
                 className="h-12 bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 hover:border-white/30 rounded-2xl transition-all duration-300 hover:scale-105"
               >

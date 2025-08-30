@@ -1,28 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/app/utils/supabase/server";
 
-
-
-const users = [
-  { "userId": 1, "name": "Kasun Chamara", "email": "kasun@example.com", "password": "Pass@123" },
-  { "userId": 2, "name": "Anjali Perera", "email": "anjali.p@example.com", "password": "Hello@456" },
-  { "userId": 3, "name": "Nimal Silva", "email": "nimal.s@example.com", "password": "Secure@789" },
-  { "userId": 4, "name": "Kavindu Jayasuriya", "email": "kavindu.j@example.com", "password": "MyPass@111" },
-  { "userId": 5, "name": "Tharushi Fernando", "email": "tharushi.f@example.com", "password": "Test@222" },
-  { "userId": 6, "name": "Sandun Abeysekara", "email": "sandun.a@example.com", "password": "User@333" },
-  { "userId": 7, "name": "Ishara Madushani", "email": "ishara.m@example.com", "password": "Demo@444" },
-  { "userId": 8, "name": "Malith Weerasinghe", "email": "malith.w@example.com", "password": "Pass@555" },
-  { "userId": 9, "name": "Dinithi Karunaratne", "email": "dinithi.k@example.com", "password": "Login@666" },
-  { "userId": 10, "name": "Supun Dissanayake", "email": "supun.d@example.com", "password": "Secret@777" }
-]
-
-
-export function GET(request : NextRequest ){
-    return NextResponse.json({data : `your penis`});
+export async function POST(request: NextRequest) {
+  const body = await request.json(); // request.json() is asynchronous
+  console.log("Received POST request with body:", body);
+  const supabase = await createClient();
+  const { data: newProfile, error: createError } = await supabase
+    .from("profiles")
+    .insert([
+      {
+        first_name: body.first_name,
+        last_name: body.last_name,
+        email: body.email,
+        password: body.password,
+        image: body.image,
+        created_by: body.created_by,
+        created_at: body.created_at,
+      },
+    ]);
+  if (createError) {
+    return NextResponse.json({ error: createError.message }, { status: 500 });
+  }
+  return NextResponse.json({ newProfile }, { status: 200 });
 }
 
-export async function POST (request : NextRequest){
-    const body  = await request.json();   // request.json() is asynchronous
-    
-    return NextResponse.json(body);
 
+
+
+
+
+export async function GET(request: NextRequest) {
+  const supabase = await createClient();
+
+  // Get query params from URL
+  const { searchParams } = new URL(request.url);
+  const email = searchParams.get("email");
+
+  if (!email) {
+    return NextResponse.json({ error: "Email is required" }, { status: 400 });
+  }
+
+  const { data , error} = await supabase
+    .from("profiles") // case-sensitive table name
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if (!data) {
+    return NextResponse.json({ data: null }, { status: 404 });
+  }
+
+  return NextResponse.json({ data }, { status: 200 });
 }

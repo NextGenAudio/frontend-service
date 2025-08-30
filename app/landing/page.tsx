@@ -15,15 +15,57 @@ import {
   Mail,
   User,
 } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileAvatar from "../components/profile-avatar";
+import { useEffect } from "react";
+
 export function Landing() {
-    const { status, data: session } = useSession();
+  const { status, data: session } = useSession();
+
+  useEffect(() => {
+    const updateProfiles = async () => {
+      if (session?.user?.email) {
+        const result = await fetch(`/api/user?email=${session.user.email}`);
+        const data = await result.json();
+        console.log("User data:", data.data);
+
+        if (!data.data) {
+          const createResult = await fetch("/api/user", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              first_name: session.user.name!.split(" ")[0],
+              last_name: session.user.name!.split(" ").slice(1).join(" "),
+              email: session.user.email,
+              password: null,
+              image: session.user.image,
+              created_at: new Date().toISOString(),
+              created_by: "provider"
+            }),
+          });
+          const createData = await createResult.json();
+          console.log("Created user data:", createData);
+        }
+      }
+    };
+    updateProfiles();
+  }, [session]);
+
   if (status === "loading") {
     return null; // or a loading spinner
   }
+
+  // Change the navigation of the TrySonex button if user is authenticated
+  const TrySonexHandler = () => {
+    if (status === "authenticated") {
+      window.location.href = "/player";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* Header */}
@@ -85,7 +127,10 @@ export function Landing() {
                     {session?.user?.name}
                   </span>
                   <ProfileAvatar w={12} h={12} />
-                  <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">
+                  <Button
+                    onClick={() => signOut()}
+                    className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105"
+                  >
                     Logout
                   </Button>
                 </div>
@@ -157,8 +202,9 @@ export function Landing() {
               {/* CTA Button */}
 
               <div className="pt-4">
-                <Link href="/player">
+                <Link href="/login">
                   <Button
+                    onClick={TrySonexHandler}
                     size="lg"
                     className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border border-white/20 backdrop-blur-md px-8 py-6 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105"
                   >
