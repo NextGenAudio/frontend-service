@@ -19,16 +19,23 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileAvatar from "../components/profile-avatar";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
+import { set } from "react-hook-form";
 
 export function Landing() {
   const { status, data: session } = useSession();
+  const [first_name, set_first_name] = useState("");
+  const [last_name, set_last_name] = useState("");
+  const [email, set_email] = useState("");
 
   useEffect(() => {
     const updateProfiles = async () => {
       if (session?.user?.email) {
         const result = await fetch(`/api/user?email=${session.user.email}`);
         const data = await result.json();
+        set_first_name(data.data.first_name);
+        set_last_name(data.data.last_name);
+        set_email(data.data.email);
         console.log("User data:", data.data);
 
         if (!data.data) {
@@ -123,8 +130,8 @@ export function Landing() {
               )}
               {status === "authenticated" && (
                 <div className="flex items-center space-x-12">
-                  <span className="mr-4 text-sm font-medium text-orange-400 tracking-wider uppercase bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-400/30">
-                    {session?.user?.name}
+                  <span className=" text-sm font-medium text-orange-400 tracking-wider uppercase bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-400/30">
+                    {session?.user?.name || first_name + " " + last_name}
                   </span>
                   <ProfileAvatar w={12} h={12} />
                   <Button

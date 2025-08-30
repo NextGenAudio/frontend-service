@@ -24,31 +24,27 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ newProfile }, { status: 200 });
 }
 
-
-
-
-
-
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
 
   // Get query params from URL
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email");
-
+  const password = searchParams.get("password");
   if (!email) {
     return NextResponse.json({ error: "Email is required" }, { status: 400 });
   }
 
-  const { data , error} = await supabase
-    .from("profiles") // case-sensitive table name
-    .select("*")
-    .eq("email", email)
-    .single();
+  if (!password) {
+    const { data, error } = await supabase
+      .from("profiles") // case-sensitive table name
+      .select("*")
+      .eq("email", email)
+      .single();
 
-  if (!data) {
-    return NextResponse.json({ data: null }, { status: 404 });
+    if (!data) {
+      return NextResponse.json({ data: null }, { status: 404 });
+    }
+    return NextResponse.json({ data }, { status: 200 });
   }
-
-  return NextResponse.json({ data }, { status: 200 });
 }

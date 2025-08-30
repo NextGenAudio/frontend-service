@@ -31,6 +31,13 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     // Simulate auth process
+    const result = await signIn("credentials", {
+      email,
+      password,
+      callbackUrl: "/",
+    });
+
+    console.log("SignIn result:", result);
 
     setTimeout(() => {
       setIsLoading(false);
@@ -41,8 +48,6 @@ export default function Login() {
       });
     }, 2000);
   };
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden">
@@ -287,7 +292,7 @@ export default function Login() {
             {/* Social Login */}
             <div className="grid grid-cols-2 gap-4">
               <Button
-              onClick={()=>signIn("spofity",{callbackUrl:"/"})}
+                onClick={() => signIn("spofity", { callbackUrl: "/" })}
                 type="button"
                 variant="outline"
                 className="h-12 bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 hover:border-white/30 rounded-2xl transition-all duration-300 hover:scale-105"
