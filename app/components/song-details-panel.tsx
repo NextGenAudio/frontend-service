@@ -3,24 +3,27 @@
 import { useState } from "react";
 import { Heart, Share2, MoreHorizontal, ChevronDown } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import Image from 'next/image';
+import Image from "next/image";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/app/components/ui/collapsible";
 import { ScrollArea } from "@radix-ui/themes";
-
+import SongCover from "./song-cover";
 interface Song {
-  title: string;
-  artist: string;
-  album: string;
-  duration: string;
-  currentTime: string;
+  id: string;
+  title: string | undefined;
+  artist: string | undefined;
+  album: string | undefined;
+  // duration: string;
+  source: string;
+  metadata: any;
+  // isLiked: boolean;
 }
 
 interface GlassSongDetailsPanelProps {
-  song: Song;
+  song: Song | null;
 }
 
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
@@ -46,16 +49,14 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         <div className="space-y-6 mx-3">
           <div className="overflow-hidden aspect-square bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20  transition-all duration-500 group">
             <div className="text-center">
-              <Image src="/assets/marathondi-song.jpg" alt="Song Cover Image" width={500} height={500} />
-              
-              
+              <SongCover song={song}  />
             </div>
           </div>
 
           <div className="text-center space-y-3 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-            <h3 className="text-xl font-bold text-white/90">{song.title}</h3>
-            <p className="text-white/70 font-medium">{song.artist}</p>
-            <p className="text-sm text-white/60">{song.album}</p>
+            <h3 className="text-xl font-bold text-white/90">{song?.title}</h3>
+            <p className="text-white/70 font-medium">{song?.artist}</p>
+            <p className="text-sm text-white/60">{song?.album}</p>
           </div>
 
           <div className="flex justify-center gap-3">
@@ -99,9 +100,9 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Duration</span>
-                  <span className="text-white/80 font-medium">
+                  {/* <span className="text-white/80 font-medium">
                     {song.duration}
-                  </span>
+                  </span> */}
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Bitrate</span>

@@ -15,30 +15,20 @@ import { parseWebStream } from "music-metadata";
 
 interface Song {
   id: string;
-  // duration: string;
-  source: string;
-  metadata: any;
-}
-interface SongDetails {
   title: string | undefined;
   artist: string | undefined;
   album: string | undefined;
+  // duration: string;
+  source: string;
+  metadata: any;
+  // isLiked: boolean;
 }
 
-interface PlayerControlsProps extends SongDetails {
-  isLiked: boolean;
-}
 
-interface SongDetailsPanelProps extends SongDetails {
-  metadata?: any;
-  isLiked: boolean;
-}
 
 export function MusicPlayer() {
   const src = "songs\\Ahinsakawi - Dimanka Wellalage - www.artmusic.lk.mp3"; // ✅ rename to avoid spaces
 
-  const [songPlayer, setSongPlayer] = useState<PlayerControlsProps>();
-  const [songDetailsPanel, setSongDetailsPanel] = useState<SongDetailsPanelProps>();
   const [metadata, setMetadata] = useState<any>(null);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
 
@@ -64,13 +54,13 @@ export function MusicPlayer() {
 
             {/* Song Details Panel */}
             <ResizablePanel defaultSize={25} minSize={20} maxSize={30}>
-              {/* <SongDetailsPanel song={songDetailsPanel} /> */}
+              <SongDetailsPanel song={currentSong} />
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
       </div>
 
-      {/* <FloatingPlayerControls song={songPlayer} /> */}
+      <FloatingPlayerControls song={currentSong} />
     </>
   );
 }

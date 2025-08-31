@@ -21,10 +21,15 @@ import { ProfileDropdown } from "./profile-dropdown";
 import { parseBlob, parseWebStream } from "music-metadata";
 interface Song {
   id: string;
+  title: string | undefined;
+  artist: string | undefined;
+  album: string | undefined;
   // duration: string;
   source: string;
   metadata: any;
+  // isLiked: boolean;
 }
+
 
 interface PlaylistPanelProps {
   onSongSelect: (song: Song) => void;
@@ -52,6 +57,9 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
 
             loadedSongs.push({
             id: i.toString(),
+            title: metadata.common.title || path.split(".")[0],
+            artist: metadata.common.artist || "Unknown Artist",
+            album: metadata.common.album || "Unknown Album",
             source: `/songs/${path}`,
             metadata: metadata.common,
           });
@@ -226,10 +234,10 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
 
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate text-white drop-shadow-sm">
-                      {song.metadata.title}
+                      {song.title}
                     </div>
                     <div className="text-sm text-white/70 truncate">
-                      {song.metadata.artist}
+                      {song.artist}
                     </div>
                   </div>
 

@@ -27,22 +27,20 @@ import {
 import Image from "next/image";
 import { Howl } from "howler";
 import { parseWebStream } from "music-metadata";
+import SongCover from "./song-cover";
 
-interface SongData {
-  title: string;
-  artist: string;
-  album: string;
-  duration: string;
-  currentTime: string;
-  liked?: boolean;
-  albumArt?: string;
+interface Song {
+  id: string;
+  title: string | undefined;
+  artist: string | undefined;
+  album: string | undefined;
+  // duration: string;
+  source: string;
+  metadata: any;
+  // isLiked: boolean;
 }
 
-// interface PlayerControlsProps {
-//   song: Song;
-// }
-
-export const FloatingPlayerControls = (song : String) => {
+export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState(0);
@@ -51,7 +49,7 @@ export const FloatingPlayerControls = (song : String) => {
   const [progress, setProgress] = useState([40]);
   const [duration, setDuration] = useState(0);
   const [metadata, setMetadata] = useState<any>(null);
-  const [isLiked, setIsLiked] = useState(song.liked || false);
+  const [isLiked, setIsLiked] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [crossfade, setCrossfade] = useState([3]);
   const [playbackSpeed, setPlaybackSpeed] = useState([1]);
@@ -130,14 +128,8 @@ export const FloatingPlayerControls = (song : String) => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3 min-w-0 w-1/4">
                 <div className="relative group">
-                  <div className="w-16 h-16 bg-orange-300/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105">
-                    <Image
-                      src="/assets/marathondi-song.jpg"
-                      alt="Album art"
-                      width={68}
-                      height={68}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
+                  <div className="overflow-hidden w-16 h-16 bg-orange-300/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105">
+                    <SongCover song={song} />
                     {/* />
                     ) : (
                       <div className="text-sm text-orange-200/90 font-medium">♪</div>
@@ -163,10 +155,10 @@ export const FloatingPlayerControls = (song : String) => {
 
                 <div className="min-w-0 flex-1">
                   <div className="font-medium text-white truncate text-sm">
-                    {song.title}
+                    {song?.title}
                   </div>
                   <div className="text-xs text-orange-200/70 truncate">
-                    {song.artist}
+                    {song?.artist}
                   </div>
                 </div>
 
@@ -406,9 +398,9 @@ export const FloatingPlayerControls = (song : String) => {
             </div>
 
             <div className="flex items-center justify-center gap-4 px-8">
-              <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem] text-right">
+              {/* <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem] text-right">
                 {song.currentTime}
-              </span>
+              </span> */}
               <div
                 className="flex-1 max-w-2xl relative group"
                 ref={progressRef}
@@ -422,9 +414,9 @@ export const FloatingPlayerControls = (song : String) => {
                 />
                 <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
+              {/* <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
                 {song.duration}
-              </span>
+              </span> */}
             </div>
           </div>
         </div>
