@@ -28,6 +28,7 @@ import Image from "next/image";
 import { Howl } from "howler";
 import { parseWebStream } from "music-metadata";
 import SongCover from "./song-cover";
+import * as RadixSlider from "@radix-ui/react-slider";
 
 interface Song {
   id: string;
@@ -46,7 +47,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [repeatMode, setRepeatMode] = useState(0);
   const [volume, setVolume] = useState([75]);
   const [isMuted, setIsMuted] = useState(false);
-  const [progress, setProgress] = useState([40]);
+  const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [metadata, setMetadata] = useState<any>(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -58,8 +59,8 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
+  const [currentTime, setCurrentTime] = useState(0); // seconds
 
-  const togglePlayPause = () => setIsPlaying(!isPlaying);
   const toggleShuffle = () => setIsShuffle(!isShuffle);
   const toggleRepeat = () => setRepeatMode((prev) => (prev + 1) % 3);
   const toggleMute = () => setIsMuted(!isMuted);
@@ -70,22 +71,10 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-  const src = "songs\\Ahinsakawi - Dimanka Wellalage - www.artmusic.lk.mp3"; // ✅ rename to avoid spaces
 
   const soundRef = useRef<Howl | null>(null);
 
   useEffect(() => {
-    // Create Howler sound
-    const sound = new Howl({
-      src: [src],
-      html5: true,
-      volume: 0.7,
-      preload: true,
-      onplay: () => setIsPlaying(true),
-      onpause: () => setIsPlaying(false),
-      onend: () => setIsPlaying(false),
-    });
-    soundRef.current = sound;
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
 
@@ -116,6 +105,72 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
+
+  useEffect(() => {
+    if (!song?.source) return;
+    // Create Howler sound
+    const sound = new Howl({
+      src: [song?.source || ""],
+      html5: true,
+      volume: isMuted ? 0 : volume[0] / 100,
+      preload: true,
+      onplay: () => {
+        setIsPlaying(true);
+        setDuration(sound.duration());
+      },
+      onpause: () => setIsPlaying(false),
+      onend: () => setIsPlaying(false),
+    });
+
+    soundRef.current = sound;
+
+    return () => {
+      sound.unload(); // cleanup old sound
+    };
+  }, [song]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (soundRef.current && isPlaying) {
+      interval = setInterval(() => {
+        const seek = soundRef.current?.seek() as number;
+        setCurrentTime(seek);
+        setProgress((seek / duration) * 100 || 0);
+      }, 500);
+    }
+
+    return () => clearInterval(interval);
+  }, [isPlaying, duration]);
+
+  // 2. Update volume while playing
+  useEffect(() => {
+    if (soundRef.current) {
+      soundRef.current.volume(isMuted ? 0 : volume[0] / 100);
+    }
+  }, [volume, isMuted]);
+
+
+  const handleSeek = (value: number[]) => {
+    if (!soundRef.current) return;
+    const seekTime = (value[0] / 100) * duration;
+    soundRef.current.seek(seekTime);
+    setProgress(value[0]);
+    setCurrentTime(seekTime);
+  };
+  
+  const togglePlayPause = () => {
+    const sound = soundRef.current;
+    if (!sound) return;
+
+    if (sound.playing()) {
+      sound.pause();
+      setIsPlaying(false);
+    } else {
+      sound.play();
+      setIsPlaying(true);
+    }
+  };
 
   return (
     <TooltipProvider>
@@ -384,39 +439,54 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                     </TooltipContent>
                   </Tooltip>
 
-                  <div className="w-24 group">
-                    <Slider
+                  <div className="w-32 group">
+                    <RadixSlider.Root
                       value={isMuted ? [0] : volume}
                       onValueChange={setVolume}
                       max={100}
                       step={1}
-                      className="w-full [&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-orange-400 [&_[role=slider]]:to-orange-500 [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-300/30 [&_[role=slider]]:shadow-lg [&_[role=slider]]:transition-all [&_[role=slider]]:duration-200 hover:[&_[role=slider]]:scale-125 [&_.slider-track]:bg-orange-300/30 [&_.slider-range]:bg-gradient-to-r [&_.slider-range]:from-orange-400 [&_.slider-range]:to-orange-500"
-                    />
+                      className="w-full relative flex items-center select-none touch-none h-5"
+                    >
+                      {/* Track (background line) */}
+                      <RadixSlider.Track className="bg-orange-300/30 relative grow rounded-full h-5">
+                        {/* Filled portion */}
+                        <RadixSlider.Range className="absolute bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full" />
+                      </RadixSlider.Track>
+
+                      {/* Thumb (knob) */}
+                      {/* <RadixSlider.Thumb className="block w-3 h-5 rounded-full bg-white shadow-lg hover:scale-110 transition-transform" /> */}
+                    </RadixSlider.Root>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center justify-center gap-4 px-8">
-              {/* <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem] text-right">
-                {song.currentTime}
-              </span> */}
-              <div
-                className="flex-1 max-w-2xl relative group"
-                ref={progressRef}
-              >
-                <Slider
-                  value={progress}
-                  onValueChange={setProgress}
+              <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem] text-right">
+                {`${Math.floor(currentTime / 60)}:${(currentTime % 60)
+                  .toFixed(0)
+                  .padStart(2, "0")}`}
+              </span>
+              <div className="flex-1 max-w-2xl relative group">
+                <RadixSlider.Root
+                  value={[progress]}
+                  onValueChange={handleSeek}
                   max={100}
                   step={0.1}
-                  className=""
-                />
+                  className="w-full relative flex items-center select-none touch-none h-5  cursor-move"
+                >
+                  <RadixSlider.Track className="bg-orange-300/30 relative grow rounded-full h-5">
+                    <RadixSlider.Range className="absolute bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full" />
+                  </RadixSlider.Track>
+                  {/* <RadixSlider.Thumb className="block w-3 h-5 rounded-full bg-white shadow-lg hover:scale-110 transition-transform" /> */}
+                </RadixSlider.Root>
                 <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              {/* <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
-                {song.duration}
-              </span> */}
+              <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
+                {`${Math.floor(duration / 60)}:${(duration % 60)
+                  .toFixed(0)
+                  .padStart(2, "0")}`}
+              </span>
             </div>
           </div>
         </div>

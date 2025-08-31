@@ -27,8 +27,6 @@ interface Song {
 
 
 export function MusicPlayer() {
-  const src = "songs\\Ahinsakawi - Dimanka Wellalage - www.artmusic.lk.mp3"; // ✅ rename to avoid spaces
-
   const [metadata, setMetadata] = useState<any>(null);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
 
