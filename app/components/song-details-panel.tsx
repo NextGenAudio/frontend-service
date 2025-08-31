@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Share2, MoreHorizontal, ChevronDown } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import Image from "next/image";
@@ -28,6 +28,9 @@ interface GlassSongDetailsPanelProps {
 
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
   const [isLiked, setIsLiked] = useState(false);
+  useEffect(()=>{
+    console.log(song?.metadata);
+  }, [song]);       
 
   return (
     <div className="h-full overflow-y-auto relative overflow-hidden">
@@ -99,22 +102,22 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
               </h4>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
-                  <span className="text-white/60">Duration</span>
-                  {/* <span className="text-white/80 font-medium">
-                    {song.duration}
-                  </span> */}
+                  <span className="text-white/60">Year</span>
+                  <span className="text-white/80 font-medium">
+                    {song?.metadata?.common.year}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Bitrate</span>
-                  <span className="text-white/80 font-medium">320 kbps</span>
+                  <span className="text-white/80 font-medium">{(song?.metadata?.format.bitrate / 1000).toFixed(0)} kbps</span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Sample Rate</span>
-                  <span className="text-white/80 font-medium">44.1 kHz</span>
+                  <span className="text-white/80 font-medium">{(song?.metadata?.format.sampleRate / 1000).toFixed(0)} kHz</span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">File Format</span>
-                  <span className="text-white/80 font-medium">MP3</span>
+                  <span className="text-white/80 font-medium">{song?.metadata?.format.container}</span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Added</span>

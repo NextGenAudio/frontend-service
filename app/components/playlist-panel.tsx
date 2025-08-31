@@ -61,7 +61,7 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
             artist: metadata.common.artist || "Unknown Artist",
             album: metadata.common.album || "Unknown Album",
             source: `/songs/${path}`,
-            metadata: metadata.common,
+            metadata: metadata,
           });
           
         } catch (err) {
