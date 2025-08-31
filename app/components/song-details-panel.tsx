@@ -30,8 +30,8 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
     <div className="h-full overflow-y-auto relative overflow-hidden">
       {/* <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-amber-300/15 to-red-400/20" />
       <div className="absolute inset-0 backdrop-blur-xl bg-white/5" /> */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/80 to-gray-900/90"></div>
-      <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
+      <div className="bg-gradient-to-b from-gray-900/80 via-gray-900/80 to-gray-900/90"></div>
+      <div className="backdrop-blur-xl bg-white/10"></div>
 
       <div className="relative h-full flex flex-col">
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
@@ -44,7 +44,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         </div>
 
         <div className="space-y-6 mx-3">
-          <div className="overflow-hidden aspect-square bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20 hover:bg-white/15 hover:scale-[1.02] transition-all duration-500 group">
+          <div className="overflow-hidden aspect-square bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20  transition-all duration-500 group">
             <div className="text-center">
               <Image src="/assets/marathondi-song.jpg" alt="Song Cover Image" width={500} height={500} />
               

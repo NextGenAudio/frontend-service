@@ -25,8 +25,10 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/tooltip";
 import Image from "next/image";
+import { Howl } from "howler";
+import { parseWebStream } from "music-metadata";
 
-interface Song {
+interface SongData {
   title: string;
   artist: string;
   album: string;
@@ -36,17 +38,19 @@ interface Song {
   albumArt?: string;
 }
 
-interface PlayerControlsProps {
-  song: Song;
-}
+// interface PlayerControlsProps {
+//   song: Song;
+// }
 
-export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
+export const FloatingPlayerControls = (song : String) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState(0);
   const [volume, setVolume] = useState([75]);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState([40]);
+  const [duration, setDuration] = useState(0);
+  const [metadata, setMetadata] = useState<any>(null);
   const [isLiked, setIsLiked] = useState(song.liked || false);
   const [showQueue, setShowQueue] = useState(false);
   const [crossfade, setCrossfade] = useState([3]);
@@ -68,8 +72,22 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
+  const src = "songs\\Ahinsakawi - Dimanka Wellalage - www.artmusic.lk.mp3"; // ✅ rename to avoid spaces
+
+  const soundRef = useRef<Howl | null>(null);
 
   useEffect(() => {
+    // Create Howler sound
+    const sound = new Howl({
+      src: [src],
+      html5: true,
+      volume: 0.7,
+      preload: true,
+      onplay: () => setIsPlaying(true),
+      onpause: () => setIsPlaying(false),
+      onend: () => setIsPlaying(false),
+    });
+    soundRef.current = sound;
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
 
@@ -407,7 +425,6 @@ export const FloatingPlayerControls = ({ song }: PlayerControlsProps) => {
               <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
                 {song.duration}
               </span>
-           
             </div>
           </div>
         </div>
