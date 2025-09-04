@@ -29,6 +29,7 @@ import { Howl } from "howler";
 import { parseWebStream } from "music-metadata";
 import SongCover from "./song-cover";
 import * as RadixSlider from "@radix-ui/react-slider";
+import { usePlayerSettings } from "@/app/hooks/use-player-settings";
 
 interface Song {
   id: string;
@@ -42,11 +43,10 @@ interface Song {
 }
 
 export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState(0);
-  const [volume, setVolume] = useState([75]);
-  const [isMuted, setIsMuted] = useState(false);
+
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [metadata, setMetadata] = useState<any>(null);
@@ -66,6 +66,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const toggleMute = () => setIsMuted(!isMuted);
   const toggleLike = () => setIsLiked(!isLiked);
 
+  const { volume, setVolume, isMuted, setIsMuted } = usePlayerSettings();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -99,6 +100,11 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
             toggleLike();
           }
           break;
+        case "KeyM":
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            toggleMute();
+          }
       }
     };
 
@@ -112,8 +118,9 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     const sound = new Howl({
       src: [song?.source || ""],
       html5: true,
-      volume: isMuted ? 0 : volume[0] / 100,
+      volume: isMuted ? 0 : volume / 100,
       preload: true,
+      loop: repeatMode === 1,
       onplay: () => {
         setIsPlaying(true);
         setDuration(sound.duration());
@@ -146,19 +153,39 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   // 2. Update volume while playing
   useEffect(() => {
     if (soundRef.current) {
-      soundRef.current.volume(isMuted ? 0 : volume[0] / 100);
+      soundRef.current.volume(isMuted ? 0 : volume / 100);
     }
   }, [volume, isMuted]);
 
+  useEffect(() => {
+    if (soundRef.current) {
+      soundRef.current.loop(repeatMode === 1);
+    }
+  }, [repeatMode]);
 
   const handleSeek = (value: number[]) => {
     if (!soundRef.current) return;
-    const seekTime = (value[0] / 100) * duration;
+    const percent = value[0];
+    const seekTime = (percent / 100) * duration;
     soundRef.current.seek(seekTime);
-    setProgress(value[0]);
-    setCurrentTime(seekTime);
+    setProgress(percent); // percent
+    setCurrentTime(seekTime); // seconds
   };
-  
+
+  useEffect(() => {
+    let frame: number;
+    const update = () => {
+      if (soundRef.current && soundRef.current.playing()) {
+        const time = soundRef.current.seek() as number;
+        setCurrentTime(time);
+        setProgress((time / duration) * 100); // convert to percent
+      }
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    return () => cancelAnimationFrame(frame);
+  }, [duration]);
+
   const togglePlayPause = () => {
     const sound = soundRef.current;
     if (!sound) return;
@@ -427,7 +454,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                         className="h-7 w-7 rounded-full backdrop-blur-sm border border-orange-300/20 text-orange-200/80 hover:text-white hover:scale-110 hover:bg-orange-400/30 transition-all duration-300"
                         onClick={toggleMute}
                       >
-                        {isMuted || volume[0] === 0 ? (
+                        {isMuted || volume === 0 ? (
                           <VolumeX className="h-3 w-3" />
                         ) : (
                           <Volume2 className="h-3 w-3" />
@@ -441,8 +468,8 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
                   <div className="w-32 group">
                     <RadixSlider.Root
-                      value={isMuted ? [0] : volume}
-                      onValueChange={setVolume}
+                      value={isMuted ? [0] : [volume]}
+                      onValueChange={([value]) => setVolume(value)}
                       max={100}
                       step={1}
                       className="w-full relative flex items-center select-none touch-none h-5"

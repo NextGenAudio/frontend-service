@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -12,6 +12,7 @@ import { SongDetailsPanel } from "@/app/components/song-details-panel";
 import { FloatingPlayerControls } from "@/app/components/player-controls";
 import { ScrollArea } from "@radix-ui/themes";
 import { parseWebStream } from "music-metadata";
+import { useSidebar } from "../utils/sidebar-context";
 
 interface Song {
   id: string;
@@ -24,12 +25,10 @@ interface Song {
   // isLiked: boolean;
 }
 
-
-
 export function MusicPlayer() {
   const [metadata, setMetadata] = useState<any>(null);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
-
+  const { player } = useSidebar();
   return (
     <>
       <div className="bg-slate-900 h-screen ml-[115px] rounded-[32px] bg-background text-foreground flex flex-col overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] drop-shadow-xl">
@@ -58,7 +57,7 @@ export function MusicPlayer() {
         </div>
       </div>
 
-      <FloatingPlayerControls song={currentSong} />
+      {player && <FloatingPlayerControls song={currentSong} />}
     </>
   );
 }
