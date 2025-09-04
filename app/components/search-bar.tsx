@@ -7,7 +7,7 @@ export function SearchBar() {
   const [searchValue, setSearchValue] = useState("")
 
   return (
-    <div className="w-full mx-auto">
+    <div className=" mx-4">
       <div className="flex items-center gap-4 bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2 shadow-2xl">
         {/* Home Icon */}
         {/* <button className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300 hover:scale-105">

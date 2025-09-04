@@ -1,26 +1,27 @@
 "use client";
-import { LucideProps } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import React, { ForwardRefExoticComponent, RefAttributes } from "react";
 import { useState } from "react";
-import { MenuItem } from "../components/sidebar";
 import { deflate } from "zlib";
 
 interface SidebarButtonProps {
-  item: MenuItem;
+  Icon: LucideIcon;
   isActive: boolean;
+  label: string;
   handleItemClick: (label: string) => void;
 }
 
 const SidebarButton = ({
-  item,
+  Icon,
+  label,
   handleItemClick,
   isActive,
 }: SidebarButtonProps) => {
-  const Icon = item.icon;
+  
   return (
     <div>
       <button
-        onClick={() => handleItemClick(item.label)}
+        onClick={() => handleItemClick(label)}
         className={`
                   group relative w-14 h-14 rounded-2xl 
                   backdrop-blur-md border border-white/20
@@ -63,7 +64,7 @@ const SidebarButton = ({
           className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-black/80 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none whitespace-nowrap z-50 group-hover:translate-x-1 backdrop-blur-sm border border-white/10 shadow-lg
   [transition-delay:0ms] group-hover:[transition-delay:2000ms]"
         >
-          {item.label}
+          {label}
           <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black/90" />
         </div>
 

@@ -19,6 +19,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { SearchBar } from "./search-bar";
 import { ProfileDropdown } from "./profile-dropdown";
 import { parseBlob, parseWebStream } from "music-metadata";
+import { useSidebar } from "../utils/sidebar-context";
 interface Song {
   id: string;
   title: string | undefined;
@@ -30,7 +31,6 @@ interface Song {
   // isLiked: boolean;
 }
 
-
 interface PlaylistPanelProps {
   onSongSelect: (song: Song) => void;
 }
@@ -41,42 +41,40 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
   const [currentSongId, setCurrentSongId] = useState("1");
   const [showVisualizer, setShowVisualizer] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
-
+  const { searchBar } = useSidebar();
   useEffect(() => {
-  const fetchSongs = async () => {
-    try {
-      const res = await fetch("/api/songs");
-      const data = await res.json();
-      const loadedSongs: Song[] = [];
-      for (let i = 0; i < data.files.length; i++) {
-        const path = data.files[i];
-        try {
-          const response = await fetch(`/songs/${path}`);
-          const blob = await response.blob();
-          const metadata = await parseBlob(blob);
+    const fetchSongs = async () => {
+      try {
+        const res = await fetch("/api/songs");
+        const data = await res.json();
+        const loadedSongs: Song[] = [];
+        for (let i = 0; i < data.files.length; i++) {
+          const path = data.files[i];
+          try {
+            const response = await fetch(`/songs/${path}`);
+            const blob = await response.blob();
+            const metadata = await parseBlob(blob);
 
             loadedSongs.push({
-            id: i.toString(),
-            title: metadata.common.title || path.split(".")[0],
-            artist: metadata.common.artist || "Unknown Artist",
-            album: metadata.common.album || "Unknown Album",
-            source: `/songs/${path}`,
-            metadata: metadata,
-          });
-          
-        } catch (err) {
-          console.error("Error parsing file:", path, err);
+              id: i.toString(),
+              title: metadata.common.title || path.split(".")[0],
+              artist: metadata.common.artist || "Unknown Artist",
+              album: metadata.common.album || "Unknown Album",
+              source: `/songs/${path}`,
+              metadata: metadata,
+            });
+          } catch (err) {
+            console.error("Error parsing file:", path, err);
+          }
         }
+        setSongs(loadedSongs);
+      } catch (err) {
+        console.error("Error fetching songs:", err);
       }
-      setSongs(loadedSongs);
-    } catch (err) {
-      console.error("Error fetching songs:", err);
-    }
-  };
+    };
 
-  fetchSongs();
-  
-}, []);
+    fetchSongs();
+  }, []);
   const [items, setItems] = useState(songs.slice(0, 5));
   const [hasMore, setHasMore] = useState(true);
   const handleSongClick = (song: Song) => {
@@ -98,13 +96,14 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
   }
 
   return (
-    <div className="relative  h-full flex flex-col overflow-y-scroll py-20 pb-9">
+    <div className="relative  h-full flex flex-col overflow-y-scroll pt-5 pb-20">
       {/* Glass background with gradient */}
-
+    
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20 backdrop-blur-xl" />
+      
       <div className="inset-0  bg-white/5 backdrop-blur-sm" />
-
-      <div className="relative z-10 h-full flex flex-col">
+      {searchBar && <SearchBar />}
+      <div className="pt-5 relative z-10 h-full flex flex-col">
         <div className=" p-4 cursor-pointer group transition-all duration-30  border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

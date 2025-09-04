@@ -6,9 +6,9 @@ type SidebarContextType = {
   player: boolean;
   searchBar: boolean;
   detailPanel: boolean;
-  togglePlayer: () => void;
-  toggleSearchBar: () => void;
-  toggleDetailPanel: () => void;
+  setPlayer: (value: boolean) => void;
+  setSearchBar: (value: boolean) => void;
+  setDetailPanel: (value: boolean) => void;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -18,9 +18,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [searchBar, setSearchBar] = useState(false);
   const [detailPanel, setDetailPanel] = useState(false);
 
-  const togglePlayer = () => setPlayer((prev) => !prev);
-  const toggleSearchBar = () => setSearchBar((prev) => !prev);
-  const toggleDetailPanel = () => setDetailPanel((prev) => !prev);
 
   return (
     <SidebarContext.Provider
@@ -28,9 +25,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         player,
         searchBar,
         detailPanel,
-        togglePlayer,
-        toggleSearchBar,
-        toggleDetailPanel,
+        setPlayer,
+        setSearchBar,
+        setDetailPanel
       }}
     >
       {children}
