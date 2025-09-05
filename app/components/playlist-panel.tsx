@@ -45,13 +45,14 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const res = await fetch("/api/songs");
+        const res = await fetch("http://localhost:8080/files/list");
         const data = await res.json();
+        console.log(data);
         const loadedSongs: Song[] = [];
-        for (let i = 0; i < data.files.length; i++) {
-          const path = data.files[i];
+        for (let i = 0; i < data.length; i++) {
+          const path = data[i].path;
           try {
-            const response = await fetch(`/songs/${path}`);
+            const response = await fetch(path);
             const blob = await response.blob();
             const metadata = await parseBlob(blob);
 
