@@ -8,11 +8,13 @@ type SidebarContextType = {
   searchBar: boolean;
   detailPanel: boolean;
   upload: boolean;
+  createFolder: boolean;
   setHome: (value: boolean) => void;
   setPlayer: (value: boolean) => void;
   setSearchBar: (value: boolean) => void;
   setDetailPanel: (value: boolean) => void;
   setUpload: (value: boolean) => void;
+  setCreateFolder: (value: boolean) => void;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -23,7 +25,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [searchBar, setSearchBar] = useState(false);
   const [detailPanel, setDetailPanel] = useState(false);
   const [upload, setUpload] = useState(false);
-
+  const [createFolder, setCreateFolder] = useState(false);
   return (
     <SidebarContext.Provider
       value={{
@@ -32,11 +34,13 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         searchBar,
         detailPanel,
         upload,
+        createFolder,
         setHome,
         setPlayer,
         setSearchBar,
         setDetailPanel,
-        setUpload
+        setUpload,
+        setCreateFolder,
       }}
     >
       {children}

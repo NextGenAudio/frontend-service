@@ -37,7 +37,8 @@ export const Sidebar = () => {
     setPlayer,
     setSearchBar,
     setDetailPanel,
-    setUpload
+    setUpload,
+    setCreateFolder
   } = useSidebar();
 
   const { status, data: session } = useSession();
@@ -51,6 +52,7 @@ export const Sidebar = () => {
     if (label === "Home") {
       setHome(true);
       setUpload(false);
+      setCreateFolder(false);
     }
     if (label == "Player") {
       setPlayer(!player);

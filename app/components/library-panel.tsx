@@ -13,7 +13,7 @@ import { useSidebar } from "../utils/sidebar-context";
 
 export const LibraryPanel = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const { setUpload, setHome } = useSidebar();
+  const { setUpload, setHome,setCreateFolder } = useSidebar();
   const playlists = [
     {
       id: "1",
@@ -66,11 +66,24 @@ export const LibraryPanel = () => {
                   Your Library
                 </h2>
                 <div className="flex items-center gap-2">
+                     <Button
+                    size="sm"
+                    className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white data-[state=active]:bg-white hover:scale-100 transition-all duration-200 shadow-lg"
+                    onClick={() => {
+                      setUpload(false);
+                      setCreateFolder(true);
+                      setHome(false);
+                      console.log("fuk")
+                    }}
+                  >
+                    <Plus className="h-4 w-4" /><span>Add Music</span>
+                  </Button>
                   <Button
                     size="sm"
                     className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white data-[state=active]:bg-white hover:scale-100 transition-all duration-200 shadow-lg"
                     onClick={() => {
                       setUpload(true);
+                      setCreateFolder(false);
                       setHome(false);
                       console.log("fuk")
                     }}

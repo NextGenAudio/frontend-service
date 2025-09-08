@@ -20,6 +20,7 @@ import { SearchBar } from "./search-bar";
 import { ProfileDropdown } from "./profile-dropdown";
 import { parseBlob, parseWebStream } from "music-metadata";
 import { useSidebar } from "../utils/sidebar-context";
+import { useMusicContext } from "../utils/music-context";
 interface Song {
   id: string;
   title: string | undefined;
@@ -38,21 +39,31 @@ interface PlaylistPanelProps {
   onSongSelect: (song: Song) => void;
 }
 
-export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
+export const PlaylistPanel = () => {
+  const { setCurrentSong } = useMusicContext();
+
   const [isOpen, setIsOpen] = useState(true);
+
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentSongId, setCurrentSongId] = useState("1");
   const [showVisualizer, setShowVisualizer] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
   const { searchBar } = useSidebar();
+
+  const onSongSelect = (song: Song) => {
+    setCurrentSong(song);
+  };
+
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const res = await fetch("http://localhost:8080/files/list");
+        const res = await fetch("http://localhost:8080/files/list", {
+          method: "GET",
+          credentials: "include", // include cookies
+        });
         const data = await res.json();
         console.log(data);
-       
-      
+
         setSongs(data);
       } catch (err) {
         console.error("Error fetching songs:", err);
@@ -84,9 +95,9 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
   return (
     <div className="relative  h-full flex flex-col overflow-y-scroll pt-5 pb-20">
       {/* Glass background with gradient */}
-    
+
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20 backdrop-blur-xl" />
-      
+
       <div className="inset-0  bg-white/5 backdrop-blur-sm" />
       {searchBar && <SearchBar />}
       <div className="pt-5 relative z-10 h-full flex flex-col">
@@ -178,6 +189,14 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
             </div>
           </div>
         )}
+        <div className="px-4 pt-4">
+          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+            <div className="col-span-6 ml-20">Title</div>
+
+            <div className="col-span-3">Album</div>
+            <div className="col-span-1">Duration</div>
+          </div>
+        </div>
         <InfiniteScroll
           dataLength={items.length}
           next={fetchMoreData}
@@ -189,7 +208,7 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
               {songs.map((song, id) => (
                 <div
                   key={song.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                  className={`flex  items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
                     currentSongId === song.id
                       ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
                       : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
@@ -216,19 +235,29 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
                       )}
                     </Button>
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate text-white drop-shadow-sm">
-                      {song.title || song.filename}
-                    </div>
-                    <div className="text-sm text-white/70 truncate">
-                      {song.artist}
-                    </div>
-                    <div className="text-sm text-white/70 truncate">
+                  <div className="grid grid-cols-10 gap-3 w-full  items-center">
+                    <span className="col-span-6 flex flex-col">
+                      <div className="font-medium truncate text-white drop-shadow-sm">
+                        {song.title || song.filename}
+                      </div>
+                      <span className="col-span-text-sm text-white/70 truncate">
+                        {song.artist}
+                      </span>
+                    </span>
+                    <span className="col-span-3 text-m text-white/70 truncate">
                       {song.album}
-                    </div>
+                    </span>
+                    <span className="col-span-1 text-center  text-white/70 truncate">
+                      {song.metadata?.track_length/60
+                        ? `${Math.floor(song.metadata.track_length / 60)}:${
+                            Math.floor(song.metadata.track_length % 60) < 10
+                              ? "0" +
+                                Math.floor(song.metadata.track_length % 60)
+                              : Math.floor(song.metadata.track_length % 60)
+                          }`
+                        : "0:00"}
+                    </span>
                   </div>
-
                   <div className="flex items-center gap-2">
                     {currentSongId === song.id && isPlaying && (
                       <div className="flex items-center gap-1">

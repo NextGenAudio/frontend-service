@@ -113,10 +113,9 @@ export function MusicUpload() {
     }
 
     try {
-      
       const formDataToSend = new FormData();
       formDataToSend.append("file", musicFile.file); // backend expects "file"
-
+      formDataToSend.append("user", formData.title);
       // If you also want to send artwork and metadata:
       if (artworkFile) {
         formDataToSend.append("artwork", artworkFile.file);
@@ -132,6 +131,7 @@ export function MusicUpload() {
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
           onUploadProgress: (progressEvent) => {
             if (progressEvent.total) {
               const percent = Math.round(
@@ -274,7 +274,7 @@ export function MusicUpload() {
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
               <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
                 <ImageIcon className="w-6 h-6 text-orange-400" />
-                Album Artwork
+                Music Artwork
               </h2>
 
               {!artworkFile ? (
@@ -347,7 +347,7 @@ export function MusicUpload() {
                     required
                   />
                 </div>
-
+{/* 
                 <div>
                   <Label htmlFor="album" className="text-white mb-2 block">
                     Album
@@ -364,7 +364,7 @@ export function MusicUpload() {
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
                     placeholder="Enter album name"
                   />
-                </div>
+                </div> */}
 
                 <div>
                   <Label
