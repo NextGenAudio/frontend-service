@@ -46,9 +46,8 @@ export const PlaylistPanel = () => {
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentSongId, setCurrentSongId] = useState("1");
-  const [showVisualizer, setShowVisualizer] = useState(true);
   const [songs, setSongs] = useState<Song[]>([]);
-  const { searchBar } = useSidebar();
+  const { searchBar , visualizer} = useSidebar();
 
   const onSongSelect = (song: Song) => {
     setCurrentSong(song);
@@ -110,27 +109,7 @@ export const PlaylistPanel = () => {
                   alt="Playlist cover"
                   className="w-full h-full object-cover"
                 />
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowVisualizer(!showVisualizer);
-                    }}
-                    className="h-8 px-14 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-110"
-                    title={
-                      showVisualizer ? "Hide Visualizer" : "Show Visualizer"
-                    }
-                  >
-                    <BarChart3
-                      className={`h-4 w-4 transition-colors ${
-                        showVisualizer ? "text-orange-300" : "text-white/70"
-                      }`}
-                    />
-                    Visualizer
-                  </Button>
-                </div>
+                
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-[1px]" />
                 <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />
               </div>
@@ -141,30 +120,12 @@ export const PlaylistPanel = () => {
                 <p className="text-base text-white/80">{songs.length} songs</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowVisualizer(!showVisualizer);
-                }}
-                className="h-8 px-14 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-110"
-                title={showVisualizer ? "Hide Visualizer" : "Show Visualizer"}
-              >
-                <BarChart3
-                  className={`h-4 w-4 transition-colors ${
-                    showVisualizer ? "text-orange-300" : "text-white/70"
-                  }`}
-                />
-                Visualizer
-              </Button>
-            </div>
+            
           </div>
         </div>
 
         {/* Glass Visualizer Area */}
-        {showVisualizer && (
+        {visualizer && (
           <div className="p-4 border-b border-white/10">
             <div className="h-32 bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 rounded-xl flex items-center justify-center relative overflow-hidden backdrop-blur-sm border border-white/20">
               <div className="text-sm text-white/70 font-medium z-10">

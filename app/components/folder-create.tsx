@@ -2,61 +2,29 @@
 
 import type React from "react";
 import { useState, useRef } from "react";
-import {
-  Upload,
-  Music,
-  ImageIcon,
-  X,
-  Check,
-  AlertCircle,
-  Play,
-  Pause,
-} from "lucide-react";
+import { ImageIcon, X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
-// import { Textarea } from "@/app/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
 import axios from "axios";
 
 interface UploadedFile {
   file: File;
-  progress: number;
-  status: "uploading" | "completed" | "error";
   preview?: string;
 }
 
 export function FolderCreate() {
-  const [musicFile, setMusicFile] = useState<UploadedFile | null>(null);
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    artist: "",
-    album: "",
-    genre: "",
-    year: "",
+    name: "",
     description: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
-  const musicInputRef = useRef<HTMLInputElement>(null);
   const artworkInputRef = useRef<HTMLInputElement>(null);
 
-  const handleMusicDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    const musicFile = files.find((file) => file.type.startsWith("audio/"));
-    if (musicFile) {
-      handleMusicUpload(musicFile);
-    }
-  };
-
+  // Handle drag-drop for artwork
   const handleArtworkDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
@@ -66,88 +34,45 @@ export function FolderCreate() {
     }
   };
 
-  const handleMusicUpload = (file: File) => {
-    const uploadFile: UploadedFile = {
-      file,
-      progress: 0,
-      status: "uploading",
-    };
-    setMusicFile(uploadFile);
-
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setMusicFile((prev) => {
-        if (!prev) return null;
-        const newProgress = Math.min(prev.progress + 10, 100);
-        return {
-          ...prev,
-          progress: newProgress,
-          status: newProgress === 100 ? "completed" : "uploading",
-        };
-      });
-    }, 200);
-
-    setTimeout(() => clearInterval(interval), 2000);
-  };
-
+  // Preview artwork before sending
   const handleArtworkUpload = (file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      const uploadFile: UploadedFile = {
+      setArtworkFile({
         file,
-        progress: 100,
-        status: "completed",
         preview: e.target?.result as string,
-      };
-      setArtworkFile(uploadFile);
+      });
     };
     reader.readAsDataURL(file);
   };
 
+  // Submit form data to Spring Boot API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!musicFile) {
-      alert("Please select a music file!");
-      return;
-    }
+    setLoading(true);
+    setMessage(null);
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append("file", musicFile.file); // backend expects "file"
-      formDataToSend.append("user", formData.title);
-      // If you also want to send artwork and metadata:
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("description", formData.description);
       if (artworkFile) {
         formDataToSend.append("artwork", artworkFile.file);
       }
-      if (formData) {
-        Object.entries(formData).forEach(([key, value]) => {
-          formDataToSend.append(key, value as string);
-        });
-      }
 
-      const response = await axios.post(
-        "http://localhost:8080/files/upload",
-        formDataToSend,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const percent = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              console.log("Upload progress:", percent + "%");
-            }
-          },
-        }
-      );
+      await axios.post("http://localhost:8080/folders", formDataToSend, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
 
-      console.log("Upload successful:", response.data);
-      alert("File uploaded successfully!");
+      setMessage("✅ Folder created successfully!");
+      setFormData({ name: "", description: "" });
+      setArtworkFile(null);
     } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Upload failed!");
+      console.error(error);
+      setMessage("❌ Failed to create folder. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,15 +90,14 @@ export function FolderCreate() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-orange-200 to-orange-400 bg-clip-text text-transparent mb-2">
             Create Folder
           </h1>
-          {/* <p className="text-gray-400">Share your creativity with the world</p> */}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-8">
           {/* Artwork Upload */}
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
               <ImageIcon className="w-6 h-6 text-orange-400" />
-              Music Artwork
+              Folder Artwork
             </h2>
 
             {!artworkFile ? (
@@ -201,7 +125,7 @@ export function FolderCreate() {
               <div className="relative aspect-square rounded-xl overflow-hidden group">
                 <img
                   src={artworkFile.preview || "/placeholder.svg"}
-                  alt="Album artwork"
+                  alt="Folder artwork"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -227,20 +151,17 @@ export function FolderCreate() {
 
             <div className="space-y-6">
               <div>
-                <Label htmlFor="title" className="text-white mb-2 block">
+                <Label htmlFor="name" className="text-white mb-2 block">
                   Folder Name *
                 </Label>
                 <Input
-                  id="title"
-                  value={formData.title}
+                  id="name"
+                  value={formData.name}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      title: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }
                   className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
-                  placeholder="Enter track title"
+                  placeholder="Enter folder name"
                   required
                 />
               </div>
@@ -258,24 +179,24 @@ export function FolderCreate() {
                     }))
                   }
                   className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20 min-h-[100px] w-full rounded-md p-2"
-                  placeholder="Tell us about your track..."
+                  placeholder="Enter folder description..."
                 />
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Submit Button */}
-        <div className="text-center mt-11">
-          <Button
-            type="submit"
-            disabled={!formData.title }
-            onClick={handleSubmit}
-            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            Upload Track
-          </Button>
-        </div>
+          {/* Submit Button */}
+          <div className="col-span-2 text-center mt-6">
+            <Button
+              type="submit"
+              disabled={!formData.name || loading}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {loading ? "Creating..." : "Create Folder"}
+            </Button>
+            {message && <p className="mt-4 text-white">{message}</p>}
+          </div>
+        </form>
       </div>
     </div>
   );

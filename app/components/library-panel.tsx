@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Music, MoreHorizontal } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
@@ -14,6 +14,27 @@ import { useSidebar } from "../utils/sidebar-context";
 export const LibraryPanel = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { setUpload, setHome,setCreateFolder } = useSidebar();
+  const [folders, setFolders] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchFolders = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/folders", {
+            method: "GET",
+            credentials: "include", // include cookies
+          });
+          const data = await res.json();
+          console.log(data);
+
+          setFolders(data);
+        } catch (err) {
+          console.error("Error fetching songs:", err);
+        }
+      };
+
+      fetchFolders();
+    }, []);
+
   const playlists = [
     {
       id: "1",
@@ -70,8 +91,8 @@ export const LibraryPanel = () => {
                     size="sm"
                     className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white data-[state=active]:bg-white hover:scale-100 transition-all duration-200 shadow-lg"
                     onClick={() => {
-                      setUpload(false);
-                      setCreateFolder(true);
+                      setUpload(true);
+                      setCreateFolder(false);
                       setHome(false);
                       console.log("fuk")
                     }}
@@ -82,8 +103,8 @@ export const LibraryPanel = () => {
                     size="sm"
                     className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white data-[state=active]:bg-white hover:scale-100 transition-all duration-200 shadow-lg"
                     onClick={() => {
-                      setUpload(true);
-                      setCreateFolder(false);
+                      setUpload(false);
+                      setCreateFolder(true);
                       setHome(false);
                       console.log("fuk")
                     }}

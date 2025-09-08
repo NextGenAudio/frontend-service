@@ -33,12 +33,14 @@ export const Sidebar = () => {
     searchBar,
     detailPanel,
     upload,
+    visualizer,
     setHome,
     setPlayer,
     setSearchBar,
     setDetailPanel,
     setUpload,
-    setCreateFolder
+    setCreateFolder,
+    setVisualizer
   } = useSidebar();
 
   const { status, data: session } = useSession();
@@ -66,11 +68,11 @@ export const Sidebar = () => {
     if (label === "Favorites") {
       setFavorites(true);
     }
-    if (label === "Analytics") {
-      setAnalytics(true);
-    }
     if (label === "Settings") {
       setSettings(true);
+    }
+    if(label === "Visualizer"){
+      setVisualizer(!visualizer);
     }
   };
 
@@ -120,10 +122,10 @@ export const Sidebar = () => {
           isActive={favorites}
         />
         <SidebarButton
-          label={"Analytics"}
+          label={"Visualizer"}
           Icon={BarChart3}
           handleItemClick={handleToggleButton}
-          isActive={analytics}
+          isActive={visualizer}
         />
         <SidebarButton
           label={"Settings"}
