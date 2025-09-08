@@ -14,8 +14,10 @@ import SongCover from "./song-cover";
 interface Song {
   id: string;
   title: string | undefined;
+  filename: string;
   artist: string | undefined;
   album: string | undefined;
+  uploadedAt: Date;
   // duration: string;
   source: string;
   metadata: any;
@@ -104,24 +106,29 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Year</span>
                   <span className="text-white/80 font-medium">
-                    {song?.metadata?.common.year}
+                    {song?.metadata?.year || "Unknown"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Bitrate</span>
-                  <span className="text-white/80 font-medium">{(song?.metadata?.format.bitrate / 1000).toFixed(0)} kbps</span>
+                  <span className="text-white/80 font-medium">{(song?.metadata?.bitrate / 1000).toFixed(0)} kbps</span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Sample Rate</span>
-                  <span className="text-white/80 font-medium">{(song?.metadata?.format.sampleRate / 1000).toFixed(0)} kHz</span>
+                  <span className="text-white/80 font-medium">{(song?.metadata?.sample_rate / 1000).toFixed(0)} kHz</span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">File Format</span>
-                  <span className="text-white/80 font-medium">{song?.metadata?.format.container}</span>
+                  <span className="text-white/80 font-medium">{song?.metadata?.format || "Unknown"}</span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
+                  <span className="text-white/60">Duration</span>
+                  <span className="text-white/80 font-medium">{`${Math.floor(song?.metadata?.track_length / 60)}:${(song?.metadata?.track_length % 60).toString().padStart(2, "0")} min` || "Unknown"}</span>
+                </div>
+                
+                <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Added</span>
-                  <span className="text-white/80 font-medium">2 days ago</span>
+                  <span className="text-white/80 font-medium">{song?.uploadedAt ? new Date(song.uploadedAt).toLocaleDateString() : ""}</span>
                 </div>
               </div>
             </div>

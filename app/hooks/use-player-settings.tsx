@@ -12,6 +12,16 @@ export const usePlayerSettings = () => {
     return saved === "true"; // default false
   });
 
+  const [isRepeat, setIsRepeat] = useState(() => {
+    const saved = localStorage.getItem("isRepeat");
+    return saved === "true"; // default false
+  });
+
+  const [progress, setProgress] = useState(() => {
+    const saved = localStorage.getItem("progress");
+    return saved ? Number(saved) : 0; // default 0s
+  });
+
   // Save whenever volume changes
   useEffect(() => {
     localStorage.setItem("volume", String(volume));
@@ -22,5 +32,24 @@ export const usePlayerSettings = () => {
     localStorage.setItem("isMuted", String(isMuted));
   }, [isMuted]);
 
-  return { volume, setVolume, isMuted, setIsMuted };
+  // Save whenever repeat changes
+  useEffect(() => {
+    localStorage.setItem("isRepeat", String(isRepeat));
+  }, [isRepeat]);
+
+  // Save whenever progress changes
+  useEffect(() => {
+    localStorage.setItem("progress", String(progress));
+  }, [progress]);
+
+  return {
+    volume,
+    setVolume,
+    isMuted,
+    setIsMuted,
+    isRepeat,
+    setIsRepeat,
+    progress,
+    setProgress,
+  };
 };

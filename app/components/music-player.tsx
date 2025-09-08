@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -13,12 +13,16 @@ import { FloatingPlayerControls } from "@/app/components/player-controls";
 import { ScrollArea } from "@radix-ui/themes";
 import { parseWebStream } from "music-metadata";
 import { useSidebar } from "../utils/sidebar-context";
+import { MusicUpload } from "./music-upload";
 
 interface Song {
   id: string;
   title: string | undefined;
+  filename: string;
+
   artist: string | undefined;
   album: string | undefined;
+  uploadedAt: Date;
   // duration: string;
   source: string;
   metadata: any;
@@ -28,7 +32,30 @@ interface Song {
 export function MusicPlayer() {
   const [metadata, setMetadata] = useState<any>(null);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  const { player } = useSidebar();
+
+  const { player, home, upload } = useSidebar();
+
+  useEffect(() => {
+    if (!currentSong) return;
+
+    const url = `http://localhost:8080/files/download/${currentSong.filename}`;
+    console.log("Song URL:", url);
+
+    // Update state with direct backend URL
+    setCurrentSong({
+      ...currentSong,
+      source: url,
+      id: currentSong.id,
+    });
+
+    // Cleanup object URL if you used Blob before
+    return () => {
+      if (currentSong.source?.startsWith("blob:")) {
+        URL.revokeObjectURL(currentSong.source);
+      }
+    };
+  }, [currentSong?.filename]);
+
   return (
     <>
       <div className="bg-slate-900 h-screen ml-[115px] rounded-[32px] bg-background text-foreground flex flex-col overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] drop-shadow-xl">
@@ -44,7 +71,8 @@ export function MusicPlayer() {
 
             {/* Main Playlist Panel */}
             <ResizablePanel defaultSize={50} minSize={30}>
-              <PlaylistPanel onSongSelect={setCurrentSong} />
+              {upload && <MusicUpload />}
+              {home && <PlaylistPanel onSongSelect={setCurrentSong} />}
             </ResizablePanel>
 
             <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />

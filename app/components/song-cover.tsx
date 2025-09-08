@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 export default function SongCover({ song }: { song: any }) {
-  const picture = song?.metadata?.common.picture?.[0];
+  const picture = song?.metadata?.cover_art;
 
   if (!picture) {
     // fallback image
@@ -23,14 +23,15 @@ export default function SongCover({ song }: { song: any }) {
     )
   );
 
-  const imageSrc = `data:${picture.format};base64,${base64String}`;
+  // const imageSrc = `data:${picture.format};base64,${base64String}`;
 
   return (
     <Image
-      src={imageSrc}
+      src={picture}
       alt="Song Cover"
       width={500}
       height={500}
+      unoptimized
     />
   );
 }

@@ -34,6 +34,7 @@ import { usePlayerSettings } from "@/app/hooks/use-player-settings";
 interface Song {
   id: string;
   title: string | undefined;
+  filename: string;
   artist: string | undefined;
   album: string | undefined;
   // duration: string;
@@ -47,7 +48,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState(0);
 
-  const [progress, setProgress] = useState(0);
+  // const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [metadata, setMetadata] = useState<any>(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -66,7 +67,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const toggleMute = () => setIsMuted(!isMuted);
   const toggleLike = () => setIsLiked(!isLiked);
 
-  const { volume, setVolume, isMuted, setIsMuted } = usePlayerSettings();
+  const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat, progress, setProgress } = usePlayerSettings();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);

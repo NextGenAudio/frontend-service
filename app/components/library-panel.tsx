@@ -8,10 +8,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/app/components/ui/collapsible";
+import { useSidebar } from "../utils/sidebar-context";
+
 
 export const LibraryPanel = () => {
   const [isOpen, setIsOpen] = useState(true);
-
+  const { setUpload, setHome } = useSidebar();
   const playlists = [
     {
       id: "1",
@@ -58,17 +60,22 @@ export const LibraryPanel = () => {
       <div className="relative h-full flex flex-col">
         {/* <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild> */}
-            <div className="p-4 border-b border-white/20 cursor-pointer  backdrop-blur-sm">
+            <div className="p-4  pt-6 border-b border-white/20 cursor-pointer  backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl ml-3 pt-4 font-semibold text-white drop-shadow-sm">
+                <h2 className="text-xl ml-3  font-semibold text-white drop-shadow-sm">
                   Your Library
                 </h2>
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
-                    className="h-8 w-8 p-0 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white hover:scale-110 transition-all duration-200 shadow-lg"
+                    className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white data-[state=active]:bg-white hover:scale-100 transition-all duration-200 shadow-lg"
+                    onClick={() => {
+                      setUpload(true);
+                      setHome(false);
+                      console.log("fuk")
+                    }}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4" /><span>New Folder</span>
                   </Button>
                 </div>
               </div>
@@ -80,21 +87,21 @@ export const LibraryPanel = () => {
               <TabsList className="grid  grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
                 <TabsTrigger
                   value="all"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-[10px]"
+                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200  rounded-[10px]"
                 >
                   All
                 </TabsTrigger>
                 <TabsTrigger
                   value="playlists"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-[10px]"
+                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 rounded-[10px]"
                 >
                   Playlists
                 </TabsTrigger>
                 <TabsTrigger
                   value="imports"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 data-[state=active]:shadow-lg rounded-[10px]"
+                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200  rounded-[10px]"
                 >
-                  Imports
+                  Folders
                 </TabsTrigger>
               </TabsList>
 

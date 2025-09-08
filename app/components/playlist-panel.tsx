@@ -23,8 +23,11 @@ import { useSidebar } from "../utils/sidebar-context";
 interface Song {
   id: string;
   title: string | undefined;
+  filename: string;
   artist: string | undefined;
   album: string | undefined;
+  path: string;
+  uploadedAt: Date;
   // duration: string;
   source: string;
   metadata: any;
@@ -48,27 +51,9 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
         const res = await fetch("http://localhost:8080/files/list");
         const data = await res.json();
         console.log(data);
-        const loadedSongs: Song[] = [];
-        for (let i = 0; i < data.length; i++) {
-          const path = data[i].path;
-          try {
-            const response = await fetch(path);
-            const blob = await response.blob();
-            const metadata = await parseBlob(blob);
-
-            loadedSongs.push({
-              id: i.toString(),
-              title: metadata.common.title || path.split(".")[0],
-              artist: metadata.common.artist || "Unknown Artist",
-              album: metadata.common.album || "Unknown Album",
-              source: `/songs/${path}`,
-              metadata: metadata,
-            });
-          } catch (err) {
-            console.error("Error parsing file:", path, err);
-          }
-        }
-        setSongs(loadedSongs);
+       
+      
+        setSongs(data);
       } catch (err) {
         console.error("Error fetching songs:", err);
       }
@@ -172,11 +157,11 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
           <div className="p-4 border-b border-white/10">
             <div className="h-32 bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 rounded-xl flex items-center justify-center relative overflow-hidden backdrop-blur-sm border border-white/20">
               <div className="text-sm text-white/70 font-medium z-10">
-                Music Visualizer
+                {songs.find((song) => song.id === currentSongId)?.filename}
               </div>
               {/* Enhanced animated bars */}
               <div className="absolute inset-0 flex items-center justify-center gap-1 px-8">
-                {Array.from({ length: 24 }).map((_, i) => (
+                {Array.from({ length: 100 }).map((_, i) => (
                   <div
                     key={i}
                     className="w-1 bg-gradient-to-t from-orange-400/60 to-pink-400/80 rounded-full animate-pulse shadow-lg"
@@ -234,10 +219,13 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
 
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate text-white drop-shadow-sm">
-                      {song.title}
+                      {song.title || song.filename}
                     </div>
                     <div className="text-sm text-white/70 truncate">
                       {song.artist}
+                    </div>
+                    <div className="text-sm text-white/70 truncate">
+                      {song.album}
                     </div>
                   </div>
 
@@ -249,9 +237,9 @@ export const PlaylistPanel = ({ onSongSelect }: PlaylistPanelProps) => {
                         <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
                       </div>
                     )}
-                    <span className="text-sm text-white/70 font-medium">
+                    {/* <span className="text-sm text-white/70 font-medium">
                       {song.metadata.duration}
-                    </span>
+                    </span> */}
                     <Button
                       size="icon"
                       variant="ghost"

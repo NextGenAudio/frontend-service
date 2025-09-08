@@ -1,25 +1,41 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef } from "react"
-import { Upload, Music, ImageIcon, X, Check, AlertCircle, Play, Pause } from "lucide-react"
-import { Button } from "@/app/components/ui/button"
-import { Input } from "@/app/components/ui/input"
-import { Label } from "@/app/components/ui/label"
+import type React from "react";
+import { useState, useRef } from "react";
+import {
+  Upload,
+  Music,
+  ImageIcon,
+  X,
+  Check,
+  AlertCircle,
+  Play,
+  Pause,
+} from "lucide-react";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
 // import { Textarea } from "@/app/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/components/ui/select";
+import axios from "axios";
 
 interface UploadedFile {
-  file: File
-  progress: number
-  status: "uploading" | "completed" | "error"
-  preview?: string
+  file: File;
+  progress: number;
+  status: "uploading" | "completed" | "error";
+  preview?: string;
 }
 
 export function MusicUpload() {
-  const [musicFile, setMusicFile] = useState<UploadedFile | null>(null)
-  const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [musicFile, setMusicFile] = useState<UploadedFile | null>(null);
+  const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     artist: "",
@@ -27,71 +43,113 @@ export function MusicUpload() {
     genre: "",
     year: "",
     description: "",
-  })
+  });
 
-  const musicInputRef = useRef<HTMLInputElement>(null)
-  const artworkInputRef = useRef<HTMLInputElement>(null)
+  const musicInputRef = useRef<HTMLInputElement>(null);
+  const artworkInputRef = useRef<HTMLInputElement>(null);
 
   const handleMusicDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    const files = Array.from(e.dataTransfer.files)
-    const musicFile = files.find((file) => file.type.startsWith("audio/"))
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    const musicFile = files.find((file) => file.type.startsWith("audio/"));
     if (musicFile) {
-      handleMusicUpload(musicFile)
+      handleMusicUpload(musicFile);
     }
-  }
+  };
 
   const handleArtworkDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    const files = Array.from(e.dataTransfer.files)
-    const imageFile = files.find((file) => file.type.startsWith("image/"))
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    const imageFile = files.find((file) => file.type.startsWith("image/"));
     if (imageFile) {
-      handleArtworkUpload(imageFile)
+      handleArtworkUpload(imageFile);
     }
-  }
+  };
 
   const handleMusicUpload = (file: File) => {
     const uploadFile: UploadedFile = {
       file,
       progress: 0,
       status: "uploading",
-    }
-    setMusicFile(uploadFile)
+    };
+    setMusicFile(uploadFile);
 
     // Simulate upload progress
     const interval = setInterval(() => {
       setMusicFile((prev) => {
-        if (!prev) return null
-        const newProgress = Math.min(prev.progress + 10, 100)
+        if (!prev) return null;
+        const newProgress = Math.min(prev.progress + 10, 100);
         return {
           ...prev,
           progress: newProgress,
           status: newProgress === 100 ? "completed" : "uploading",
-        }
-      })
-    }, 200)
+        };
+      });
+    }, 200);
 
-    setTimeout(() => clearInterval(interval), 2000)
-  }
+    setTimeout(() => clearInterval(interval), 2000);
+  };
 
   const handleArtworkUpload = (file: File) => {
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (e) => {
       const uploadFile: UploadedFile = {
         file,
         progress: 100,
         status: "completed",
         preview: e.target?.result as string,
-      }
-      setArtworkFile(uploadFile)
-    }
-    reader.readAsDataURL(file)
-  }
+      };
+      setArtworkFile(uploadFile);
+    };
+    reader.readAsDataURL(file);
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Uploading music:", { musicFile, artworkFile, formData })
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!musicFile) {
+      alert("Please select a music file!");
+      return;
+    }
+
+    try {
+      
+      const formDataToSend = new FormData();
+      formDataToSend.append("file", musicFile.file); // backend expects "file"
+
+      // If you also want to send artwork and metadata:
+      if (artworkFile) {
+        formDataToSend.append("artwork", artworkFile.file);
+      }
+      if (formData) {
+        Object.entries(formData).forEach(([key, value]) => {
+          formDataToSend.append(key, value as string);
+        });
+      }
+
+      const response = await axios.post(
+        "http://localhost:8080/files/upload",
+        formDataToSend,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percent = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              console.log("Upload progress:", percent + "%");
+            }
+          },
+        }
+      );
+
+      console.log("Upload successful:", response.data);
+      alert("File uploaded successfully!");
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Upload failed!");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 p-6">
@@ -126,13 +184,19 @@ export function MusicUpload() {
                 className="border-2 border-dashed border-orange-400/30 rounded-xl p-12 text-center cursor-pointer hover:border-orange-400/50 hover:bg-white/5 transition-all duration-300 group"
               >
                 <Upload className="w-16 h-16 text-orange-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                <p className="text-xl text-white mb-2">Drop your music file here</p>
-                <p className="text-gray-400">or click to browse (MP3, WAV, FLAC)</p>
+                <p className="text-xl text-white mb-2">
+                  Drop your music file here
+                </p>
+                <p className="text-gray-400">
+                  or click to browse (MP3, WAV, FLAC)
+                </p>
                 <input
                   ref={musicInputRef}
                   type="file"
                   accept="audio/*"
-                  onChange={(e) => e.target.files?.[0] && handleMusicUpload(e.target.files[0])}
+                  onChange={(e) =>
+                    e.target.files?.[0] && handleMusicUpload(e.target.files[0])
+                  }
                   className="hidden"
                 />
               </div>
@@ -142,8 +206,12 @@ export function MusicUpload() {
                   <div className="flex items-center gap-3">
                     <Music className="w-8 h-8 text-orange-400" />
                     <div>
-                      <p className="text-white font-medium">{musicFile.file.name}</p>
-                      <p className="text-gray-400 text-sm">{(musicFile.file.size / 1024 / 1024).toFixed(2)} MB</p>
+                      <p className="text-white font-medium">
+                        {musicFile.file.name}
+                      </p>
+                      <p className="text-gray-400 text-sm">
+                        {(musicFile.file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -154,7 +222,11 @@ export function MusicUpload() {
                       onClick={() => setIsPlaying(!isPlaying)}
                       className="text-orange-400 hover:text-orange-300 hover:bg-orange-400/10"
                     >
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      {isPlaying ? (
+                        <Pause className="w-4 h-4" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
                     </Button>
                     <Button
                       type="button"
@@ -177,7 +249,9 @@ export function MusicUpload() {
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">{musicFile.progress}% uploaded</span>
+                  <span className="text-gray-400">
+                    {musicFile.progress}% uploaded
+                  </span>
                   {musicFile.status === "completed" && (
                     <span className="text-green-400 flex items-center gap-1">
                       <Check className="w-4 h-4" />
@@ -212,12 +286,17 @@ export function MusicUpload() {
                 >
                   <ImageIcon className="w-12 h-12 text-orange-400 mb-4 group-hover:scale-110 transition-transform" />
                   <p className="text-white mb-2">Drop artwork here</p>
-                  <p className="text-gray-400 text-sm">JPG, PNG (min 500x500)</p>
+                  <p className="text-gray-400 text-sm">
+                    JPG, PNG (min 500x500)
+                  </p>
                   <input
                     ref={artworkInputRef}
                     type="file"
                     accept="image/*"
-                    onChange={(e) => e.target.files?.[0] && handleArtworkUpload(e.target.files[0])}
+                    onChange={(e) =>
+                      e.target.files?.[0] &&
+                      handleArtworkUpload(e.target.files[0])
+                    }
                     className="hidden"
                   />
                 </div>
@@ -245,33 +324,26 @@ export function MusicUpload() {
 
             {/* Metadata Form */}
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-              <h2 className="text-2xl font-semibold text-white mb-6">Track Details</h2>
+              <h2 className="text-2xl font-semibold text-white mb-6">
+                Folder Details
+              </h2>
 
               <div className="space-y-6">
                 <div>
                   <Label htmlFor="title" className="text-white mb-2 block">
-                    Title *
+                    Folder Name *
                   </Label>
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
                     placeholder="Enter track title"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="artist" className="text-white mb-2 block">
-                    Artist *
-                  </Label>
-                  <Input
-                    id="artist"
-                    value={formData.artist}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, artist: e.target.value }))}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
-                    placeholder="Enter artist name"
                     required
                   />
                 </div>
@@ -283,61 +355,33 @@ export function MusicUpload() {
                   <Input
                     id="album"
                     value={formData.album}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, album: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        album: e.target.value,
+                      }))
+                    }
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
                     placeholder="Enter album name"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="genre" className="text-white mb-2 block">
-                      Genre
-                    </Label>
-                    <Select
-                      value={formData.genre}
-                      onValueChange={(value) => setFormData((prev) => ({ ...prev, genre: value }))}
-                    >
-                      <SelectTrigger className="bg-white/10 border-white/20 text-white focus:border-orange-400 focus:ring-orange-400/20">
-                        <SelectValue placeholder="Select genre" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-white/20">
-                        <SelectItem value="pop">Pop</SelectItem>
-                        <SelectItem value="rock">Rock</SelectItem>
-                        <SelectItem value="hip-hop">Hip Hop</SelectItem>
-                        <SelectItem value="electronic">Electronic</SelectItem>
-                        <SelectItem value="jazz">Jazz</SelectItem>
-                        <SelectItem value="classical">Classical</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="year" className="text-white mb-2 block">
-                      Year
-                    </Label>
-                    <Input
-                      id="year"
-                      type="number"
-                      value={formData.year}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, year: e.target.value }))}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
-                      placeholder="2024"
-                      min="1900"
-                      max="2030"
-                    />
-                  </div>
-                </div>
-
                 <div>
-                  <Label htmlFor="description" className="text-white mb-2 block">
+                  <Label
+                    htmlFor="description"
+                    className="text-white mb-2 block"
+                  >
                     Description
                   </Label>
                   <textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20 min-h-[100px] w-full rounded-md p-2"
                     placeholder="Tell us about your track..."
                   />
@@ -359,5 +403,5 @@ export function MusicUpload() {
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -21,19 +21,23 @@ import { useSidebar } from "../utils/sidebar-context";
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("Home");
-  const [home, setHome] = useState(true);
+
   const [notifications, setNotifications] = useState(false);
   const [favorites, setFavorites] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [settings, setSettings] = useState(false);
 
   const {
+    home, 
     player,
     searchBar,
     detailPanel,
+    upload,
+    setHome,
     setPlayer,
     setSearchBar,
     setDetailPanel,
+    setUpload
   } = useSidebar();
 
   const { status, data: session } = useSession();
@@ -45,7 +49,8 @@ export const Sidebar = () => {
     console.log(`Clicked on ${label}`);
 
     if (label === "Home") {
-      setHome((prev) => !prev);
+      setHome(true);
+      setUpload(false);
     }
     if (label == "Player") {
       setPlayer(!player);
