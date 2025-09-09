@@ -98,7 +98,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
           </div>
 
           <div className="space-y-4 py-4">
-            <div className=" mb-40 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg">
+            <div className=" mb-44 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg">
               <h4 className="font-medium text-white/80 mb-4 text-center">
                 Metadata
               </h4>

@@ -1,0 +1,11 @@
+dynamic routing - IGP , EGP
+IGP - distance vecotr 
+
+OSPF -  single area
+    - Multi area
+
+    OSPF has some ,limitations - there should be one zero area to connect all other area. we can't handle whole internet using this
+
+0 routing plicy -  congigured by the administrator
+
+playing with multiple routing table is advanced BG

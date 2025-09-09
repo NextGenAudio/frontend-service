@@ -1,26 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Play,
-  Pause,
-  MoreHorizontal,
-  ChevronDown,
-  BarChart3,
-} from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Play, Pause, MoreHorizontal } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/app/components/ui/collapsible";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { SearchBar } from "./search-bar";
-import { ProfileDropdown } from "./profile-dropdown";
-import { parseBlob, parseWebStream } from "music-metadata";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
+
 interface Song {
   id: string;
   title: string | undefined;
@@ -41,13 +28,16 @@ interface PlaylistPanelProps {
 
 export const PlaylistPanel = () => {
   const { setCurrentSong } = useMusicContext();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = useState(0);
+  const [isHeaderCompact, setIsHeaderCompact] = useState(false);
 
   const [isOpen, setIsOpen] = useState(true);
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentSongId, setCurrentSongId] = useState("1");
   const [songs, setSongs] = useState<Song[]>([]);
-  const { searchBar , visualizer} = useSidebar();
+  const { searchBar, visualizer } = useSidebar();
 
   const onSongSelect = (song: Song) => {
     setCurrentSong(song);
@@ -71,8 +61,10 @@ export const PlaylistPanel = () => {
 
     fetchSongs();
   }, []);
+
   const [items, setItems] = useState(songs.slice(0, 5));
   const [hasMore, setHasMore] = useState(true);
+
   const handleSongClick = (song: Song) => {
     setCurrentSongId(song.id);
     onSongSelect(song);
@@ -91,43 +83,125 @@ export const PlaylistPanel = () => {
     }
   }
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollRef.current) {
+        const scrollTop = scrollRef.current.scrollTop;
+        setScrollY(scrollTop);
+
+        setIsHeaderCompact(scrollTop > 120);
+      }
+    };
+
+    const scrollElement = scrollRef.current;
+    if (scrollElement) {
+      scrollElement.addEventListener("scroll", handleScroll, { passive: true });
+      return () => scrollElement.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
+
   return (
-    <div className="relative  h-full flex flex-col overflow-y-scroll pt-5 pb-20">
+    <div
+      ref={scrollRef}
+      className="relative h-full flex flex-col overflow-y-scroll pt-5 pb-20"
+      onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
+    >
       {/* Glass background with gradient */}
-
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20 backdrop-blur-xl" />
+      <div className="inset-0 bg-white/5 backdrop-blur-sm" />
 
-      <div className="inset-0  bg-white/5 backdrop-blur-sm" />
       {searchBar && <SearchBar />}
+
       <div className="pt-5 relative z-10 h-full flex flex-col">
-        <div className=" p-4 cursor-pointer group transition-all duration-30  border-b border-white/10">
+        <div
+          className="p-4 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl"
+          style={{
+            transform: `translateY(${Math.min(scrollY * 0.3, 30)}px)`,
+          }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-52 h-52 rounded-xl overflow-hidden relative flex-shrink-0">
+              <div
+                className="rounded-xl overflow-hidden relative flex-shrink-0 transition-all duration-700 ease-out"
+                style={{
+                  width: isHeaderCompact ? "60px" : "208px",
+                  height: isHeaderCompact ? "60px" : "208px",
+                  opacity: isHeaderCompact
+                    ? 0
+                    : Math.max(0.3, 1 - scrollY / 200),
+                  transform: `scale(${
+                    isHeaderCompact ? 0.3 : Math.max(0.8, 1 - scrollY / 400)
+                  })`,
+                }}
+              >
                 <img
                   src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop&crop=center"
                   alt="Playlist cover"
                   className="w-full h-full object-cover"
                 />
-                
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-[1px]" />
                 <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />
               </div>
-              <div className="hidden sm:block">
-                <h2 className="text-8xl  font-extrabold text-white drop-shadow-lg">
+
+              <div className="hidden sm:block transition-all duration-700 ease-out">
+                <h2
+                  className="font-extrabold text-white drop-shadow-lg transition-all duration-700 ease-out"
+                  style={{
+                    fontSize: isHeaderCompact
+                      ? "2rem"
+                      : `${Math.max(2, 6 - scrollY / 50)}rem`,
+                    lineHeight: isHeaderCompact ? "2.5rem" : "1",
+                    transform: `translateX(${
+                      isHeaderCompact ? "-60px" : "0px"
+                    })`,
+                  }}
+                >
                   Playlist #1
                 </h2>
-                <p className="text-base text-white/80">{songs.length} songs</p>
+                <p
+                  className="text-white/80 transition-all duration-700 ease-out"
+                  style={{
+                    fontSize: isHeaderCompact ? "0.875rem" : "1rem",
+                    transform: `translateX(${
+                      isHeaderCompact ? "-60px" : "0px"
+                    })`,
+                    opacity: isHeaderCompact ? 0.9 : 0.8,
+                  }}
+                >
+                  {songs.length} songs
+                </p>
               </div>
             </div>
-            
+          </div>
+        </div>
+
+        <div
+          className={`fixed top-0 left-0 right-0 z-30 p-4 backdrop-blur-xl bg-gradient-to-r from-gray-900/95 to-slate-800/95 border-b border-white/10 transition-all duration-700 ease-out ${
+            isHeaderCompact
+              ? "translate-y-0 opacity-100"
+              : "-translate-y-full opacity-0"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
+              <img
+                src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop&crop=center"
+                alt="Playlist cover"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">Playlist #1</h3>
+              <p className="text-sm text-white/70">{songs.length} songs</p>
+            </div>
           </div>
         </div>
 
         {/* Glass Visualizer Area */}
         {visualizer && (
           <div className="p-4 border-b border-white/10">
-            <div className="h-32 bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 rounded-xl flex items-center justify-center relative overflow-hidden backdrop-blur-sm border border-white/20">
+            <div className="h-40 bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 rounded-xl flex items-center justify-center relative overflow-hidden backdrop-blur-sm border border-white/20">
               <div className="text-sm text-white/70 font-medium z-10">
                 {songs.find((song) => song.id === currentSongId)?.filename}
               </div>
@@ -150,6 +224,7 @@ export const PlaylistPanel = () => {
             </div>
           </div>
         )}
+
         <div className="px-4 pt-4">
           <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-6 ml-20">Title</div>
@@ -158,91 +233,84 @@ export const PlaylistPanel = () => {
             <div className="col-span-1">Duration</div>
           </div>
         </div>
-        <InfiniteScroll
-          dataLength={items.length}
-          next={fetchMoreData}
-          hasMore={hasMore}
-          loader={<h4>Loading...</h4>}
-        >
-          <ScrollArea>
-            <div className="p-4 space-y-2">
-              {songs.map((song, id) => (
-                <div
-                  key={song.id}
-                  className={`flex  items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
-                    currentSongId === song.id
-                      ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
-                      : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
-                  }`}
-                  onClick={() => handleSongClick(song)}
-                >
-                  <div className="font-medium truncate text-white drop-shadow-sm">
-                    {id + 1}
-                  </div>
-                  <div className="relative">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        togglePlayPause();
-                      }}
-                    >
-                      {isPlaying && currentSongId === song.id ? (
-                        <Pause className="h-4 w-4 text-white" />
-                      ) : (
-                        <Play className="h-4 w-4 text-white" />
-                      )}
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-10 gap-3 w-full  items-center">
-                    <span className="col-span-6 flex flex-col">
-                      <div className="font-medium truncate text-white drop-shadow-sm">
-                        {song.title || song.filename}
-                      </div>
-                      <span className="col-span-text-sm text-white/70 truncate">
-                        {song.artist}
-                      </span>
-                    </span>
-                    <span className="col-span-3 text-m text-white/70 truncate">
-                      {song.album}
-                    </span>
-                    <span className="col-span-1 text-center  text-white/70 truncate">
-                      {song.metadata?.track_length/60
-                        ? `${Math.floor(song.metadata.track_length / 60)}:${
-                            Math.floor(song.metadata.track_length % 60) < 10
-                              ? "0" +
-                                Math.floor(song.metadata.track_length % 60)
-                              : Math.floor(song.metadata.track_length % 60)
-                          }`
-                        : "0:00"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {currentSongId === song.id && isPlaying && (
-                      <div className="flex items-center gap-1">
-                        <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
-                        <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>
-                        <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
-                      </div>
+
+        <ScrollArea>
+          <div className="p-4 space-y-2">
+            {songs.map((song, id) => (
+              <div
+                key={song.id}
+                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                  currentSongId === song.id
+                    ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
+                    : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
+                }`}
+                onClick={() => handleSongClick(song)}
+              >
+                <div className="font-medium truncate text-white drop-shadow-sm">
+                  {id + 1}
+                </div>
+                <div className="relative">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePlayPause();
+                    }}
+                  >
+                    {isPlaying && currentSongId === song.id ? (
+                      <Pause className="h-4 w-4 text-white" />
+                    ) : (
+                      <Play className="h-4 w-4 text-white" />
                     )}
-                    {/* <span className="text-sm text-white/70 font-medium">
+                  </Button>
+                </div>
+                <div className="grid grid-cols-10 gap-3 w-full items-center">
+                  <span className="col-span-6 flex flex-col">
+                    <div className="font-medium truncate text-white drop-shadow-sm">
+                      {song.title || song.filename}
+                    </div>
+                    <span className="col-span-text-sm text-white/70 truncate">
+                      {song.artist}
+                    </span>
+                  </span>
+                  <span className="col-span-3 text-m text-white/70 truncate">
+                    {song.album}
+                  </span>
+                  <span className="col-span-1 text-center text-white/70 truncate">
+                    {song.metadata?.track_length / 60
+                      ? `${Math.floor(song.metadata.track_length / 60)}:${
+                          Math.floor(song.metadata.track_length % 60) < 10
+                            ? "0" + Math.floor(song.metadata.track_length % 60)
+                            : Math.floor(song.metadata.track_length % 60)
+                        }`
+                      : "0:00"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {currentSongId === song.id && isPlaying && (
+                    <div className="flex items-center gap-1">
+                      <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
+                      <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>
+                      <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
+                    </div>
+                  )}
+                  {/* <span className="text-sm text-white/70 font-medium">
                       {song.metadata.duration}
                     </span> */}
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
-                    >
-                      <MoreHorizontal className="h-3 w-3 text-white/70" />
-                    </Button>
-                  </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                  >
+                    <MoreHorizontal className="h-3 w-3 text-white/70" />
+                  </Button>
                 </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </InfiniteScroll>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );

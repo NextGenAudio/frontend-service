@@ -3,37 +3,69 @@ import { useEffect, useState } from "react";
 import { Plus, Music, MoreHorizontal } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/app/components/ui/collapsible";
 import { useSidebar } from "../utils/sidebar-context";
+
+type Folder = {
+  id: number;
+  name: string;
+  description?: string;
+  folderArt?: string; // comes from DB
+  musicCount?: number;
+};
+
+interface Song {
+  id: string;
+  title: string | undefined;
+  filename: string;
+
+  artist: string | undefined;
+  album: string | undefined;
+  uploadedAt: Date;
+  // duration: string;
+  source: string;
+  metadata: any;
+  // isLiked: boolean;
+}
 
 
 export const LibraryPanel = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const { setUpload, setHome,setCreateFolder } = useSidebar();
-  const [folders, setFolders] = useState<string[]>([]);
+  const { setUpload, setHome, setCreateFolder } = useSidebar();
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+  const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
     const fetchFolders = async () => {
       try {
         const res = await fetch("http://localhost:8080/folders", {
-            method: "GET",
-            credentials: "include", // include cookies
-          });
-          const data = await res.json();
-          console.log(data);
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await res.json();
+        console.log("Fetched folders:", data);
+        setFolders(data);
+      } catch (err) {
+        console.error("Error fetching folders:", err);
+      }
+    };
+    fetchFolders();
+  }, []);
 
-          setFolders(data);
-        } catch (err) {
-          console.error("Error fetching songs:", err);
-        }
-      };
-
-      fetchFolders();
-    }, []);
+    // Handle folder click
+  const handleFolderClick = async (folder: Folder) => {
+    setSelectedFolder(folder);
+    try {
+      const res = await fetch(`http://localhost:8080/files/list?folderId=${folder.id}`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      console.log("Songs in folder:", data);
+      setSongs(data);
+    } catch (err) {
+      console.error("Error fetching songs:", err);
+    }
+  };
 
   const playlists = [
     {
@@ -50,28 +82,9 @@ export const LibraryPanel = () => {
       image:
         "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100&h=100&fit=crop&crop=center",
     },
-    {
-      id: "3",
-      name: "Workout Mix",
-      songCount: 35,
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop&crop=center",
-    },
-    {
-      id: "4",
-      name: "Road Trip",
-      songCount: 23,
-      image:
-        "https://images.unsplash.com/photo-1518444065439-e933c06ce9cd?w=100&h=100&fit=crop&crop=center",
-    },
-    {
-      id: "5",
-      name: "Study Session",
-      songCount: 19,
-      image:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=center",
-    },
   ];
+
+  const defaultImage = "/placeholder.svg";
 
   return (
     <div className="h-full relative overflow-hidden">
@@ -79,176 +92,159 @@ export const LibraryPanel = () => {
       <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
 
       <div className="relative h-full flex flex-col">
-        {/* <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild> */}
-            <div className="p-4  pt-6 border-b border-white/20 cursor-pointer  backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl ml-3  font-semibold text-white drop-shadow-sm">
-                  Your Library
-                </h2>
-                <div className="flex items-center gap-2">
-                     <Button
-                    size="sm"
-                    className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white data-[state=active]:bg-white hover:scale-100 transition-all duration-200 shadow-lg"
-                    onClick={() => {
-                      setUpload(true);
-                      setCreateFolder(false);
-                      setHome(false);
-                      console.log("fuk")
-                    }}
-                  >
-                    <Plus className="h-4 w-4" /><span>Add Music</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm text-white data-[state=active]:bg-white hover:scale-100 transition-all duration-200 shadow-lg"
-                    onClick={() => {
-                      setUpload(false);
-                      setCreateFolder(true);
-                      setHome(false);
-                      console.log("fuk")
-                    }}
-                  >
-                    <Plus className="h-4 w-4" /><span>New Folder</span>
-                  </Button>
-                </div>
-              </div>
+        {/* Header */}
+        <div className="p-4 pt-6 border-b border-white/20 cursor-pointer backdrop-blur-sm">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl ml-3 font-semibold text-white drop-shadow-sm">
+              Your Library
+            </h2>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
+                onClick={() => {
+                  setUpload(true);
+                  setCreateFolder(false);
+                  setHome(false);
+                }}
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add Music</span>
+              </Button>
+              <Button
+                size="sm"
+                className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
+                onClick={() => {
+                  setUpload(false);
+                  setCreateFolder(true);
+                  setHome(false);
+                }}
+              >
+                <Plus className="h-4 w-4" />
+                <span>New Folder</span>
+              </Button>
             </div>
-          {/* </CollapsibleTrigger> */}
+          </div>
+        </div>
 
-          {/* <CollapsibleContent className="flex-1"> */}
-            <Tabs defaultValue="playlists" className="h-full flex flex-col">
-              <TabsList className="grid  grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
-                <TabsTrigger
-                  value="all"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200  rounded-[10px]"
+        {/* Tabs */}
+        <Tabs defaultValue="all" className="h-full flex flex-col">
+          <TabsList className="grid grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+            <TabsTrigger
+              value="all"
+              className="data-[state=active]:bg-white/30 text-white/80 hover:text-white"
+            >
+              All
+            </TabsTrigger>
+            <TabsTrigger
+              value="playlists"
+              className="data-[state=active]:bg-white/30 text-white/80 hover:text-white"
+            >
+              Playlists
+            </TabsTrigger>
+            <TabsTrigger
+              value="folders"
+              className="data-[state=active]:bg-white/30 text-white/80 hover:text-white"
+            >
+              Folders
+            </TabsTrigger>
+          </TabsList>
+
+          {/* All = playlists + folders */}
+          <TabsContent value="all" className="flex-1 px-3 overflow-y-auto">
+            <div className="space-y-2">
+              {/* Playlists */}
+              {playlists.map((playlist) => (
+                <div
+                  key={`playlist-${playlist.id}`}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 cursor-pointer transition-all duration-300 group shadow-lg"
                 >
-                  All
-                </TabsTrigger>
-                <TabsTrigger
-                  value="playlists"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200 rounded-[10px]"
-                >
-                  Playlists
-                </TabsTrigger>
-                <TabsTrigger
-                  value="imports"
-                  className="data-[state=active]:bg-white/30 data-[state=active]:text-white text-white/80 hover:text-white transition-all duration-200  rounded-[10px]"
-                >
-                  Folders
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="all" className="flex-1 px-3 overflow-y-auto">
-                <div className="space-y-2">
-                  {playlists.map((playlist) => (
-                    <div
-                      key={playlist.id}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:scale-[1.02] cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-xl"
-                    >
-                      <div className="relative flex-shrink-0">
-                        <img
-                          src={playlist.image || "/placeholder.svg"}
-                          alt={playlist.name}
-                          className="w-12 h-12 rounded-xl object-cover shadow-md"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-xl"></div>
-                      </div>
-                      <div className="flex-1 min-w-0 hidden sm:block">
-                        <div className="font-medium truncate text-white drop-shadow-sm">
-                          {playlist.name}
-                        </div>
-                        <div className="text-sm text-white/70">
-                          {playlist.songCount} songs
-                        </div>
-                      </div>
-                      <Button
-                        size="icon"
-                        className="h-8 w-8 opacity-0 rounded-xl group-hover:opacity-100 bg-white/20 hover:bg-white/30 border border-white/30 text-white hover:scale-110 transition-all duration-200 hidden sm:flex backdrop-blur-sm"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                  <img
+                    src={playlist.image || defaultImage}
+                    alt={playlist.name}
+                    className="w-12 h-12 rounded-xl object-cover shadow-md"
+                  />
+                  <div className="flex-1 min-w-0 hidden sm:block">
+                    <div className="font-medium truncate text-white">
+                      {playlist.name}
                     </div>
-                  ))}
-                  {["Local Files", "Downloaded"].map((item, index) => (
-                    <div
-                      key={`special-${index}`}
-                      className="flex items-center gap-3 p-3 bg-white/15 backdrop-blur-sm border border-white/25 rounded-xl hover:bg-white/25 hover:scale-[1.02] cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl"
-                    >
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-                        <Music className="h-6 w-6 text-white/80" />
-                      </div>
-                      <div className="text-sm font-medium hidden sm:block text-white drop-shadow-sm">
-                        {item}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent
-                value="playlists"
-                className="flex-1 px-3 overflow-y-auto"
-              >
-                <div className="space-y-2">
-                  {playlists.map((playlist) => (
-                    <div
-                      key={playlist.id}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 hover:scale-[1.02] cursor-pointer transition-all duration-300 group shadow-lg hover:shadow-xl"
-                    >
-                      <div className="relative flex-shrink-0">
-                        <img
-                          src={playlist.image || "/placeholder.svg"}
-                          alt={playlist.name}
-                          className="w-12 h-12 rounded-xl object-cover shadow-md"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-xl"></div>
-                      </div>
-                      <div className="flex-1 min-w-0 hidden sm:block">
-                        <div className="font-medium truncate text-white drop-shadow-sm">
-                          {playlist.name}
-                        </div>
-                        <div className="text-sm text-white/70">
-                          {playlist.songCount} songs
-                        </div>
-                      </div>
-                      <Button
-                        size="icon"
-                        className="h-8 w-8 opacity-0 rounded-xl group-hover:opacity-100 bg-white/20 hover:bg-white/30 border border-white/30 text-white hover:scale-110 transition-all duration-200 hidden sm:flex backdrop-blur-sm"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent
-                value="imports"
-                className="flex-1 px-3 overflow-y-auto"
-              >
-                <div className="space-y-2">
-                  <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 hover:scale-[1.02] cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl">
-                    <div className="text-sm font-medium text-white drop-shadow-sm">
-                      Spotify Import
-                    </div>
-                    <div className="text-xs text-white/70">
-                      Last synced 2 days ago
-                    </div>
-                  </div>
-                  <div className="p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 hover:scale-[1.02] cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl">
-                    <div className="text-sm font-medium text-white drop-shadow-sm">
-                      Apple Music
-                    </div>
-                    <div className="text-xs text-white/70">
-                      Last synced 1 week ago
+                    <div className="text-sm text-white/70">
+                      {playlist.songCount} songs
                     </div>
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
-          {/* </CollapsibleContent>
-        </Collapsible> */}
+              ))}
+
+              {/* Folders */}
+              {folders.map((folder) => (
+                <div
+                  key={`folder-${folder.id}`}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 cursor-pointer transition-all duration-300 shadow-lg"
+                >
+                  <img
+                    src={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
+                    alt={folder.name}
+                    className="w-12 h-12 rounded-xl object-cover shadow-md"
+                  />
+                  <div className="flex-1 min-w-0 hidden sm:block">
+                    <div className="font-medium truncate text-white">
+                      {folder.name}
+                    </div>
+                    <div className="text-sm text-white/70">
+                      {folder.musicCount ?? 0} songs
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Only Playlists */}
+          <TabsContent value="playlists" className="flex-1 px-3 overflow-y-auto">
+            <div className="space-y-2">
+              {playlists.map((playlist) => (
+                <div
+                  key={playlist.id}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20"
+                >
+                  <img
+                    src={playlist.image || defaultImage}
+                    alt={playlist.name}
+                    className="w-12 h-12 rounded-xl object-cover shadow-md"
+                  />
+                  <div className="flex-1 min-w-0 hidden sm:block">
+                    <div className="font-medium truncate text-white">
+                      {playlist.name}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Only Folders */}
+          <TabsContent value="folders" className="flex-1 px-3 overflow-y-auto">
+            <div className="space-y-2">
+              {folders.map((folder) => (
+                <div
+                  key={folder.id}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20"
+                >
+                  <img
+                    src={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
+                    alt={folder.name}
+                    className="w-12 h-12 rounded-xl object-cover shadow-md"
+                  />
+                  <div className="flex-1 min-w-0 hidden sm:block">
+                    <div className="font-medium truncate text-white">
+                      {folder.name}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

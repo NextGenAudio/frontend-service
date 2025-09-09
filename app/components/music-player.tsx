@@ -20,6 +20,7 @@ import {
   useMusicContext,
 } from "../utils/music-context";
 import { create } from "domain";
+import { ProfileDropdown } from "./profile-dropdown";
 
 interface Song {
   id: string;
@@ -39,7 +40,7 @@ export function MusicPlayer() {
   const [metadata, setMetadata] = useState<any>(null);
   const { currentSong, setCurrentSong } = useMusicContext();
   const { isPlaying, setIsPlaying } = useMusicContext();
-  const { player, home, upload, createFolder } = useSidebar();
+  const { player, home, upload, profile, createFolder } = useSidebar();
 
   useEffect(() => {
     if (!currentSong) return;
@@ -78,6 +79,7 @@ export function MusicPlayer() {
 
               {/* Main Playlist Panel */}
               <ResizablePanel defaultSize={50} minSize={30}>
+                <ProfileDropdown />
                 {createFolder && <FolderCreate />}
                 {upload && <MusicUpload />}
                 {home && <PlaylistPanel />}
@@ -94,7 +96,8 @@ export function MusicPlayer() {
         </div>
 
         {player && <FloatingPlayerControls song={currentSong} />}
-    
+      
+
     </>
   );
 }

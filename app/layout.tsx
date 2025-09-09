@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import AuthProvider from "./auth/Provider";
+import { MusicProvider } from "./utils/music-context";
+import { SidebarProvider } from "./utils/sidebar-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,7 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <SidebarProvider>
+            <MusicProvider>{children}</MusicProvider>
+          </SidebarProvider>
+        </AuthProvider>
       </body>
     </html>
   );
