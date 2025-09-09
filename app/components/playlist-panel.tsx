@@ -7,6 +7,7 @@ import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { SearchBar } from "./search-bar";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
+import { clsx } from "clsx";
 
 interface Song {
   id: string;
@@ -19,7 +20,7 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  // isLiked: boolean;
+  isLiked: boolean;
 }
 
 interface PlaylistPanelProps {
@@ -34,36 +35,33 @@ export const PlaylistPanel = () => {
 
   const [isOpen, setIsOpen] = useState(true);
 
-  const [isPlaying, setIsPlaying] = useState(true);
+  const {isPlaying, setIsPlaying} = useMusicContext();
   const [currentSongId, setCurrentSongId] = useState("1");
-  const [songs, setSongs] = useState<Song[]>([]);
-  const { searchBar, visualizer } = useSidebar();
+  const { songList, entityName, entityArt, entityType } = useMusicContext();
+  const { searchBar, player, visualizer, setPlayer } = useSidebar();
 
   const onSongSelect = (song: Song) => {
     setCurrentSong(song);
   };
 
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/files/list", {
-          method: "GET",
-          credentials: "include", // include cookies
-        });
-        const data = await res.json();
-        console.log(data);
+  // useEffect(() => {
+  //   const fetchSongs = async () => {
+  //     try {
+  //       const res = await fetch("http://localhost:8080/files/list", {
+  //         method: "GET",
+  //         credentials: "include", // include cookies
+  //       });
+  //       const data = await res.json();
+  //       console.log(data);
 
-        setSongs(data);
-      } catch (err) {
-        console.error("Error fetching songs:", err);
-      }
-    };
+  //       setSongs(data);
+  //     } catch (err) {
+  //       console.error("Error fetching songs:", err);
+  //     }
+  //   };
 
-    fetchSongs();
-  }, []);
-
-  const [items, setItems] = useState(songs.slice(0, 5));
-  const [hasMore, setHasMore] = useState(true);
+  //   fetchSongs();
+  // }, []);
 
   const handleSongClick = (song: Song) => {
     setCurrentSongId(song.id);
@@ -73,15 +71,6 @@ export const PlaylistPanel = () => {
   const togglePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
-
-  function fetchMoreData() {
-    // Simulate fetching more songs (pagination)
-    const nextItems = songs.slice(items.length, items.length + 10);
-    setItems((prev) => [...prev, ...nextItems]);
-    if (items.length + nextItems.length >= songs.length) {
-      setHasMore(false);
-    }
-  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,11 +92,11 @@ export const PlaylistPanel = () => {
   return (
     <div
       ref={scrollRef}
-      className="relative h-full flex flex-col overflow-y-scroll pt-5 pb-20"
+      className="relative h-full flex flex-col overflow-y-scroll pt-5"
       onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
     >
       {/* Glass background with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20 backdrop-blur-xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20 backdrop-blur-xl " />
       <div className="inset-0 bg-white/5 backdrop-blur-sm" />
 
       {searchBar && <SearchBar />}
@@ -135,11 +124,11 @@ export const PlaylistPanel = () => {
                 }}
               >
                 <img
-                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop&crop=center"
-                  alt="Playlist cover"
-                  className="w-full h-full object-cover"
+                  src={entityArt ?? undefined}
+                  alt={entityName ?? undefined}
+                  className=" rounded-xl object-cover shadow-md"
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-[1px]" />
+                <div className="absolute inset-0" />
                 <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />
               </div>
 
@@ -156,7 +145,7 @@ export const PlaylistPanel = () => {
                     })`,
                   }}
                 >
-                  Playlist #1
+                  {entityName}
                 </h2>
                 <p
                   className="text-white/80 transition-all duration-700 ease-out"
@@ -168,42 +157,21 @@ export const PlaylistPanel = () => {
                     opacity: isHeaderCompact ? 0.9 : 0.8,
                   }}
                 >
-                  {songs.length} songs
+                  {songList.length} songs
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div
-          className={`fixed top-0 left-0 right-0 z-30 p-4 backdrop-blur-xl bg-gradient-to-r from-gray-900/95 to-slate-800/95 border-b border-white/10 transition-all duration-700 ease-out ${
-            isHeaderCompact
-              ? "translate-y-0 opacity-100"
-              : "-translate-y-full opacity-0"
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop&crop=center"
-                alt="Playlist cover"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white">Playlist #1</h3>
-              <p className="text-sm text-white/70">{songs.length} songs</p>
-            </div>
-          </div>
-        </div>
+     
 
         {/* Glass Visualizer Area */}
         {visualizer && (
           <div className="p-4 border-b border-white/10">
             <div className="h-40 bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 rounded-xl flex items-center justify-center relative overflow-hidden backdrop-blur-sm border border-white/20">
               <div className="text-sm text-white/70 font-medium z-10">
-                {songs.find((song) => song.id === currentSongId)?.filename}
+                {songList.find((song) => song.id === currentSongId)?.filename}
               </div>
               {/* Enhanced animated bars */}
               <div className="absolute inset-0 flex items-center justify-center gap-1 px-8">
@@ -227,7 +195,7 @@ export const PlaylistPanel = () => {
 
         <div className="px-4 pt-4">
           <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
-            <div className="col-span-6 ml-20">Title</div>
+            <div className="col-span-6 ml-14">Title</div>
 
             <div className="col-span-3">Album</div>
             <div className="col-span-1">Duration</div>
@@ -235,8 +203,8 @@ export const PlaylistPanel = () => {
         </div>
 
         <ScrollArea>
-          <div className="p-4 space-y-2">
-            {songs.map((song, id) => (
+          <div className={clsx("p-4 space-y-2", player ? "pb-52" : "pb-8")}>
+            {songList.map((song, id) => (
               <div
                 key={song.id}
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
@@ -253,10 +221,12 @@ export const PlaylistPanel = () => {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      togglePlayPause();
+                      setIsPlaying(!isPlaying);
+                      handleSongClick(song);
+                      setPlayer(true);
                     }}
                   >
                     {isPlaying && currentSongId === song.id ? (

@@ -104,6 +104,7 @@ export function MusicUpload() {
     reader.readAsDataURL(file);
   };
 
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -347,24 +348,6 @@ export function MusicUpload() {
                     required
                   />
                 </div>
-{/* 
-                <div>
-                  <Label htmlFor="album" className="text-white mb-2 block">
-                    Album
-                  </Label>
-                  <Input
-                    id="album"
-                    value={formData.album}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        album: e.target.value,
-                      }))
-                    }
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
-                    placeholder="Enter album name"
-                  />
-                </div> */}
 
                 <div>
                   <Label
