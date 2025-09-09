@@ -23,53 +23,34 @@ interface Song {
   isLiked: boolean;
 }
 
-interface PlaylistPanelProps {
-  onSongSelect: (song: Song) => void;
-}
+
 
 export const PlaylistPanel = () => {
-  const { setCurrentSong } = useMusicContext();
+  const { selectSong, setSelectSong, playingSong, setPlayingSong } = useMusicContext();
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
   const [isHeaderCompact, setIsHeaderCompact] = useState(false);
 
   const [isOpen, setIsOpen] = useState(true);
 
-  const {isPlaying, setIsPlaying} = useMusicContext();
-  const [currentSongId, setCurrentSongId] = useState("1");
+  const { isPlaying, setIsPlaying } = useMusicContext();
+  const [selectSongId, setSelectSongId] = useState("1");
+  const [playingSongId, setPlayingSongId] = useState("1");
   const { songList, entityName, entityArt, entityType } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer } = useSidebar();
 
-  const onSongSelect = (song: Song) => {
-    setCurrentSong(song);
+
+ 
+
+  const handleSongSingleClick = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
   };
 
-  // useEffect(() => {
-  //   const fetchSongs = async () => {
-  //     try {
-  //       const res = await fetch("http://localhost:8080/files/list", {
-  //         method: "GET",
-  //         credentials: "include", // include cookies
-  //       });
-  //       const data = await res.json();
-  //       console.log(data);
-
-  //       setSongs(data);
-  //     } catch (err) {
-  //       console.error("Error fetching songs:", err);
-  //     }
-  //   };
-
-  //   fetchSongs();
-  // }, []);
-
-  const handleSongClick = (song: Song) => {
-    setCurrentSongId(song.id);
-    onSongSelect(song);
-  };
-
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
+  const handleSongDoubleClick = (song: Song) => {
+    setPlayingSongId(song.id);
+    setPlayingSong(song);
   };
 
   useEffect(() => {
@@ -164,14 +145,12 @@ export const PlaylistPanel = () => {
           </div>
         </div>
 
-     
-
         {/* Glass Visualizer Area */}
         {visualizer && (
           <div className="p-4 border-b border-white/10">
             <div className="h-40 bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 rounded-xl flex items-center justify-center relative overflow-hidden backdrop-blur-sm border border-white/20">
               <div className="text-sm text-white/70 font-medium z-10">
-                {songList.find((song) => song.id === currentSongId)?.filename}
+                {songList.find((song) => song.id === playingSongId)?.filename}
               </div>
               {/* Enhanced animated bars */}
               <div className="absolute inset-0 flex items-center justify-center gap-1 px-8">
@@ -208,11 +187,12 @@ export const PlaylistPanel = () => {
               <div
                 key={song.id}
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
-                  currentSongId === song.id
+                  playingSongId === song.id
                     ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
                     : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
                 }`}
-                onClick={() => handleSongClick(song)}
+                onClick={() => handleSongSingleClick(song)}
+                onDoubleClick={() => handleSongDoubleClick(song)}
               >
                 <div className="font-medium truncate text-white drop-shadow-sm">
                   {id + 1}
@@ -224,12 +204,17 @@ export const PlaylistPanel = () => {
                     className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsPlaying(!isPlaying);
-                      handleSongClick(song);
-                      setPlayer(true);
+                      if (playingSongId === song.id) {
+                        setIsPlaying(!isPlaying); // toggle play/pause
+                      } else {
+                        handleSongSingleClick(song); // load a new song
+                        setPlayer(true);
+                      
+                        setIsPlaying(true); // start playing it
+                      }
                     }}
                   >
-                    {isPlaying && currentSongId === song.id ? (
+                    {isPlaying && playingSongId === song.id ? (
                       <Pause className="h-4 w-4 text-white" />
                     ) : (
                       <Play className="h-4 w-4 text-white" />
@@ -259,7 +244,7 @@ export const PlaylistPanel = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {currentSongId === song.id && isPlaying && (
+                  {playingSongId === song.id && isPlaying && (
                     <div className="flex items-center gap-1">
                       <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
                       <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>

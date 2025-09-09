@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 import {
   Play,
   Pause,
@@ -30,6 +30,7 @@ import { parseWebStream } from "music-metadata";
 import SongCover from "./song-cover";
 import * as RadixSlider from "@radix-ui/react-slider";
 import { usePlayerSettings } from "@/app/hooks/use-player-settings";
+import MusicContext, { useMusicContext } from "../utils/music-context";
 
 interface Song {
   id: string;
@@ -40,11 +41,10 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  // isLiked: boolean;
+  isLiked: boolean;
 }
 
 export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState(0);
 
@@ -60,14 +60,23 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
-  const [currentTime, setCurrentTime] = useState(0); // seconds
+  const [currentTime, setCurrentTime] = useState(0);
+  const [progress, setProgress] = useState(0); // in percentage 0-100
 
   const toggleShuffle = () => setIsShuffle(!isShuffle);
   const toggleRepeat = () => setRepeatMode((prev) => (prev + 1) % 3);
   const toggleMute = () => setIsMuted(!isMuted);
   const toggleLike = () => setIsLiked(!isLiked);
 
-  const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat, progress, setProgress } = usePlayerSettings();
+  const {
+    volume,
+    setVolume,
+    isMuted,
+    setIsMuted,
+    isRepeat,
+    setIsRepeat,
+  } = usePlayerSettings();
+  const { isPlaying, setIsPlaying } = useMusicContext();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -83,7 +92,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
       switch (e.code) {
         case "Space":
           e.preventDefault();
-          togglePlayPause();
+          setIsPlaying(!isPlaying);
           break;
         case "ArrowRight":
           if (e.shiftKey) {
@@ -113,29 +122,41 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
 
-  useEffect(() => {
-    if (!song?.source) return;
-    // Create Howler sound
-    const sound = new Howl({
-      src: [song?.source || ""],
-      html5: true,
-      volume: isMuted ? 0 : volume / 100,
-      preload: true,
-      loop: repeatMode === 1,
-      onplay: () => {
-        setIsPlaying(true);
-        setDuration(sound.duration());
-      },
-      onpause: () => setIsPlaying(false),
-      onend: () => setIsPlaying(false),
-    });
+ useEffect(() => {
+  if (!song?.source) return;
 
-    soundRef.current = sound;
+  // If already loaded with same source, don't recreate
+  if (soundRef.current && (soundRef.current as any)._src === song.source) {
+    return;
+  }
 
-    return () => {
-      sound.unload(); // cleanup old sound
-    };
-  }, [song]);
+  // Stop and unload if switching to a different song
+  if (soundRef.current) {
+    soundRef.current.stop();
+    soundRef.current.unload();
+  }
+
+  const sound = new Howl({
+    src: [song.source],
+    html5: true,
+    volume: isMuted ? 0 : volume / 100,
+    preload: true,
+    loop: repeatMode === 1,
+    onplay: () => {
+      setIsPlaying(true);
+      setDuration(sound.duration());
+    },
+    onpause: () => setIsPlaying(false),
+    onend: () => setIsPlaying(false),
+  });
+
+  soundRef.current = sound;
+
+  return () => {
+    // only cleanup if unmounting, not when replaying same song
+    sound.unload();
+  };
+}, [song?.source]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -187,18 +208,21 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     return () => cancelAnimationFrame(frame);
   }, [duration]);
 
-  const togglePlayPause = () => {
-    const sound = soundRef.current;
-    if (!sound) return;
+ useEffect(() => {
+  const sound = soundRef.current;
+  if (!sound) return;
 
+  if (isPlaying) {
+    if (!sound.playing()) {
+      sound.play();
+    }
+  } else {
     if (sound.playing()) {
       sound.pause();
-      setIsPlaying(false);
-    } else {
-      sound.play();
-      setIsPlaying(true);
     }
-  };
+  }
+}, [isPlaying]);
+
 
   return (
     <TooltipProvider>
@@ -327,7 +351,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                       <Button
                         size="icon"
                         className="h-12 w-12 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-300 hover:to-orange-400 text-white shadow-lg hover:shadow-orange-400/50 transition-all duration-300 hover:scale-110 border border-orange-300/30"
-                        onClick={togglePlayPause}
+                        onClick={() => setIsPlaying(!isPlaying)}
                       >
                         {isPlaying ? (
                           <Pause className="h-5 w-5" />

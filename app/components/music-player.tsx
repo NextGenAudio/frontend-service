@@ -33,35 +33,35 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  // isLiked: boolean;
+  isLiked: boolean;
 }
 
 export function MusicPlayer() {
   const [metadata, setMetadata] = useState<any>(null);
-  const { currentSong, setCurrentSong } = useMusicContext();
+  const { selectSong, setSelectSong, playingSong, setPlayingSong } = useMusicContext();
   const { isPlaying, setIsPlaying } = useMusicContext();
   const { player, home, upload, profile, createFolder } = useSidebar();
 
   useEffect(() => {
-    if (!currentSong) return;
+    if (!selectSong) return;
 
-    const url = `http://localhost:8080/files/download/${currentSong.filename}`;
+    const url = `http://localhost:8080/files/download/${selectSong.filename}`;
     console.log("Song URL:", url);
 
     // Update state with direct backend URL
-    setCurrentSong({
-      ...currentSong,
+    setPlayingSong({
+      ...selectSong,
       source: url,
-      id: currentSong.id,
+      id: selectSong.id,
     });
 
     // Cleanup object URL if you used Blob before
     return () => {
-      if (currentSong.source?.startsWith("blob:")) {
-        URL.revokeObjectURL(currentSong.source);
+      if (playingSong?.source?.startsWith("blob:")) {
+        URL.revokeObjectURL(playingSong.source);
       }
     };
-  }, [currentSong?.filename]);
+  }, [playingSong?.filename]);
 
   return (
     <>
@@ -89,14 +89,13 @@ export function MusicPlayer() {
 
               {/* Song Details Panel */}
               <ResizablePanel defaultSize={25} minSize={20} maxSize={30}>
-                <SongDetailsPanel song={currentSong} />
+                <SongDetailsPanel song={selectSong} />
               </ResizablePanel>
             </ResizablePanelGroup>
           </div>
         </div>
 
-        {player && <FloatingPlayerControls song={currentSong} />}
-      
+        {player && <FloatingPlayerControls song={playingSong} />}
 
     </>
   );

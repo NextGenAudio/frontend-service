@@ -17,7 +17,6 @@ interface Song {
 }
 
 type MusicContextType = {
-  currentSong: Song | null;
   isPlaying: boolean;
   songList: Song[];
   entityName: string | null;
@@ -27,31 +26,42 @@ type MusicContextType = {
   setEntityName: (value: string | null) => void;
   setEntityArt: (value: string | null) => void;
   setEntityType: (value: "folder" | "playlist" | null) => void;
-  setCurrentSong: (value: Song | null) => void;
   setIsPlaying: (value: boolean) => void;
+  duration: number;
+  setDuration: (value: number) => void;
+  selectSong: Song | null;
+  playingSong: Song | null;
+  setSelectSong: (value: Song | null) => void;
+  setPlayingSong: (value: Song | null) => void;
 };
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [selectSong, setSelectSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [songList, setSongList] = useState<Song[]>([]);
   const [entityName, setEntityName] = useState<string | null>(null);
   const [entityArt, setEntityArt] = useState<string | null>(null);
   const [entityType, setEntityType] = useState<"folder" | "playlist" | null>(null);
+  const [duration, setDuration] = useState(0);
+  const [playingSong, setPlayingSong] = useState<Song | null>(null);
   const value = {
-    currentSong,
+    selectSong,
+    playingSong,
     isPlaying,
     songList,
     entityName,
     entityArt,
     entityType,
+    duration,
+    setPlayingSong,
+    setDuration,
     setSongList,
     setEntityName,
     setEntityArt,
     setEntityType,
-    setCurrentSong,
+     setSelectSong,
     setIsPlaying,
   };
 
