@@ -107,14 +107,15 @@ export function MusicPlayer() {
             <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
 
             {/* Song Details Panel */}
-            <ResizablePanel
-              defaultSize={0}
+
+            {detailPanel && <ResizablePanel
+              defaultSize={22}
               minSize={20}
               maxSize={25}
               
             >
               {detailPanel && <SongDetailsPanel song={selectSong} />}
-            </ResizablePanel>
+            </ResizablePanel>}
           </ResizablePanelGroup>
         </div>
       </div>
