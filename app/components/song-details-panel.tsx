@@ -11,6 +11,8 @@ import {
 } from "@/app/components/ui/collapsible";
 import { ScrollArea } from "@radix-ui/themes";
 import SongCover from "./song-cover";
+import clsx from "clsx";
+import { useSidebar } from "../utils/sidebar-context";
 interface Song {
   id: string;
   title: string | undefined;
@@ -30,6 +32,7 @@ interface GlassSongDetailsPanelProps {
 
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
   const [isLiked, setIsLiked] = useState(false);
+  const { player } = useSidebar();
   useEffect(()=>{
     console.log(song?.metadata);
   }, [song]);       
@@ -97,8 +100,8 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
             </Button>
           </div>
 
-          <div className="space-y-4 py-4">
-            <div className=" mb-44 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg">
+          <div className={"p-4 space-y-4"}>
+            <div className={clsx("backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg", player ? "mb-52" : "mb-8")}>
               <h4 className="font-medium text-white/80 mb-4 text-center">
                 Metadata
               </h4>
