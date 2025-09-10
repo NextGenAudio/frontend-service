@@ -16,6 +16,7 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 // import { Textarea } from "@/app/components/ui/textarea"
+import { Plus, FolderPlus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -24,7 +25,8 @@ import {
   SelectValue,
 } from "@/app/components/ui/select";
 import axios from "axios";
-
+import { useMusicContext } from "../utils/music-context";
+import router from "next/router";
 interface UploadedFile {
   file: File;
   progress: number;
@@ -43,10 +45,12 @@ export function MusicUpload() {
     genre: "",
     year: "",
     description: "",
+    selectedFolder: "", // Added selectedFolder property
   });
 
   const musicInputRef = useRef<HTMLInputElement>(null);
   const artworkInputRef = useRef<HTMLInputElement>(null);
+  const { folderList, playlistList } = useMusicContext();
 
   const handleMusicDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -104,7 +108,6 @@ export function MusicUpload() {
     reader.readAsDataURL(file);
   };
 
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -120,6 +123,10 @@ export function MusicUpload() {
       // If you also want to send artwork and metadata:
       if (artworkFile) {
         formDataToSend.append("artwork", artworkFile.file);
+      }
+      if (formData.selectedFolder) {
+        const folder = folderList.find(f => f.name === formData.selectedFolder);
+        formDataToSend.append("folderId", folder?.id);
       }
       if (formData) {
         Object.entries(formData).forEach(([key, value]) => {
@@ -323,53 +330,68 @@ export function MusicUpload() {
               )}
             </div>
 
-            {/* Metadata Form */}
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-              <h2 className="text-2xl font-semibold text-white mb-6">
-                Folder Details
+              <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
+                <FolderPlus className="w-6 h-6 text-orange-400" />
+                Folder Selection
               </h2>
 
-              <div className="space-y-6">
-                <div>
-                  <Label htmlFor="title" className="text-white mb-2 block">
-                    Folder Name *
-                  </Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }))
-                    }
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20"
-                    placeholder="Enter track title"
-                    required
-                  />
-                </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <>
+                  <div>
+                    <Label
+                      htmlFor="folder-select"
+                      className="text-white mb-2 block"
+                    >
+                      Select Folder *
+                    </Label>
+                    <Select
+                      value={formData.selectedFolder}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          selectedFolder: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="bg-white/10 border-white/20 text-white focus:border-orange-400 focus:ring-orange-400/20">
+                        <SelectValue placeholder="Choose an existing folder" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800/95 backdrop-blur-xl border-white/20">
+                        {folderList.map((folder) => (
+                          <SelectItem
+                            key={folder.id}
+                            value={folder.name}
+                            className="text-white hover:bg-white/10 focus:bg-white/10"
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span>{folder.name}</span>
+                              <span className="text-gray-400 text-sm ml-2">
+                                {folder.musicCount} songs
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <Label
-                    htmlFor="description"
-                    className="text-white mb-2 block"
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1 h-px bg-white/20"></div>
+                    <span className="text-gray-400 text-sm">or</span>
+                    <div className="flex-1 h-px bg-white/20"></div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={() => router.push("/create-folder")}
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
-                    Description
-                  </Label>
-                  <textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 focus:ring-orange-400/20 min-h-[100px] w-full rounded-md p-2"
-                    placeholder="Tell us about your track..."
-                  />
-                </div>
-              </div>
+                    <FolderPlus className="w-4 h-4 mr-2" />
+                    Create New Folder
+                  </Button>
+                </>
+              </form>
             </div>
           </div>
 

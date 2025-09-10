@@ -194,7 +194,7 @@ export const PlaylistPanel = () => {
                 onClick={() => handleSongSingleClick(song)}
                 onDoubleClick={() => handleSongDoubleClick(song)}
               >
-                <div className="font-medium truncate text-white drop-shadow-sm">
+                <div className="font-medium text-white drop-shadow-sm">
                   {id + 1}
                 </div>
                 <div className="relative">

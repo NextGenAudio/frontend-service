@@ -11,6 +11,7 @@ import {
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import MediaCard from "./ui/media-card";
+import { set } from "react-hook-form";
 
 
 type Folder = {
@@ -37,7 +38,7 @@ interface Song {
 
 export const LibraryPanel = () => {
   const { setUpload, setHome, setCreateFolder } = useSidebar();
-  const [folders, setFolders] = useState<Folder[]>([]);
+  const {folderList , setFolderList} = useMusicContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const { setSongList, setEntityType, setEntityName, setEntityArt } = useMusicContext();
@@ -51,7 +52,7 @@ export const LibraryPanel = () => {
         });
         const data = await res.json();
         console.log("Fetched folders:", data);
-        setFolders(data);
+        setFolderList(data);
       } catch (err) {
         console.error("Error fetching folders:", err);
       }
@@ -166,7 +167,7 @@ export const LibraryPanel = () => {
           count={playlist.songCount}
         />
       ))}
-      {folders.map((folder) => (
+      {folderList.map((folder) => (
         <MediaCard
           key={`folder-${folder.id}`}
           name={folder.name}
@@ -195,7 +196,7 @@ export const LibraryPanel = () => {
   {/* Folders only */}
   <TabsContent value="folders" className="flex-1 px-3 overflow-y-auto">
     <div className="space-y-2">
-      {folders.map((folder) => (
+      {folderList.map((folder) => (
         <MediaCard
           key={`folder-${folder.id}`}
           name={folder.name}
