@@ -36,8 +36,8 @@ interface Song {
   // isLiked: boolean;
 }
 
-export const LibraryPanel = () => {
-  const { setUpload, setHome, setCreateFolder } = useSidebar();
+export const LibraryPanel = ({songRefresh, folderRefresh}:{songRefresh: number, folderRefresh: number}) => {
+  const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
   const {folderList , setFolderList} = useMusicContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
@@ -58,7 +58,7 @@ export const LibraryPanel = () => {
       }
     };
     fetchFolders();
-  }, []);
+  }, [folderRefresh, songRefresh]);
 
   // Handle folder click
   const handleFolderClick = async (folder: Folder) => {
@@ -77,6 +77,11 @@ export const LibraryPanel = () => {
       setEntityName(folder.name);
       setEntityArt(folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : "");
       setSongList(data);
+      setPlaylist(true);
+      setHome(false);
+      setUpload(false);
+      setCreateFolder(false);
+      
     } catch (err) {
       console.error("Error fetching songs:", err);
     }
@@ -165,6 +170,7 @@ export const LibraryPanel = () => {
           name={playlist.name}
           image={playlist.image || defaultImage}
           count={playlist.songCount}
+          type="playlist"
         />
       ))}
       {folderList.map((folder) => (
@@ -173,6 +179,7 @@ export const LibraryPanel = () => {
           name={folder.name}
           image={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
           count={folder.musicCount}
+          type="folder"
           onClick={() => handleFolderClick(folder)}
         />
       ))}
@@ -188,6 +195,7 @@ export const LibraryPanel = () => {
           name={playlist.name}
           image={playlist.image || defaultImage}
           count={playlist.songCount}
+          type="playlist"
         />
       ))}
     </div>
@@ -203,6 +211,7 @@ export const LibraryPanel = () => {
           image={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
           count={folder.musicCount}
           onClick={() => handleFolderClick(folder)}
+          type="folder"
         />
       ))}
     </div>

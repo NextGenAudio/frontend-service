@@ -13,7 +13,7 @@ interface UploadedFile {
   preview?: string;
 }
 
-export function FolderCreate() {
+export function FolderCreate({ setRefresh }: { setRefresh: React.Dispatch<React.SetStateAction<number>> }) {
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -68,6 +68,7 @@ export function FolderCreate() {
       setMessage("✅ Folder created successfully!");
       setFormData({ name: "", description: "" });
       setArtworkFile(null);
+      setRefresh((old) => old + 1); // increment key
     } catch (error) {
       console.error(error);
       setMessage("❌ Failed to create folder. Please try again.");
@@ -156,7 +157,7 @@ export function FolderCreate() {
                 </Label>
                 <Input
                   id="name"
-                  value={formData.name}
+                  value={formData.name || "New Folder"}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }

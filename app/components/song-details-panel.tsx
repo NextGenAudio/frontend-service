@@ -44,7 +44,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
       <div className="relative h-full flex flex-col">
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
           <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
-            <h2 className="text-lg font-semibold text-white/90">Now Playing</h2>
+            <h2 className="text-lg font-semibold text-white/90">Music Details</h2>
             {/* <ChevronDown
                   className={`h-4 w-4 text-white/70 transition-all duration-300 ${isOpen ? "rotate-180" : ""} group-hover:text-white/90`}
                 /> */}

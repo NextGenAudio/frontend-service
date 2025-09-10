@@ -19,6 +19,9 @@ type SidebarContextType = {
   setCreateFolder: (value: boolean) => void;
   setVisualizer: (value: boolean) => void;
   setProfile: (value: boolean) => void;
+  playlist: boolean;
+  setPlaylist: (value: boolean) => void;
+  
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -32,6 +35,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [createFolder, setCreateFolder] = useState(false);
   const [visualizer, setVisualizer] = useState(false);
   const [profile, setProfile] = useState(false);
+  const [playlist, setPlaylist] = useState(false);
+
   return (
     <SidebarContext.Provider
       value={{
@@ -43,6 +48,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         createFolder,
         visualizer,
         profile,
+        playlist,
         setHome,
         setPlayer,
         setSearchBar,
@@ -51,7 +57,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         setCreateFolder,
         setVisualizer,
         setProfile,
-      
+        setPlaylist,
+       
       }}
     >
       {children}

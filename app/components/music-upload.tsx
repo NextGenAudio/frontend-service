@@ -34,7 +34,12 @@ interface UploadedFile {
   preview?: string;
 }
 
-export function MusicUpload() {
+interface MusicUploadProps {
+  setRefresh: React.Dispatch<React.SetStateAction<number>>;
+}
+
+
+export function MusicUpload({ setRefresh }: MusicUploadProps) {
   const [musicFile, setMusicFile] = useState<UploadedFile | null>(null);
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -153,6 +158,7 @@ export function MusicUpload() {
 
       console.log("Upload successful:", response.data);
       alert("File uploaded successfully!");
+      setRefresh((prev) => prev + 1);
     } catch (error) {
       console.error("Upload failed:", error);
       alert("Upload failed!");

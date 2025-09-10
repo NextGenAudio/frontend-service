@@ -6,9 +6,10 @@ interface MediaCardProps {
   image?: string;
   count?: number;
   onClick?: () => void;
+    type?: "folder" | "playlist";
 }
 
-function MediaCard({ name, image, count, onClick }: MediaCardProps) {
+function MediaCard({ name, image, count, onClick, type }: MediaCardProps) {
   return (
     <div
       onClick={onClick}
@@ -25,6 +26,7 @@ function MediaCard({ name, image, count, onClick }: MediaCardProps) {
           <div className="text-sm text-white/70">{count} songs</div>
         )}
       </div>
+        <div className="text-sm text-white/70 capitalize">{type}</div>
     </div>
   );
 }

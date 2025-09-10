@@ -23,10 +23,9 @@ interface Song {
   isLiked: boolean;
 }
 
-
-
 export const PlaylistPanel = () => {
-  const { selectSong, setSelectSong, playingSong, setPlayingSong } = useMusicContext();
+  const { selectSong, setSelectSong, playingSong, setPlayingSong } =
+    useMusicContext();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
@@ -38,18 +37,19 @@ export const PlaylistPanel = () => {
   const [selectSongId, setSelectSongId] = useState("1");
   const [playingSongId, setPlayingSongId] = useState("1");
   const { songList, entityName, entityArt, entityType } = useMusicContext();
-  const { searchBar, player, visualizer, setPlayer } = useSidebar();
-
-
- 
+  const { searchBar, player, visualizer, setPlayer,  setDetailPanel } = useSidebar();
 
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
+    setDetailPanel(true);
   };
 
   const handleSongDoubleClick = (song: Song) => {
     setPlayingSongId(song.id);
+    setDetailPanel(true);
+    setSelectSongId(song.id);
+    setSelectSong(song);
     setPlayingSong(song);
   };
 
@@ -192,7 +192,12 @@ export const PlaylistPanel = () => {
                     : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
                 }`}
                 onClick={() => handleSongSingleClick(song)}
-                onDoubleClick={() => handleSongDoubleClick(song)}
+                onDoubleClick={() => {
+                  handleSongDoubleClick(song);
+                  setPlayer(true);
+
+                  setIsPlaying(true); // start playing it
+                }}
               >
                 <div className="font-medium text-white drop-shadow-sm">
                   {id + 1}
@@ -209,7 +214,7 @@ export const PlaylistPanel = () => {
                       } else {
                         handleSongSingleClick(song); // load a new song
                         setPlayer(true);
-                      
+
                         setIsPlaying(true); // start playing it
                       }
                     }}
