@@ -128,15 +128,14 @@ export function MusicPlayer() {
   }, [playingSong?.source]);
 
   useEffect(() => {
-    
+
   })
 
   return (
     <>
       <div className="bg-slate-900 h-screen ml-[115px] rounded-[32px] bg-background text-foreground flex flex-col overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] drop-shadow-xl">
-        {/* Main Content Area - now takes full height since player is floating */}
+
         <div className="flex-1 min-h-0 h-full">
-          {/* <audio ref={audioRef} hidden playsInline /> */}
           <ResizablePanelGroup direction="horizontal" className="h-full">
         
             <ResizablePanel defaultSize={20} minSize={10} maxSize={25}>
