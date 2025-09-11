@@ -19,6 +19,7 @@ import { MusicProvider, useMusicContext } from "../utils/music-context";
 import { create } from "domain";
 import { ProfileDropdown } from "./profile-dropdown";
 import { MusicPlayerHome } from "./music-player-home";
+import AudioVisualizer from "./audio-visualizer";
 interface Song {
   id: string;
   title: string | undefined;
@@ -77,6 +78,10 @@ export function MusicPlayer() {
     };
   }, [playingSong?.filename]);
 
+
+
+  
+
   return (
     <>
       <div className="bg-slate-900 h-screen ml-[115px] rounded-[32px] bg-background text-foreground flex flex-col overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] drop-shadow-xl">
@@ -96,12 +101,14 @@ export function MusicPlayer() {
             {/* Main Playlist Panel */}
             <ResizablePanel defaultSize={30} minSize={20}>
               <ProfileDropdown />
+              
               {createFolder && (
                 <FolderCreate setRefresh={setFolderCreateRefresh} />
               )}
               {upload && <MusicUpload setRefresh={setSongUploadRefresh} />}
               {playlist && <PlaylistPanel />}
               {home && <MusicPlayerHome />}
+             
             </ResizablePanel>
 
             <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />

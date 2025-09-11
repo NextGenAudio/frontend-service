@@ -37,6 +37,8 @@ type MusicContextType = {
   playlistList: any[];
   setFolderList: (value: any[]) => void;
   setPlaylistList: (value: any[]) => void;
+  playingSongDuration: number;
+  setPlayingSongDuration: (value: number) => void;
 };
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -52,7 +54,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [playingSong, setPlayingSong] = useState<Song | null>(null);
   const [folderList, setFolderList] = useState<any[]>([]);
   const [playlistList, setPlaylistList] = useState<any[]>([]);
-
+  const [playingSongDuration, setPlayingSongDuration] = useState(0);
   const value = {
     selectSong,
     playingSong,
@@ -74,6 +76,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setEntityType,
      setSelectSong,
     setIsPlaying,
+    playingSongDuration,
+    setPlayingSongDuration,
   };
 
   return (

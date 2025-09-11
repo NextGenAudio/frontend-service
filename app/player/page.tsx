@@ -14,6 +14,7 @@ const Home = () => {
         {/* Music player positioned to not overlap sidebar */}
         <div className="absolute w-screen  z-0">
           <MusicPlayer />
+          
         </div>
      
     </div>

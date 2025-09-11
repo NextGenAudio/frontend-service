@@ -8,6 +8,7 @@ import { SearchBar } from "./search-bar";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import { clsx } from "clsx";
+import AudioVisualizer from "./audio-visualizer";
 
 interface Song {
   id: string;
@@ -37,7 +38,8 @@ export const PlaylistPanel = () => {
   const [selectSongId, setSelectSongId] = useState("1");
   const [playingSongId, setPlayingSongId] = useState("1");
   const { songList, entityName, entityArt, entityType } = useMusicContext();
-  const { searchBar, player, visualizer, setPlayer,  setDetailPanel } = useSidebar();
+  const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
+    useSidebar();
 
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
@@ -146,30 +148,12 @@ export const PlaylistPanel = () => {
         </div>
 
         {/* Glass Visualizer Area */}
+
         {visualizer && (
-          <div className="p-4 border-b border-white/10">
-            <div className="h-40 bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 rounded-xl flex items-center justify-center relative overflow-hidden backdrop-blur-sm border border-white/20">
-              <div className="text-sm text-white/70 font-medium z-10">
-                {songList.find((song) => song.id === playingSongId)?.filename}
-              </div>
-              {/* Enhanced animated bars */}
-              <div className="absolute inset-0 flex items-center justify-center gap-1 px-8">
-                {Array.from({ length: 100 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1 bg-gradient-to-t from-orange-400/60 to-pink-400/80 rounded-full animate-pulse shadow-lg"
-                    style={{
-                      height: `${Math.random() * 60 + 20}%`,
-                      animationDelay: `${i * 0.1}s`,
-                      animationDuration: `${Math.random() * 1 + 0.5}s`,
-                    }}
-                  />
-                ))}
-              </div>
-              {/* Glass overlay */}
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-[1px]" />
-            </div>
-          </div>
+          <AudioVisualizer
+            source={playingSong?.source || "" } // your backend URL: http://localhost:8080/files/download/...
+            fileName={songList.find((s) => s.id === playingSongId)?.filename || ""}
+          />
         )}
 
         <div className="px-4 pt-4">

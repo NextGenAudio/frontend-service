@@ -62,20 +62,15 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const progressRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [progress, setProgress] = useState(0); // in percentage 0-100
+  const [isDragging, setIsDragging] = useState(false);
 
   const toggleShuffle = () => setIsShuffle(!isShuffle);
   const toggleRepeat = () => setRepeatMode((prev) => (prev + 1) % 3);
   const toggleMute = () => setIsMuted(!isMuted);
   const toggleLike = () => setIsLiked(!isLiked);
 
-  const {
-    volume,
-    setVolume,
-    isMuted,
-    setIsMuted,
-    isRepeat,
-    setIsRepeat,
-  } = usePlayerSettings();
+  const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
+    usePlayerSettings();
   const { isPlaying, setIsPlaying } = useMusicContext();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -122,41 +117,41 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
 
- useEffect(() => {
-  if (!song?.source) return;
+  useEffect(() => {
+    if (!song?.source) return;
 
-  // If already loaded with same source, don't recreate
-  if (soundRef.current && (soundRef.current as any)._src === song.source) {
-    return;
-  }
+    // If already loaded with same source, don't recreate
+    if (soundRef.current && (soundRef.current as any)._src === song.source) {
+      return;
+    }
 
-  // Stop and unload if switching to a different song
-  if (soundRef.current) {
-    soundRef.current.stop();
-    soundRef.current.unload();
-  }
+    // Stop and unload if switching to a different song
+    if (soundRef.current) {
+      soundRef.current.stop();
+      soundRef.current.unload();
+    }
 
-  const sound = new Howl({
-    src: [song.source],
-    html5: true,
-    volume: isMuted ? 0 : volume / 100,
-    preload: true,
-    loop: repeatMode === 1,
-    onplay: () => {
-      setIsPlaying(true);
-      setDuration(sound.duration());
-    },
-    onpause: () => setIsPlaying(false),
-    onend: () => setIsPlaying(false),
-  });
+    const sound = new Howl({
+      src: [song.source],
+      html5: true,
+      volume: isMuted ? 0 : volume / 100,
+      preload: true,
+      loop: repeatMode === 1,
+      onplay: () => {
+        setIsPlaying(true);
+        setDuration(sound.duration() || 0);
+      },
+      onpause: () => setIsPlaying(false),
+      onend: () => setIsPlaying(false),
+    });
 
-  soundRef.current = sound;
+    soundRef.current = sound;
 
-  return () => {
-    // only cleanup if unmounting, not when replaying same song
-    sound.unload();
-  };
-}, [song?.source]);
+    return () => {
+      // only cleanup if unmounting, not when replaying same song
+      sound.unload();
+    };
+  }, [song?.source]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -197,32 +192,31 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   useEffect(() => {
     let frame: number;
     const update = () => {
-      if (soundRef.current && soundRef.current.playing()) {
+      if (soundRef.current && soundRef.current.playing() && !isDragging) {
         const time = soundRef.current.seek() as number;
         setCurrentTime(time);
-        setProgress((time / duration) * 100); // convert to percent
+        setProgress((time / duration) * 100);
       }
       frame = requestAnimationFrame(update);
     };
     update();
     return () => cancelAnimationFrame(frame);
-  }, [duration]);
+  }, [duration, isDragging]);
 
- useEffect(() => {
-  const sound = soundRef.current;
-  if (!sound) return;
+  useEffect(() => {
+    const sound = soundRef.current;
+    if (!sound) return;
 
-  if (isPlaying) {
-    if (!sound.playing()) {
-      sound.play();
+    if (isPlaying) {
+      if (!sound.playing()) {
+        sound.play();
+      }
+    } else {
+      if (sound.playing()) {
+        sound.pause();
+      }
     }
-  } else {
-    if (sound.playing()) {
-      sound.pause();
-    }
-  }
-}, [isPlaying]);
-
+  }, [isPlaying]);
 
   return (
     <TooltipProvider>
@@ -491,16 +485,16 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                     </TooltipContent>
                   </Tooltip>
 
-                  <div className="w-32 group">
+                  <div className="w-40 group">
                     <RadixSlider.Root
                       value={isMuted ? [0] : [volume]}
                       onValueChange={([value]) => setVolume(value)}
                       max={100}
                       step={1}
-                      className="w-full relative flex items-center select-none touch-none h-5"
+                      className="w-full relative flex items-center select-none touch-none h-5 cursor-pointer"
                     >
                       {/* Track (background line) */}
-                      <RadixSlider.Track className="bg-orange-300/30 relative grow rounded-full h-5">
+                      <RadixSlider.Track className="bg-orange-300/30 relative grow rounded-full h-3">
                         {/* Filled portion */}
                         <RadixSlider.Range className="absolute bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full" />
                       </RadixSlider.Track>
@@ -522,17 +516,22 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
               <div className="flex-1 max-w-2xl relative group">
                 <RadixSlider.Root
                   value={[progress]}
-                  onValueChange={handleSeek}
+                  onValueChange={([val]) => {
+                    setIsDragging(true); // user is dragging
+                    setProgress(val); // update UI
+                  }}
+                  onValueCommit={handleSeek}
                   max={100}
                   step={0.1}
-                  className="w-full relative flex items-center select-none touch-none h-5  cursor-move"
+                  className="w-full relative flex items-center select-none touch-none h-5 cursor-pointer"
                 >
-                  <RadixSlider.Track className="bg-orange-300/30 relative grow rounded-full h-5">
+                  <RadixSlider.Track className="bg-orange-300/30 relative grow rounded-full h-3">
                     <RadixSlider.Range className="absolute bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full" />
                   </RadixSlider.Track>
-                  {/* <RadixSlider.Thumb className="block w-3 h-5 rounded-full bg-white shadow-lg hover:scale-110 transition-transform" /> */}
+                  {/* <RadixSlider.Thumb className="hidden group-hover:block w-5 h-5 rounded-full bg-orange-500 shadow-lg " /> */}
                 </RadixSlider.Root>
-                <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </div>
               <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
                 {`${Math.floor(duration / 60)}:${(duration % 60)
