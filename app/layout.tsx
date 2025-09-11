@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "./auth/Provider";
 import { MusicProvider } from "./utils/music-context";
 import { SidebarProvider } from "./utils/sidebar-context";
+import { AudioCtxProvider } from "./utils/audio-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <SidebarProvider>
-            <MusicProvider>{children}</MusicProvider>
+            <AudioCtxProvider>
+                <MusicProvider>{children}</MusicProvider>
+            </AudioCtxProvider>
           </SidebarProvider>
         </AuthProvider>
       </body>

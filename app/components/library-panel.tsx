@@ -12,6 +12,8 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import MediaCard from "./ui/media-card";
 import { set } from "react-hook-form";
+import { useFileHandling } from "../utils/file-handling-context";
+import { useRouter } from "next/navigation";
 
 
 type Folder = {
@@ -36,13 +38,14 @@ interface Song {
   // isLiked: boolean;
 }
 
-export const LibraryPanel = ({songRefresh, folderRefresh}:{songRefresh: number, folderRefresh: number}) => {
+export const LibraryPanel = () => {
   const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
   const {folderList , setFolderList} = useMusicContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const { setSongList, setEntityType, setEntityName, setEntityArt } = useMusicContext();
-
+  const {folderCreateRefresh, songUploadRefresh} = useFileHandling();
+  const router = useRouter();
   useEffect(() => {
     const fetchFolders = async () => {
       try {
@@ -58,7 +61,7 @@ export const LibraryPanel = ({songRefresh, folderRefresh}:{songRefresh: number, 
       }
     };
     fetchFolders();
-  }, [folderRefresh, songRefresh]);
+  }, [folderCreateRefresh, songUploadRefresh]);
 
   // Handle folder click
   const handleFolderClick = async (folder: Folder) => {
@@ -77,10 +80,7 @@ export const LibraryPanel = ({songRefresh, folderRefresh}:{songRefresh: number, 
       setEntityName(folder.name);
       setEntityArt(folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : "");
       setSongList(data);
-      setPlaylist(true);
-      setHome(false);
-      setUpload(false);
-      setCreateFolder(false);
+      router.push("/player/playlist");
       
     } catch (err) {
       console.error("Error fetching songs:", err);
@@ -123,9 +123,7 @@ export const LibraryPanel = ({songRefresh, folderRefresh}:{songRefresh: number, 
                 size="sm"
                 className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
                 onClick={() => {
-                  setUpload(true);
-                  setCreateFolder(false);
-                  setHome(false);
+                  router.push("/player/upload");
                 }}
               >
                 <Plus className="h-4 w-4" />
@@ -135,9 +133,7 @@ export const LibraryPanel = ({songRefresh, folderRefresh}:{songRefresh: number, 
                 size="sm"
                 className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
                 onClick={() => {
-                  setUpload(false);
-                  setCreateFolder(true);
-                  setHome(false);
+                  router.push("/player/newfolder");
                 }}
               >
                 <Plus className="h-4 w-4" />

@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import ProfileAvatar from "./profile-avatar";
 import { useSidebar } from "../utils/sidebar-context";
+import { useRouter } from "next/navigation";
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("Home");
@@ -41,8 +42,9 @@ export const Sidebar = () => {
     setUpload,
     setCreateFolder,
     setVisualizer
-  } = useSidebar();
+    } = useSidebar();
 
+    const router =  useRouter();
   const { status, data: session } = useSession();
   if (status === "loading") {
     return null;
@@ -52,9 +54,7 @@ export const Sidebar = () => {
     console.log(`Clicked on ${label}`);
 
     if (label === "Home") {
-      setHome(true);
-      setUpload(false);
-      setCreateFolder(false);
+      router.push("/player/home");
     }
     if (label == "Player") {
       setPlayer(!player);

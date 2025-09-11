@@ -27,6 +27,7 @@ import {
 import axios from "axios";
 import { useMusicContext } from "../utils/music-context";
 import router from "next/router";
+import { useFileHandling } from "../utils/file-handling-context";
 interface UploadedFile {
   file: File;
   progress: number;
@@ -34,12 +35,10 @@ interface UploadedFile {
   preview?: string;
 }
 
-interface MusicUploadProps {
-  setRefresh: React.Dispatch<React.SetStateAction<number>>;
-}
 
 
-export function MusicUpload({ setRefresh }: MusicUploadProps) {
+
+export function MusicUpload() {
   const [musicFile, setMusicFile] = useState<UploadedFile | null>(null);
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -56,7 +55,7 @@ export function MusicUpload({ setRefresh }: MusicUploadProps) {
   const musicInputRef = useRef<HTMLInputElement>(null);
   const artworkInputRef = useRef<HTMLInputElement>(null);
   const { folderList, playlistList } = useMusicContext();
-
+  const { setSongUploadRefresh } = useFileHandling();
   const handleMusicDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
@@ -158,7 +157,7 @@ export function MusicUpload({ setRefresh }: MusicUploadProps) {
 
       console.log("Upload successful:", response.data);
       alert("File uploaded successfully!");
-      setRefresh((prev) => prev + 1);
+      setSongUploadRefresh((prev) => prev + 1);
     } catch (error) {
       console.error("Upload failed:", error);
       alert("Upload failed!");

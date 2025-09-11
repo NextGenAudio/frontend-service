@@ -1,45 +1,49 @@
 import { useState, useEffect } from "react";
 
 export const usePlayerSettings = () => {
-  // Load from localStorage (or defaults if none)
-  const [volume, setVolume] = useState(() => {
-    const saved = localStorage.getItem("volume");
-    return saved ? Number(saved) : 50; // default 50%
-  });
+  const [volume, setVolume] = useState(50);     // default
+  const [isMuted, setIsMuted] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-  const [isMuted, setIsMuted] = useState(() => {
-    const saved = localStorage.getItem("isMuted");
-    return saved === "true"; // default false
-  });
-
-  const [isRepeat, setIsRepeat] = useState(() => {
-    const saved = localStorage.getItem("isRepeat");
-    return saved === "true"; // default false
-  });
-
-  const [progress, setProgress] = useState(() => {
-    const saved = localStorage.getItem("progress");
-    return saved ? Number(saved) : 0; // default 0s
-  });
-
-  // Save whenever volume changes
+  // Load saved settings once on client
   useEffect(() => {
-    localStorage.setItem("volume", String(volume));
+    if (typeof window === "undefined") return; // ✅ guard
+
+    const savedVolume = localStorage.getItem("volume");
+    const savedMuted = localStorage.getItem("isMuted");
+    const savedRepeat = localStorage.getItem("isRepeat");
+    const savedProgress = localStorage.getItem("progress");
+
+    if (savedVolume !== null) setVolume(Number(savedVolume));
+    if (savedMuted !== null) setIsMuted(savedMuted === "true");
+    if (savedRepeat !== null) setIsRepeat(savedRepeat === "true");
+    if (savedProgress !== null) setProgress(Number(savedProgress));
+  }, []);
+
+  // Save whenever values change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("volume", String(volume));
+    }
   }, [volume]);
 
-  // Save whenever mute changes
   useEffect(() => {
-    localStorage.setItem("isMuted", String(isMuted));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("isMuted", String(isMuted));
+    }
   }, [isMuted]);
 
-  // Save whenever repeat changes
   useEffect(() => {
-    localStorage.setItem("isRepeat", String(isRepeat));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("isRepeat", String(isRepeat));
+    }
   }, [isRepeat]);
 
-  // Save whenever progress changes
   useEffect(() => {
-    localStorage.setItem("progress", String(progress));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("progress", String(progress));
+    }
   }, [progress]);
 
   return {

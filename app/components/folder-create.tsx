@@ -7,13 +7,14 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import axios from "axios";
+import { useFileHandling } from "../utils/file-handling-context";
 
 interface UploadedFile {
   file: File;
   preview?: string;
 }
 
-export function FolderCreate({ setRefresh }: { setRefresh: React.Dispatch<React.SetStateAction<number>> }) {
+export function FolderCreate() {
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -23,7 +24,7 @@ export function FolderCreate({ setRefresh }: { setRefresh: React.Dispatch<React.
   const [message, setMessage] = useState<string | null>(null);
 
   const artworkInputRef = useRef<HTMLInputElement>(null);
-
+  const { folderCreateRefresh, setFolderCreateRefresh } = useFileHandling();
   // Handle drag-drop for artwork
   const handleArtworkDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -68,7 +69,7 @@ export function FolderCreate({ setRefresh }: { setRefresh: React.Dispatch<React.
       setMessage("✅ Folder created successfully!");
       setFormData({ name: "", description: "" });
       setArtworkFile(null);
-      setRefresh((old) => old + 1); // increment key
+      setFolderCreateRefresh((old) => old + 1); // increment key
     } catch (error) {
       console.error(error);
       setMessage("❌ Failed to create folder. Please try again.");

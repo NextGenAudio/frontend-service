@@ -56,13 +56,6 @@ export const PlaylistPanel = () => {
     setSelectSong(song);
     setPlayingSong(song);
   };
-  useEffect(() => {
-    if (!songList || songList.length === 0) {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
-  }, [songList]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,9 +74,6 @@ export const PlaylistPanel = () => {
     }
   }, []);
 
-  if (loading) {
-    return <AppLoadingScreen />;
-  }
   return (
     <div
       ref={scrollRef}
@@ -171,7 +161,7 @@ export const PlaylistPanel = () => {
         </div>
 
         <ScrollArea>
-          <div className={clsx("p-4 space-y-2", player ? "pb-52" : "pb-8")}>
+          <div className={clsx("p-4 space-y-2", player ? "pb-56" : "pb-8")}>
             {songList.map((song, id) => (
               <div
                 key={song.id}

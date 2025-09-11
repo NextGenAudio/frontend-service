@@ -7,7 +7,7 @@ export default function AudioVisualizer() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
 
-  // Keep global refs alive between renders
+  // Keep global refs alive between mounts
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -18,19 +18,19 @@ export default function AudioVisualizer() {
       | undefined;
     if (!audioEl || !canvasRef.current) return;
 
-    // ✅ Init AudioContext once
+    // ✅ Create AudioContext once
     if (!audioCtxRef.current) {
       audioCtxRef.current = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
     }
 
-    // ✅ Init Analyser once
+    // ✅ Create analyser once
     if (!analyserRef.current) {
       analyserRef.current = audioCtxRef.current.createAnalyser();
       analyserRef.current.fftSize = 128;
     }
 
-    // ✅ Connect source only once
+    // ✅ Only create MediaElementSource once per <audio>
     if (!sourceRef.current) {
       sourceRef.current = audioCtxRef.current.createMediaElementSource(audioEl);
       sourceRef.current.connect(analyserRef.current);
@@ -47,11 +47,11 @@ export default function AudioVisualizer() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d")!;
 
-    // Ensure resolution matches display
+    // Handle high DPI
     const dpr = window.devicePixelRatio || 1;
     canvas.width = canvas.clientWidth * dpr;
     canvas.height = canvas.clientHeight * dpr;
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const draw = () => {
       animationRef.current = requestAnimationFrame(draw);
@@ -61,10 +61,16 @@ export default function AudioVisualizer() {
 
       const barWidth = canvas.clientWidth / bufferLength;
       let x = 0;
+
       for (let i = 0; i < bufferLength; i++) {
-        const barHeight = dataArray[i];
+        const barHeight = (dataArray[i] / 255) * canvas.clientHeight;
         ctx.fillStyle = "#f97316";
-        ctx.fillRect(x, canvas.clientHeight - barHeight, barWidth, barHeight);
+        ctx.fillRect(
+          x,
+          canvas.clientHeight - barHeight,
+          Math.max(1, barWidth - 1),
+          barHeight
+        );
         x += barWidth;
       }
     };
@@ -73,19 +79,17 @@ export default function AudioVisualizer() {
 
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      // ❌ Don’t disconnect or recreate source — keep alive
+      // ❌ don’t disconnect source — reuse on next mount
     };
   }, [soundRef.current]);
 
   return (
-    <div className="overflow-hidden rounded-lg my-4 h-full w-full bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20  flex items-center justify-center">
-    {/* Background image box */}
-    <div
-      className="absolute  left-1/2 -translate-x-1/2 h-64 w-96 bg-cover bg-center z-0 opacity-90"
-      style={{ backgroundImage: "url('/assets/sonex-v-wall.png')" }}
-    />
-
-      <canvas ref={canvasRef} className="w-full h-full" />
+    <div className="overflow-hidden rounded-lg my-4 h-full w-full bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20 flex items-center justify-center relative">
+      <div
+        className="absolute left-1/2 -translate-x-1/2 h-64 w-96 bg-cover bg-center z-0 opacity-90"
+        style={{ backgroundImage: "url('/assets/sonex-v-wall.png')" }}
+      />
+      <canvas ref={canvasRef} className="w-full h-full relative z-10" />
     </div>
   );
 }

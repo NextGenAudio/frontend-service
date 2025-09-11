@@ -73,6 +73,7 @@ export function SearchBar() {
         e.preventDefault();
         if (selectedIndex >= 0) {
           handleSongSelect(suggestions[selectedIndex]);
+
         }
         break;
       case "Escape":
@@ -84,7 +85,8 @@ export function SearchBar() {
   };
 
   const handleSongSelect = (song: Song) => {
-    setSearchValue(`${song.title} - ${song.artist}`);
+    // setSearchValue(`${song.title} - ${song.artist}`);
+    setSearchValue("")
     setShowSuggestions(false);
     setSelectedIndex(-1);
     setSelectSong(song);
