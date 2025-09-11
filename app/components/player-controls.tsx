@@ -46,10 +46,10 @@ interface Song {
 
 export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isShuffle, setIsShuffle] = useState(false);
-  const [repeatMode, setRepeatMode] = useState(0);
+ 
 
   // const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
+
   const [metadata, setMetadata] = useState<any>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
@@ -60,25 +60,25 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
+
   const [progress, setProgress] = useState(0); // in percentage 0-100
   const [isDragging, setIsDragging] = useState(false);
 
   const toggleShuffle = () => setIsShuffle(!isShuffle);
-  const toggleRepeat = () => setRepeatMode((prev) => (prev + 1) % 3);
+  const toggleRepeat = () => setRepeatMode(((repeatMode + 1) % 3));
   const toggleMute = () => setIsMuted(!isMuted);
   const toggleLike = () => setIsLiked(!isLiked);
 
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
-  const { isPlaying, setIsPlaying } = useMusicContext();
+  const { isPlaying, setIsPlaying, currentTime, setCurrentTime , soundRef , playingSongDuration, setPlayingSongDuration , repeatMode, setRepeatMode } = useMusicContext();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const soundRef = useRef<Howl | null>(null);
+  // const soundRef = useRef<Howl | null>(null);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -117,41 +117,41 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
 
-  useEffect(() => {
-    if (!song?.source) return;
+  // useEffect(() => {
+  //   if (!song?.source) return;
 
-    // If already loaded with same source, don't recreate
-    if (soundRef.current && (soundRef.current as any)._src === song.source) {
-      return;
-    }
+  //   // If already loaded with same source, don't recreate
+  //   if (soundRef.current && (soundRef.current as any)._src === song.source) {
+  //     return;
+  //   }
 
-    // Stop and unload if switching to a different song
-    if (soundRef.current) {
-      soundRef.current.stop();
-      soundRef.current.unload();
-    }
+  //   // Stop and unload if switching to a different song
+  //   if (soundRef.current) {
+  //     soundRef.current.stop();
+  //     soundRef.current.unload();
+  //   }
 
-    const sound = new Howl({
-      src: [song.source],
-      html5: true,
-      volume: isMuted ? 0 : volume / 100,
-      preload: true,
-      loop: repeatMode === 1,
-      onplay: () => {
-        setIsPlaying(true);
-        setDuration(sound.duration() || 0);
-      },
-      onpause: () => setIsPlaying(false),
-      onend: () => setIsPlaying(false),
-    });
+  //   const sound = new Howl({
+  //     src: [song.source],
+  //     html5: true,
+  //     volume: isMuted ? 0 : volume / 100,
+  //     preload: true,
+  //     loop: repeatMode === 1,
+  //     onplay: () => {
+  //       setIsPlaying(true);
+  //       setPlayingSongDuration(sound.duration() || 0);
+  //     },
+  //     onpause: () => setIsPlaying(false),
+  //     onend: () => setIsPlaying(false),
+  //   });
 
-    soundRef.current = sound;
+  //   soundRef.current = sound;
 
-    return () => {
-      // only cleanup if unmounting, not when replaying same song
-      sound.unload();
-    };
-  }, [song?.source]);
+  //   return () => {
+  //     // only cleanup if unmounting, not when replaying same song
+  //     sound.unload();
+  //   };
+  // }, [song?.source]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -160,12 +160,12 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
       interval = setInterval(() => {
         const seek = soundRef.current?.seek() as number;
         setCurrentTime(seek);
-        setProgress((seek / duration) * 100 || 0);
+        setProgress((seek / playingSongDuration) * 100 || 0);
       }, 500);
     }
 
     return () => clearInterval(interval);
-  }, [isPlaying, duration]);
+  }, [isPlaying, playingSongDuration]);
 
   // 2. Update volume while playing
   useEffect(() => {
@@ -183,7 +183,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const handleSeek = (value: number[]) => {
     if (!soundRef.current) return;
     const percent = value[0];
-    const seekTime = (percent / 100) * duration;
+    const seekTime = (percent / 100) * playingSongDuration;
     soundRef.current.seek(seekTime);
     setProgress(percent); // percent
     setCurrentTime(seekTime); // seconds
@@ -195,13 +195,13 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
       if (soundRef.current && soundRef.current.playing() && !isDragging) {
         const time = soundRef.current.seek() as number;
         setCurrentTime(time);
-        setProgress((time / duration) * 100);
+        setProgress((time / playingSongDuration) * 100);
       }
       frame = requestAnimationFrame(update);
     };
     update();
     return () => cancelAnimationFrame(frame);
-  }, [duration, isDragging]);
+  }, [playingSongDuration, isDragging]);
 
   useEffect(() => {
     const sound = soundRef.current;
@@ -534,7 +534,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                 <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </div>
               <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
-                {`${Math.floor(duration / 60)}:${(duration % 60)
+                {`${Math.floor(playingSongDuration / 60)}:${(playingSongDuration % 60)
                   .toFixed(0)
                   .padStart(2, "0")}`}
               </span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useRef } from "react";
 
 type SidebarContextType = {
   home: boolean;
@@ -21,7 +21,6 @@ type SidebarContextType = {
   setProfile: (value: boolean) => void;
   playlist: boolean;
   setPlaylist: (value: boolean) => void;
-  
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -36,7 +35,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [visualizer, setVisualizer] = useState(false);
   const [profile, setProfile] = useState(false);
   const [playlist, setPlaylist] = useState(false);
+  const soundRef = useRef<Howl | null>(null);
 
+  const [currentTime, setCurrentTime] = useState(0);
   return (
     <SidebarContext.Provider
       value={{
@@ -58,7 +59,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         setVisualizer,
         setProfile,
         setPlaylist,
-       
+        
       }}
     >
       {children}

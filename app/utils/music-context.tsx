@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React, { useRef } from "react";
 
 import { createContext, useState, useContext } from "react";
 interface Song {
@@ -39,6 +39,13 @@ type MusicContextType = {
   setPlaylistList: (value: any[]) => void;
   playingSongDuration: number;
   setPlayingSongDuration: (value: number) => void;
+  soundRef: React.MutableRefObject<Howl | null>;
+  analyserRef: React.MutableRefObject<AnalyserNode | null>;
+  dataArrayRef: React.MutableRefObject<Uint8Array | null>;
+  currentTime: number;
+  setCurrentTime: (value: number) => void;
+  repeatMode: number;
+  setRepeatMode: (value: number) => void;
 };
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -49,12 +56,21 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [songList, setSongList] = useState<Song[]>([]);
   const [entityName, setEntityName] = useState<string | null>(null);
   const [entityArt, setEntityArt] = useState<string | null>(null);
-  const [entityType, setEntityType] = useState<"folder" | "playlist" | null>(null);
+  const [entityType, setEntityType] = useState<"folder" | "playlist" | null>(
+    null
+  );
   const [duration, setDuration] = useState(0);
   const [playingSong, setPlayingSong] = useState<Song | null>(null);
   const [folderList, setFolderList] = useState<any[]>([]);
   const [playlistList, setPlaylistList] = useState<any[]>([]);
   const [playingSongDuration, setPlayingSongDuration] = useState(0);
+  const soundRef = useRef<Howl | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const [repeatMode, setRepeatMode] = useState(0);
+
+  const [currentTime, setCurrentTime] = useState(0);
+
   const value = {
     selectSong,
     playingSong,
@@ -74,16 +90,21 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setEntityName,
     setEntityArt,
     setEntityType,
-     setSelectSong,
+    setSelectSong,
     setIsPlaying,
     playingSongDuration,
     setPlayingSongDuration,
+    soundRef,
+    currentTime,
+    setCurrentTime,
+    repeatMode,
+    setRepeatMode,
+    analyserRef,
+    dataArrayRef,
   };
 
   return (
-    <MusicContext.Provider value={value}>
-      {children}
-    </MusicContext.Provider>
+    <MusicContext.Provider value={value}>{children}</MusicContext.Provider>
   );
 }
 

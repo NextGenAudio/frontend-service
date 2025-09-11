@@ -149,13 +149,7 @@ export const PlaylistPanel = () => {
 
         {/* Glass Visualizer Area */}
 
-        {visualizer && (
-          <AudioVisualizer
-            source={playingSong?.source || "" } // your backend URL: http://localhost:8080/files/download/...
-            fileName={songList.find((s) => s.id === playingSongId)?.filename || ""}
-          />
-        )}
-
+    
         <div className="px-4 pt-4">
           <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-6 ml-14">Title</div>

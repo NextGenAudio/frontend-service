@@ -79,7 +79,12 @@ export function MusicPlayerHome() {
   ]
 
   return (
-    <div className="h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
+    <div className="relative h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
+      <div
+        className="-top-32 fixed flex flex-1 left-1/4 inset-0 h-200 w-400 bg-cover bg-center z-0 opacity-90"
+        style={{ backgroundImage: "url('/assets/sonex-wall.png')" }}
+      />
+ 
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-orange-500/10 to-amber-500/10 rounded-full blur-xl animate-pulse"></div>
@@ -87,7 +92,7 @@ export function MusicPlayerHome() {
         <div className="absolute bottom-32 left-1/3 w-40 h-40 bg-gradient-to-r from-orange-400/10 to-yellow-500/10 rounded-full blur-2xl animate-pulse delay-2000"></div>
       </div>
 
-      <div className="relative z-10 p-8 space-y-8">
+      <div className="relative z-10 p-8 pt-96 space-y-8">
         {/* Hero Section */}
         <div className="relative">
           <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">

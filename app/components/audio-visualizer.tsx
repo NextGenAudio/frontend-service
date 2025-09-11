@@ -1,91 +1,91 @@
 "use client";
+import { useEffect, useRef } from "react";
+import { useMusicContext } from "../utils/music-context";
 
-import React, { useEffect, useRef, useState } from "react";
-import Waviz from "waviz/core";
-
-type Props = {
-  fileName: string; // e.g. "mysong.mp3"
-  source: string;
-};
-
-export default function CustomVisualizer({ source, fileName }: Props) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+export default function AudioVisualizer() {
+  const { soundRef } = useMusicContext();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const wavizRef = useRef<Waviz | null>(null);
+  const animationRef = useRef<number | null>(null);
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  // Keep global refs alive between renders
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
-  // Initialize Waviz once
   useEffect(() => {
-    if (canvasRef.current && audioRef.current) {
-      wavizRef.current = new Waviz(canvasRef.current, audioRef.current);
+    const audioEl = (soundRef.current as any)?._sounds?.[0]?._node as
+      | HTMLMediaElement
+      | undefined;
+    if (!audioEl || !canvasRef.current) return;
+
+    // ✅ Init AudioContext once
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
     }
-  }, []);
 
-  // Handle Play
-  const handlePlay = async () => {
-    if (!audioRef.current || !wavizRef.current) return;
+    // ✅ Init Analyser once
+    if (!analyserRef.current) {
+      analyserRef.current = audioCtxRef.current.createAnalyser();
+      analyserRef.current.fftSize = 128;
+    }
 
-    await audioRef.current.play();
-    setIsPlaying(true);
+    // ✅ Connect source only once
+    if (!sourceRef.current) {
+      sourceRef.current = audioCtxRef.current.createMediaElementSource(audioEl);
+      sourceRef.current.connect(analyserRef.current);
+      analyserRef.current.connect(audioCtxRef.current.destination);
+      console.log("Audio source connected ✅");
+    } else {
+      console.log("Reusing existing audio source ♻️");
+    }
 
-    // Waviz requires user gesture → initialize when playing
-    await wavizRef.current.input.initializePending();
-    wavizRef.current.visualizer?.bars([
-      // Each bar config as an array, according to Waviz's expected type
-      [0, 2, 0.5], // Example: [position, width, height] or similar, adjust as per Waviz docs
-      // Add more arrays if needed for more bars
-    ]);
-  };
+    const analyser = analyserRef.current;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
 
-  // Handle Pause
-  const handlePause = () => {
-    if (!audioRef.current || !wavizRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d")!;
 
-    audioRef.current.pause();
-    wavizRef.current.visualizer?.stop();
-    setIsPlaying(false);
-  };
+    // Ensure resolution matches display
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
+    ctx.scale(dpr, dpr);
+
+    const draw = () => {
+      animationRef.current = requestAnimationFrame(draw);
+      analyser.getByteFrequencyData(dataArray);
+
+      ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+      const barWidth = canvas.clientWidth / bufferLength;
+      let x = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const barHeight = dataArray[i];
+        ctx.fillStyle = "#f97316";
+        ctx.fillRect(x, canvas.clientHeight - barHeight, barWidth, barHeight);
+        x += barWidth;
+      }
+    };
+
+    draw();
+
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      // ❌ Don’t disconnect or recreate source — keep alive
+    };
+  }, [soundRef.current]);
 
   return (
-    <div className="p-4 border-b border-white/10">
-      <div className="relative h-40 rounded-xl bg-gradient-to-r from-orange-500/20 via-pink-500/30 to-red-500/20 overflow-hidden flex items-center justify-center">
-        {/* Canvas where bars are drawn */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+    <div className="overflow-hidden rounded-lg my-4 h-full w-full bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20  flex items-center justify-center">
+    {/* Background image box */}
+    <div
+      className="absolute  left-1/2 -translate-x-1/2 h-64 w-96 bg-cover bg-center z-0 opacity-90"
+      style={{ backgroundImage: "url('/assets/sonex-v-wall.png')" }}
+    />
 
-        {/* Glass overlay */}
-        <div className="absolute inset-0 bg-white/5 backdrop-blur-[1px]" />
-
-        {/* Title */}
-        <span className="z-10 text-sm text-white/70 font-medium">
-          {fileName}
-        </span>
-      </div>
-
-      {/* Controls */}
-      <div className="flex justify-center gap-4 mt-4">
-        <button
-          onClick={handlePlay}
-          disabled={isPlaying}
-          className="px-4 py-2 bg-orange-500 text-white rounded disabled:opacity-50"
-        >
-          ▶ Play
-        </button>
-        <button
-          onClick={handlePause}
-          disabled={!isPlaying}
-          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
-        >
-          ⏸ Pause
-        </button>
-      </div>
-
-      {/* Hidden audio element */}
-      <audio
-        ref={audioRef}
-        src={`/songs/${fileName}`}
-        crossOrigin="anonymous"
-      />
+      <canvas ref={canvasRef} className="w-full h-full" />
     </div>
   );
 }
