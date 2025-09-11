@@ -21,6 +21,7 @@ import {
 } from "../utils/music-context";
 import { create } from "domain";
 import { ProfileDropdown } from "./profile-dropdown";
+import { PlaylistCreate } from "./playlist-create";
 
 interface Song {
   id: string;
@@ -40,7 +41,7 @@ export function MusicPlayer() {
   const [metadata, setMetadata] = useState<any>(null);
   const { currentSong, setCurrentSong } = useMusicContext();
   const { isPlaying, setIsPlaying } = useMusicContext();
-  const { player, home, upload, profile, createFolder } = useSidebar();
+  const { player, home, upload, profile, createFolder, createPlaylist } = useSidebar();
 
   useEffect(() => {
     if (!currentSong) return;
@@ -81,6 +82,7 @@ export function MusicPlayer() {
               <ResizablePanel defaultSize={50} minSize={30}>
                 <ProfileDropdown />
                 {createFolder && <FolderCreate />}
+                {createPlaylist && <PlaylistCreate />}
                 {upload && <MusicUpload />}
                 {home && <PlaylistPanel />}
               </ResizablePanel>

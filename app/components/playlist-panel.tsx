@@ -172,6 +172,16 @@ export const PlaylistPanel = () => {
                 </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -182,18 +192,20 @@ export const PlaylistPanel = () => {
               : "-translate-y-full opacity-0"
           }`}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop&crop=center"
-                alt="Playlist cover"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white">Playlist #1</h3>
-              <p className="text-sm text-white/70">{songs.length} songs</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
+                <img
+                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop&crop=center"
+                  alt="Playlist cover"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Playlist #1</h3>
+                <p className="text-sm text-white/70">{songs.length} songs</p>
+              </div>
             </div>
           </div>
         </div>

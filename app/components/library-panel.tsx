@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Plus, Music, MoreHorizontal } from "lucide-react";
+import { Plus, Music, MoreHorizontal, FolderPlus, ListMusic, Upload } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/app/components/ui/dropdown-menu";
 import { useSidebar } from "../utils/sidebar-context";
 
 type Folder = {
@@ -27,9 +28,8 @@ interface Song {
   // isLiked: boolean;
 }
 
-
 export const LibraryPanel = () => {
-  const { setUpload, setHome, setCreateFolder } = useSidebar();
+  const { setUpload, setHome, setCreateFolder, setCreatePlaylist } = useSidebar();
   const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
@@ -51,7 +51,7 @@ export const LibraryPanel = () => {
     fetchFolders();
   }, []);
 
-    // Handle folder click
+  // Handle folder click
   const handleFolderClick = async (folder: Folder) => {
     setSelectedFolder(folder);
     try {
@@ -99,152 +99,140 @@ export const LibraryPanel = () => {
               Your Library
             </h2>
             <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
-                onClick={() => {
-                  setUpload(true);
-                  setCreateFolder(false);
-                  setHome(false);
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Music</span>
-              </Button>
-              <Button
-                size="sm"
-                className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
-                onClick={() => {
-                  setUpload(false);
-                  setCreateFolder(true);
-                  setHome(false);
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                <span>New Folder</span>
-              </Button>
+              {/* Dropdown Menu for all actions */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-gray-800/95 backdrop-blur-xl border-gray-700/50 shadow-xl">
+                  <DropdownMenuItem
+                    onClick={() => setCreatePlaylist(true)}
+                    className="text-white hover:bg-gray-700/50 cursor-pointer"
+                  >
+                    <ListMusic className="w-4 h-4 mr-2" />
+                    Create Playlist
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCreateFolder(true)}
+                    className="text-white hover:bg-gray-700/50 cursor-pointer"
+                  >
+                    <FolderPlus className="w-4 h-4 mr-2" />
+                    Create Folder
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gray-700/50" />
+                  <DropdownMenuItem
+                    onClick={() => setUpload(true)}
+                    className="text-white hover:bg-gray-700/50 cursor-pointer"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload Music
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="all" className="h-full flex flex-col">
-          <TabsList className="grid grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
-            <TabsTrigger
-              value="all"
-              className="data-[state=active]:bg-white/30 text-white/80 hover:text-white"
-            >
-              All
-            </TabsTrigger>
-            <TabsTrigger
-              value="playlists"
-              className="data-[state=active]:bg-white/30 text-white/80 hover:text-white"
-            >
-              Playlists
-            </TabsTrigger>
-            <TabsTrigger
-              value="folders"
-              className="data-[state=active]:bg-white/30 text-white/80 hover:text-white"
-            >
-              Folders
-            </TabsTrigger>
-          </TabsList>
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">
+          <Tabs defaultValue="playlists" className="h-full flex flex-col">
+            <TabsList className="bg-transparent border-b border-white/20 rounded-none p-0 h-auto">
+              <TabsTrigger
+                value="playlists"
+                className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-white/70 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-400 px-4 py-2"
+              >
+                Playlists
+              </TabsTrigger>
+              <TabsTrigger
+                value="folders"
+                className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-white/70 rounded-none border-b-2 border-transparent data-[state=active]:border-orange-400 px-4 py-2"
+              >
+                Folders
+              </TabsTrigger>
+            </TabsList>
 
-          {/* All = playlists + folders */}
-          <TabsContent value="all" className="flex-1 px-3 overflow-y-auto">
-            <div className="space-y-2">
-              {/* Playlists */}
-              {playlists.map((playlist) => (
-                <div
-                  key={`playlist-${playlist.id}`}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 cursor-pointer transition-all duration-300 group shadow-lg"
-                >
-                  <img
-                    src={playlist.image || defaultImage}
-                    alt={playlist.name}
-                    className="w-12 h-12 rounded-xl object-cover shadow-md"
-                  />
-                  <div className="flex-1 min-w-0 hidden sm:block">
-                    <div className="font-medium truncate text-white">
-                      {playlist.name}
+            <TabsContent value="playlists" className="flex-1 overflow-y-auto mt-0">
+              <div className="p-4 space-y-3">
+                {playlists.map((playlist) => (
+                  <div
+                    key={playlist.id}
+                    className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30 hover:scale-[1.02] hover:shadow-lg"
+                  >
+                    <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0">
+                      <img
+                        src={playlist.image || defaultImage}
+                        alt={playlist.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20" />
                     </div>
-                    <div className="text-sm text-white/70">
-                      {playlist.songCount} songs
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-white truncate drop-shadow-sm">
+                        {playlist.name}
+                      </h3>
+                      <p className="text-sm text-white/70 truncate">
+                        {playlist.songCount} songs
+                      </p>
                     </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    >
+                      <MoreHorizontal className="h-4 w-4 text-white/70" />
+                    </Button>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </TabsContent>
 
-              {/* Folders */}
-              {folders.map((folder) => (
-                <div
-                  key={`folder-${folder.id}`}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 cursor-pointer transition-all duration-300 shadow-lg"
-                >
-                  <img
-                    src={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
-                    alt={folder.name}
-                    className="w-12 h-12 rounded-xl object-cover shadow-md"
-                  />
-                  <div className="flex-1 min-w-0 hidden sm:block">
-                    <div className="font-medium truncate text-white">
-                      {folder.name}
+            <TabsContent value="folders" className="flex-1 overflow-y-auto mt-0">
+              <div className="p-4 space-y-3">
+                {folders.map((folder) => (
+                  <div
+                    key={folder.id}
+                    className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30 hover:scale-[1.02] hover:shadow-lg"
+                    onClick={() => handleFolderClick(folder)}
+                  >
+                    <div className="w-12 h-12 rounded-lg overflow-hidden relative flex-shrink-0 bg-gradient-to-br from-orange-500/30 to-pink-500/30 flex items-center justify-center">
+                      {folder.folderArt ? (
+                        <img
+                          src={folder.folderArt}
+                          alt={folder.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Music className="w-6 h-6 text-white/70" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-pink-500/20" />
                     </div>
-                    <div className="text-sm text-white/70">
-                      {folder.musicCount ?? 0} songs
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-white truncate drop-shadow-sm">
+                        {folder.name}
+                      </h3>
+                      <p className="text-sm text-white/70 truncate">
+                        {folder.description || "No description"}
+                      </p>
                     </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    >
+                      <MoreHorizontal className="h-4 w-4 text-white/70" />
+                    </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Only Playlists */}
-          <TabsContent value="playlists" className="flex-1 px-3 overflow-y-auto">
-            <div className="space-y-2">
-              {playlists.map((playlist) => (
-                <div
-                  key={playlist.id}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20"
-                >
-                  <img
-                    src={playlist.image || defaultImage}
-                    alt={playlist.name}
-                    className="w-12 h-12 rounded-xl object-cover shadow-md"
-                  />
-                  <div className="flex-1 min-w-0 hidden sm:block">
-                    <div className="font-medium truncate text-white">
-                      {playlist.name}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Only Folders */}
-          <TabsContent value="folders" className="flex-1 px-3 overflow-y-auto">
-            <div className="space-y-2">
-              {folders.map((folder) => (
-                <div
-                  key={folder.id}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20"
-                >
-                  <img
-                    src={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
-                    alt={folder.name}
-                    className="w-12 h-12 rounded-xl object-cover shadow-md"
-                  />
-                  <div className="flex-1 min-w-0 hidden sm:block">
-                    <div className="font-medium truncate text-white">
-                      {folder.name}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
