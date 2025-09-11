@@ -9,6 +9,8 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import { clsx } from "clsx";
 import AudioVisualizer from "./audio-visualizer";
+import App from "next/app";
+import AppLoadingScreen from "./app-loading";
 
 interface Song {
   id: string;
@@ -31,7 +33,7 @@ export const PlaylistPanel = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
   const [isHeaderCompact, setIsHeaderCompact] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
 
   const { isPlaying, setIsPlaying } = useMusicContext();
@@ -54,6 +56,13 @@ export const PlaylistPanel = () => {
     setSelectSong(song);
     setPlayingSong(song);
   };
+  useEffect(() => {
+    if (!songList || songList.length === 0) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [songList]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,6 +81,9 @@ export const PlaylistPanel = () => {
     }
   }, []);
 
+  if (loading) {
+    return <AppLoadingScreen />;
+  }
   return (
     <div
       ref={scrollRef}
@@ -149,7 +161,6 @@ export const PlaylistPanel = () => {
 
         {/* Glass Visualizer Area */}
 
-    
         <div className="px-4 pt-4">
           <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-6 ml-14">Title</div>

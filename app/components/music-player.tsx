@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef, use } from "react";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -126,6 +126,10 @@ export function MusicPlayer() {
       sound.unload();
     };
   }, [playingSong?.source]);
+
+  useEffect(() => {
+    
+  })
 
   return (
     <>

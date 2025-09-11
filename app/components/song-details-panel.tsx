@@ -13,6 +13,7 @@ import { ScrollArea } from "@radix-ui/themes";
 import SongCover from "./song-cover";
 import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
+import { useMusicContext } from "../utils/music-context";
 interface Song {
   id: string;
   title: string | undefined;
@@ -23,7 +24,7 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  // isLiked: boolean;
+  isLiked: boolean;
 }
 
 interface GlassSongDetailsPanelProps {
@@ -31,7 +32,7 @@ interface GlassSongDetailsPanelProps {
 }
 
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
-  const [isLiked, setIsLiked] = useState(false);
+  const {isLiked, setIsLiked} = useMusicContext();
   const { player } = useSidebar();
   useEffect(()=>{
     console.log(song?.metadata);

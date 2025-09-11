@@ -111,8 +111,8 @@ export function MusicPlayerHome() {
             </div>
 
             {/* Animated Sound Waves */}
-            <div className="flex items-center justify-center space-x-2 mb-6">
-              {[...Array(12)].map((_, i) => (
+            <div className="flex items-center justify-center space-x-2 mb-6 h-20">
+              {[...Array(20)].map((_, i) => (
                 <div
                   key={i}
                   className="bg-gradient-to-t from-orange-500 to-amber-400 rounded-full animate-pulse"

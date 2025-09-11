@@ -51,7 +51,6 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   // const [progress, setProgress] = useState(0);
 
   const [metadata, setMetadata] = useState<any>(null);
-  const [isLiked, setIsLiked] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [crossfade, setCrossfade] = useState([3]);
   const [playbackSpeed, setPlaybackSpeed] = useState([1]);
@@ -71,7 +70,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
-  const { isPlaying, setIsPlaying, currentTime, setCurrentTime , soundRef , playingSongDuration, setPlayingSongDuration , repeatMode, setRepeatMode } = useMusicContext();
+  const { isPlaying, setIsPlaying, currentTime, setCurrentTime , soundRef , playingSongDuration, setPlayingSongDuration , repeatMode, setRepeatMode , isLiked, setIsLiked } = useMusicContext();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -116,42 +115,6 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
-
-  // useEffect(() => {
-  //   if (!song?.source) return;
-
-  //   // If already loaded with same source, don't recreate
-  //   if (soundRef.current && (soundRef.current as any)._src === song.source) {
-  //     return;
-  //   }
-
-  //   // Stop and unload if switching to a different song
-  //   if (soundRef.current) {
-  //     soundRef.current.stop();
-  //     soundRef.current.unload();
-  //   }
-
-  //   const sound = new Howl({
-  //     src: [song.source],
-  //     html5: true,
-  //     volume: isMuted ? 0 : volume / 100,
-  //     preload: true,
-  //     loop: repeatMode === 1,
-  //     onplay: () => {
-  //       setIsPlaying(true);
-  //       setPlayingSongDuration(sound.duration() || 0);
-  //     },
-  //     onpause: () => setIsPlaying(false),
-  //     onend: () => setIsPlaying(false),
-  //   });
-
-  //   soundRef.current = sound;
-
-  //   return () => {
-  //     // only cleanup if unmounting, not when replaying same song
-  //     sound.unload();
-  //   };
-  // }, [song?.source]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
