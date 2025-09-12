@@ -1,23 +1,32 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Play, Heart, Clock, TrendingUp, Headphones, Music, Shuffle, SkipForward } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Play,
+  Heart,
+  Clock,
+  TrendingUp,
+  Headphones,
+  Music,
+  Shuffle,
+  SkipForward,
+} from "lucide-react";
 
 export function MusicPlayerHome() {
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [activeCard, setActiveCard] = useState<number | null>(null)
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeCard, setActiveCard] = useState<number | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const getGreeting = () => {
-    const hour = currentTime.getHours()
-    if (hour < 12) return "Good morning"
-    if (hour < 18) return "Good afternoon"
-    return "Good evening"
-  }
+    const hour = currentTime.getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
 
   const recentlyPlayed = [
     {
@@ -34,10 +43,28 @@ export function MusicPlayerHome() {
       image: "/watermelon-sugar-album-cover.png",
       duration: "2:54",
     },
-    { id: 3, title: "Levitating", artist: "Dua Lipa", image: "/levitating-album-cover.png", duration: "3:23" },
-    { id: 4, title: "Good 4 U", artist: "Olivia Rodrigo", image: "/good-4-u-album-cover.png", duration: "2:58" },
-    { id: 5, title: "Stay", artist: "The Kid LAROI", image: "/stay-album-cover.png", duration: "2:21" },
-  ]
+    {
+      id: 3,
+      title: "Levitating",
+      artist: "Dua Lipa",
+      image: "/levitating-album-cover.png",
+      duration: "3:23",
+    },
+    {
+      id: 4,
+      title: "Good 4 U",
+      artist: "Olivia Rodrigo",
+      image: "/good-4-u-album-cover.png",
+      duration: "2:58",
+    },
+    {
+      id: 5,
+      title: "Stay",
+      artist: "The Kid LAROI",
+      image: "/stay-album-cover.png",
+      duration: "2:21",
+    },
+  ];
 
   const moodPlaylists = [
     {
@@ -68,24 +95,54 @@ export function MusicPlayerHome() {
       songs: 35,
       color: "from-orange-400/20 to-yellow-500/20",
     },
-  ]
+  ];
 
   const topCharts = [
-    { rank: 1, title: "As It Was", artist: "Harry Styles", plays: "2.1M", trend: "up" },
-    { rank: 2, title: "Heat Waves", artist: "Glass Animals", plays: "1.8M", trend: "up" },
-    { rank: 3, title: "Bad Habit", artist: "Steve Lacy", plays: "1.6M", trend: "down" },
-    { rank: 4, title: "About Damn Time", artist: "Lizzo", plays: "1.4M", trend: "up" },
-    { rank: 5, title: "Running Up That Hill", artist: "Kate Bush", plays: "1.2M", trend: "up" },
-  ]
+    {
+      rank: 1,
+      title: "As It Was",
+      artist: "Harry Styles",
+      plays: "2.1M",
+      trend: "up",
+    },
+    {
+      rank: 2,
+      title: "Heat Waves",
+      artist: "Glass Animals",
+      plays: "1.8M",
+      trend: "up",
+    },
+    {
+      rank: 3,
+      title: "Bad Habit",
+      artist: "Steve Lacy",
+      plays: "1.6M",
+      trend: "down",
+    },
+    {
+      rank: 4,
+      title: "About Damn Time",
+      artist: "Lizzo",
+      plays: "1.4M",
+      trend: "up",
+    },
+    {
+      rank: 5,
+      title: "Running Up That Hill",
+      artist: "Kate Bush",
+      plays: "1.2M",
+      trend: "up",
+    },
+  ];
 
   return (
     <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
-      <div className="h-28 w-auto">
-      <div
-        className="-top-96 fixed flex flex-1 left-1/4 inset-0 h-100 w-150 bg-cover bg-center z-0 opacity-90"
-        style={{ backgroundImage: "url('/assets/sonex-wall.png')" }}
-      />
- </div>
+      <div className="fixed -top-72 left-1/2 transform -translate-x-1/2 z-0">
+        <div
+          className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-80"
+          style={{ backgroundImage: "url('/assets/sonex-wall.png')" }}
+        />
+      </div>
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-orange-500/10 to-amber-500/10 rounded-full blur-xl animate-pulse"></div>
@@ -102,7 +159,9 @@ export function MusicPlayerHome() {
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
                   {getGreeting()}
                 </h1>
-                <p className="text-white/80 text-lg mt-2">Ready to discover your next favorite song?</p>
+                <p className="text-white/80 text-lg mt-2">
+                  Ready to discover your next favorite song?
+                </p>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-4 rounded-full shadow-lg">
@@ -164,7 +223,9 @@ export function MusicPlayerHome() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Recently Played</h2>
-            <button className="text-orange-400 hover:text-orange-300 transition-colors">View All</button>
+            <button className="text-orange-400 hover:text-orange-300 transition-colors">
+              View All
+            </button>
           </div>
           <div className="grid grid-cols-5 gap-4">
             {recentlyPlayed.map((track) => (
@@ -188,7 +249,9 @@ export function MusicPlayerHome() {
                     <Play className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                <h3 className="font-semibold text-white truncate">{track.title}</h3>
+                <h3 className="font-semibold text-white truncate">
+                  {track.title}
+                </h3>
                 <p className="text-white/70 text-sm truncate">{track.artist}</p>
                 <p className="text-white/50 text-xs mt-1">{track.duration}</p>
               </div>
@@ -200,7 +263,9 @@ export function MusicPlayerHome() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Made For You</h2>
-            <button className="text-orange-400 hover:text-orange-300 transition-colors">Refresh</button>
+            <button className="text-orange-400 hover:text-orange-300 transition-colors">
+              Refresh
+            </button>
           </div>
           <div className="grid grid-cols-2 gap-6">
             {moodPlaylists.map((playlist) => (
@@ -210,7 +275,9 @@ export function MusicPlayerHome() {
               >
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-white">{playlist.name}</h3>
+                    <h3 className="text-xl font-bold text-white">
+                      {playlist.name}
+                    </h3>
                     <p className="text-white/70">{playlist.description}</p>
                   </div>
                   <div className="bg-white/20 backdrop-blur-md rounded-full p-3 group-hover:bg-orange-500 transition-colors duration-300">
@@ -227,7 +294,9 @@ export function MusicPlayerHome() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Top Charts</h2>
-            <button className="text-orange-400 hover:text-orange-300 transition-colors">See More</button>
+            <button className="text-orange-400 hover:text-orange-300 transition-colors">
+              See More
+            </button>
           </div>
           <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
             <div className="space-y-4">
@@ -244,7 +313,11 @@ export function MusicPlayerHome() {
                     <p className="text-white/70 text-sm">{track.artist}</p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <TrendingUp className={`w-4 h-4 ${track.trend === "up" ? "text-green-400" : "text-red-400"}`} />
+                    <TrendingUp
+                      className={`w-4 h-4 ${
+                        track.trend === "up" ? "text-green-400" : "text-red-400"
+                      }`}
+                    />
                     <span className="text-white/60 text-sm">{track.plays}</span>
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -273,5 +346,5 @@ export function MusicPlayerHome() {
         </div>
       </div>
     </div>
-  )
+  );
 }
