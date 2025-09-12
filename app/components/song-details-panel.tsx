@@ -16,6 +16,7 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import axios from "axios";
 import { set } from "react-hook-form";
+import { useEntityContext } from "../utils/entity-context";
 interface Song {
   id: string;
   title: string | undefined;
@@ -42,7 +43,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
       setliked(song.liked);
     }
   }, [song]);
-
+  const{entityName, entityType}= useEntityContext();
   const handleLikeClick = async () => {
     try {
       const newLikeStatus = !liked; // Calculate the new status first
@@ -76,7 +77,9 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
           <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
             <h2 className="text-lg font-semibold text-white/90">
-              Music Details
+             { entityName}
+             <span className="text-2xl text-white/60 font-normal ml-2">|</span>
+             <span className="text-sm text-white/60 font-normal ml-2">{entityType}</span>
             </h2>
             <Button
               size="icon"

@@ -34,8 +34,6 @@ export default function FavoritePage() {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
     useMusicContext();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollY, setScrollY] = useState(0);
-  const [isHeaderCompact, setIsHeaderCompact] = useState(false);
   const [favoritesSongs, setFavoritesSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const { isPlaying, setIsPlaying } = useMusicContext();
@@ -83,13 +81,13 @@ export default function FavoritePage() {
     const fetchFavorites = async () => {
       try {
         setLoading(true);
-        const res = await fetch('http://localhost:8080/files/favorite', {
-          method: 'GET',
-          credentials: 'include',
+        const res = await fetch("http://localhost:8080/files/favorite", {
+          method: "GET",
+          credentials: "include",
         });
         const data = await res.json();
 
-      setFavoritesSongs(data);
+        setFavoritesSongs(data);
       } catch (err) {
         console.error("Error fetching favorites:", err);
       } finally {
@@ -108,33 +106,9 @@ export default function FavoritePage() {
     }
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (scrollRef.current) {
-        const scrollTop = scrollRef.current.scrollTop;
-        setScrollY(scrollTop);
-
-        if (scrollTop > 100 && !isHeaderCompact) {
-          setIsHeaderCompact(true);
-        } else if (scrollTop < 80 && isHeaderCompact) {
-          setIsHeaderCompact(false);
-        }
-      }
-    };
-
-    const scrollElement = scrollRef.current;
-    if (scrollElement) {
-      scrollElement.addEventListener("scroll", handleScroll, { passive: true });
-      return () => scrollElement.removeEventListener("scroll", handleScroll);
-    }
-  }, [isHeaderCompact]);
-
   return (
-    <div
-      ref={scrollRef}
-      className="relative h-full flex flex-col overflow-y-scroll pt-5"
-    >
-      {/* Dynamic Background with Heart Pattern */}
+    <div className="relative h-full flex flex-col">
+      {/* Dynamic Background with Heart Pattern - Fixed */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/20 to-gray-800/20 backdrop-blur-xl" />
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-10 left-10 text-orange-400">
@@ -151,50 +125,27 @@ export default function FavoritePage() {
         </div>
       </div>
 
-      {searchBar && <SearchBar />}
+      {/* Fixed SearchBar */}
+      {searchBar && (
+        <div className="relative z-30 flex-shrink-0">
+          <SearchBar />
+        </div>
+      )}
 
-      <div className="pt-5 relative z-10 h-full flex flex-col">
-        {/* Main Header */}
-        <div
-          className={`p-4 cursor-pointer group border-b border-white/10 z-20 transition-all duration-500 ease-out ${
-            isHeaderCompact
-              ? "fixed top-0 left-0 right-0 backdrop-blur-xl bg-gray-900/90"
-              : ""
-          }`}
-          style={{
-            marginLeft:
-              isHeaderCompact && searchBar
-                ? "0"
-                : isHeaderCompact
-                ? "280px"
-                : "0",
-            width:
-              isHeaderCompact && searchBar
-                ? "100%"
-                : isHeaderCompact
-                ? "calc(100% - 280px)"
-                : "100%",
-          }}
-        >
+      {/* Fixed Header */}
+      <div className="relative z-20 flex-shrink-0 pt-5">
+        <div className="p-4 border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               {/* Animated Heart Icon */}
-              <div
-                className="relative flex-shrink-0 transition-all duration-700 ease-out"
-                style={{
-                  width: isHeaderCompact ? "80px" : "160px",
-                  height: isHeaderCompact ? "80px" : "160px",
-                }}
-              >
+              <div className="relative flex-shrink-0 w-40 h-40">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-orange-500/30 to-pink-500/30 backdrop-blur-sm border border-orange-400/30 flex items-center justify-center relative overflow-hidden">
                   {/* Animated background circles */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/20 to-pink-400/20 animate-pulse" />
                   <div className="absolute inset-2 rounded-full bg-gradient-to-br from-orange-500/10 to-pink-500/10 animate-pulse delay-1000" />
 
                   <Heart
-                    className={`text-orange-400 drop-shadow-lg transition-all duration-700 ease-out ${
-                      isHeaderCompact ? "w-8 h-8" : "w-16 h-16"
-                    }`}
+                    className="w-12 h-12 text-orange-400 drop-shadow-lg"
                     fill="currentColor"
                   />
 
@@ -213,21 +164,10 @@ export default function FavoritePage() {
               </div>
 
               <div className="flex flex-col">
-                <h1
-                  className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 drop-shadow-lg transition-all duration-700 ease-out"
-                  style={{
-                    fontSize: isHeaderCompact ? "2rem" : "4rem",
-                    lineHeight: "1.1",
-                  }}
-                >
+                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 drop-shadow-lg">
                   Loved Songs
                 </h1>
-                <p
-                  className="text-white/80 mt-2 transition-all duration-700 ease-out flex items-center gap-2"
-                  style={{
-                    fontSize: isHeaderCompact ? "0.875rem" : "1.125rem",
-                  }}
-                >
+                <p className="text-white/80 mt-2 text-lg flex items-center gap-2">
                   <Heart
                     className="w-4 h-4 text-orange-400"
                     fill="currentColor"
@@ -236,43 +176,32 @@ export default function FavoritePage() {
                 </p>
 
                 {/* Action Buttons */}
-                {!isHeaderCompact && (
-                  <div className="flex items-center gap-4 mt-6">
-                    <Button
-                      onClick={handlePlayAll}
-                      disabled={favoritesSongs.length === 0}
-                      className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg shadow-orange-500/25 transition-all duration-300 hover:scale-105 disabled:opacity-50"
-                    >
-                      <Play className="w-5 h-5 mr-2" fill="currentColor" />
-                      Play All
-                    </Button>
-                    <Button
-                      onClick={handleShuffle}
-                      disabled={favoritesSongs.length === 0}
-                      variant="outline"
-                      className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50"
-                    >
-                      <Shuffle className="w-4 h-4 mr-2" />
-                      Shuffle
-                    </Button>
-                  </div>
-                )}
+                <div className="flex items-center gap-4 mt-6">
+                  <Button
+                    onClick={handlePlayAll}
+                    disabled={favoritesSongs.length === 0}
+                    className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg shadow-orange-500/25 transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                  >
+                    <Play className="w-5 h-5 mr-2" fill="currentColor" />
+                    Play All
+                  </Button>
+                  <Button
+                    onClick={handleShuffle}
+                    disabled={favoritesSongs.length === 0}
+                    variant="outline"
+                    className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                  >
+                    <Shuffle className="w-4 h-4 mr-2" />
+                    Shuffle
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Spacer to prevent content jump when header becomes fixed */}
-        {isHeaderCompact && <div style={{ height: "140px" }} />}
-
-        {/* Table Header - Sticky */}
-        <div
-          className="sticky top-0 z-[10002] px-4 pt-4 pb-2 backdrop-blur-xl bg-gray-800/40"
-          style={{
-            marginTop: isHeaderCompact ? "90px" : "0px",
-            transition: "margin-top 0.5s ease-out",
-          }}
-        >
+        {/* Table Header - Fixed */}
+        <div className="px-4 pt-4 pb-2 backdrop-blur-xl bg-gray-800/40">
           <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-1">#</div>
             <div className="col-span-5">Title</div>
@@ -280,8 +209,10 @@ export default function FavoritePage() {
             <div className="col-span-1">Duration</div>
           </div>
         </div>
+      </div>
 
-        {/* Content */}
+      {/* Scrollable Content */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto relative z-10">
         <div
           className={clsx(
             "px-4 space-y-2 transition-all duration-500",
