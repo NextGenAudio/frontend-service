@@ -14,7 +14,7 @@ export async function GET(request: Request) {
         'Cookie': cookies,
       },
       withCredentials: true,
-    });
+    }); 
 
     const songs = response.data;
 

@@ -203,7 +203,7 @@ export const PlaylistPanel = () => {
         {/* Glass Visualizer Area */}
 
         <div className="px-4 pt-4">
-          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+          <div className="z-10 grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-6 ml-14">Title</div>
 
             <div className="col-span-3">Album</div>
@@ -216,7 +216,7 @@ export const PlaylistPanel = () => {
             {songList.map((song, id) => (
               <div
                 key={song.id}
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                className={`flex z-0 items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
                   playingSongId === song.id
                     ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
                     : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
