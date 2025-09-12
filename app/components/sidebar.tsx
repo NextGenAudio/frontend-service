@@ -69,7 +69,7 @@ export const Sidebar = () => {
       router.push("/player/favorite");
     }
     if (label === "Settings") {
-      setSettings(true);
+      router.push("/player/settings");
     }
     if(label === "Visualizer"){
       setVisualizer(!visualizer);
