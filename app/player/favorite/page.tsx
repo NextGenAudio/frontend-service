@@ -15,6 +15,7 @@ import { useSidebar } from "@/app/utils/sidebar-context";
 import { useMusicContext } from "@/app/utils/music-context";
 import { clsx } from "clsx";
 import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
+import { set } from "react-hook-form";
 
 interface Song {
   id: string;
@@ -82,15 +83,13 @@ export default function FavoritePage() {
     const fetchFavorites = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual API call to fetch favorite songs
-        // const res = await fetch('http://localhost:8080/favorites', {
-        //   method: 'GET',
-        //   credentials: 'include',
-        // });
-        // const data = await res.json();
+        const res = await fetch('http://localhost:8080/files/favorite', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const data = await res.json();
 
-        // For now, using empty array - replace with actual API call
-        setFavoritesSongs([]);
+      setFavoritesSongs(data);
       } catch (err) {
         console.error("Error fetching favorites:", err);
       } finally {

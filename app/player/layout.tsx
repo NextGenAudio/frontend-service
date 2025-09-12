@@ -20,7 +20,6 @@ import { ProfileDropdown } from "../components/profile-dropdown";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const {
     player,
@@ -35,7 +34,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const {
     setIsPlaying,
     selectSong,
-
+    isPlaying,
     playingSong,
     setPlayingSong,
     soundRef,
@@ -98,9 +97,12 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       volume: isMuted ? 0 : volume / 100,
       preload: true,
       loop: repeatMode === 1,
+      onload: () => {
+        // Auto-play when the song is loaded and isPlaying is true
+        setPlayingSongDuration(sound.duration() || 0);
+      },
       onplay: () => {
         setIsPlaying(true);
-        setPlayingSongDuration(sound.duration() || 0);
       },
       onpause: () => setIsPlaying(false),
       onend: () => setIsPlaying(false),
@@ -115,11 +117,26 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     };
   }, [playingSong?.source]);
 
+  // Handle play/pause state changes
+  useEffect(() => {
+    if (!soundRef.current) return;
+
+    if (isPlaying) {
+      if (!soundRef.current.playing()) {
+        soundRef.current.play();
+      }
+    } else {
+      if (soundRef.current.playing()) {
+        soundRef.current.pause();
+      }
+    }
+  }, [isPlaying, soundRef.current]);
+
   return (
     <div className="relative h-screen overflow-hidden ">
       <div className="absolute top-0 left-0 h-screen rounded-[32px] w-screen bg-gradient-to-bl from-orange-400 via-orange-700 to-red-700 z-0"></div>
       {/* Sidebar with higher z-index */}
-      
+
       <FileHandlingProvider>
         <div className="absolute top-0 left-0 z-10">
           <Sidebar />
@@ -136,7 +153,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
               <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
               <ResizablePanel defaultSize={30} minSize={20} maxSize={70}>
                 {/* Music player positioned to not overlap sidebar */}
-                
+
                 <ResizablePanelGroup direction="vertical">
                   {visualizer && (
                     <ResizablePanel

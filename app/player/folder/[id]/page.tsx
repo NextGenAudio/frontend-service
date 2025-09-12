@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Play, Pause, MoreHorizontal } from "lucide-react";
+import { Play, Pause, MoreHorizontal, Shuffle, Music } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { SearchBar } from "@/app/components/search-bar";
@@ -63,9 +63,29 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     setPlayingSong(song);
   };
 
+  const handlePlayAll = () => {
+    if (songList.length > 0) {
+      const firstSong = songList[0];
+      handleSongDoubleClick(firstSong);
+      setPlayer(true);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleShuffle = () => {
+    if (songList.length > 0) {
+      const randomIndex = Math.floor(Math.random() * songList.length);
+      const randomSong = songList[randomIndex];
+      handleSongDoubleClick(randomSong);
+      setPlayer(true);
+      setIsPlaying(true);
+    }
+  };
+
   useEffect(() => {
     const fetchSongs = async () => {
       try {
+        setLoading(true);
         const res = await fetch(
           `http://localhost:8080/files/list?folderId=${params.id}`,
           {
@@ -78,6 +98,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         setSongList(data);
       } catch (err) {
         console.error("Error fetching songs:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchSongs();
@@ -99,6 +121,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       return () => scrollElement.removeEventListener("scroll", handleScroll);
     }
   }, []);
+
+  
 
   return (
     <div
@@ -170,10 +194,31 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 >
                   {songList.length} songs
                 </p>
-                {entityDescription !== "" && (
-                  <hr className="my-4 border-t border-white/20" />
+
+                {/* Action Buttons */}
+                {!isHeaderCompact && songList.length > 0 && (
+                  <div className="flex items-center gap-4 mt-4">
+                    <Button
+                      onClick={handlePlayAll}
+                      className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300"
+                    >
+                      <Play className="w-5 h-5 mr-2" fill="currentColor" />
+                      Play All
+                    </Button>
+                    <Button
+                      onClick={handleShuffle}
+                      variant="outline"
+                      className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 px-6 py-3 rounded-full transition-all duration-300"
+                    >
+                      <Shuffle className="w-4 h-4 mr-2" />
+                      Shuffle
+                    </Button>
+                  </div>
                 )}
-                <p className="mt-1 ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose">
+                {entityDescription !== "" && (
+                  <hr className="mt-4 mb-2 border-t border-white/20" />
+                )}
+                <p className="ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose">
                   {entityDescription}
                 </p>
               </div>
@@ -194,92 +239,123 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
         <ScrollArea>
           <div className={clsx("p-4 space-y-2", player ? "pb-56" : "pb-8")}>
-            {songList.map((song, id) => (
-              <div
-                key={song.id}
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
-                  playingSongId === song.id
-                    ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
-                    : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
-                }`}
-                onClick={() => handleSongSingleClick(song)}
-                onDoubleClick={() => {
-                  handleSongDoubleClick(song);
-                  setPlayer(true);
-
-                  setIsPlaying(true); // start playing it
-                }}
-              >
-                <div className="font-medium text-white drop-shadow-sm">
-                  {id + 1}
-                </div>
+            {loading ? (
+              /* Loading State */
+              <div className="flex flex-col items-center justify-center py-20">
                 <div className="relative">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (playingSongId === song.id) {
-                        setIsPlaying(!isPlaying); // toggle play/pause
-                      } else {
-                        handleSongSingleClick(song); // load a new song
-                        setPlayer(true);
-
-                        setIsPlaying(true); // start playing it
-                      }
-                    }}
-                  >
-                    {isPlaying && playingSongId === song.id ? (
-                      <Pause className="h-4 w-4 text-white" />
-                    ) : (
-                      <Play className="h-4 w-4 text-white" />
-                    )}
-                  </Button>
+                  <Music className="w-16 h-16 text-orange-400 animate-pulse" />
+                  <div className="absolute inset-0 w-16 h-16 border-4 border-orange-400/30 border-t-orange-400 rounded-full animate-spin" />
                 </div>
-                <div className="grid grid-cols-10 gap-3 w-full items-center">
-                  <span className="col-span-6 flex flex-col">
-                    <div className="font-medium truncate text-white drop-shadow-sm">
-                      {song.title || song.filename}
-                    </div>
-                    <span className="col-span-text-sm text-white/70 truncate">
-                      {song.artist}
-                    </span>
-                  </span>
-                  <span className="col-span-3 text-m text-white/70 truncate">
-                    {song.album}
-                  </span>
-                  <span className="col-span-1 text-center text-white/70 truncate">
-                    {song.metadata?.track_length / 60
-                      ? `${Math.floor(song.metadata.track_length / 60)}:${
-                          Math.floor(song.metadata.track_length % 60) < 10
-                            ? "0" + Math.floor(song.metadata.track_length % 60)
-                            : Math.floor(song.metadata.track_length % 60)
-                        }`
-                      : "0:00"}
-                  </span>
+                <p className="text-white/70 mt-4 text-lg">Loading songs...</p>
+              </div>
+            ) : songList.length === 0 ? (
+              /* Empty State */
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-sm border border-orange-400/20 flex items-center justify-center">
+                    <Music className="w-16 h-16 text-orange-400/60" />
+                  </div>
+                  <div className="absolute -top-2 -right-2">
+                    <Play className="w-8 h-8 text-white/40 animate-bounce" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {playingSongId === song.id && isPlaying && (
-                    <div className="flex items-center gap-1">
-                      <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
-                      <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>
-                      <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
-                    </div>
-                  )}
-                  {/* <span className="text-sm text-white/70 font-medium">
-                      {song.metadata.duration}
-                    </span> */}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
-                  >
-                    <MoreHorizontal className="h-3 w-3 text-white/70" />
-                  </Button>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  No songs found
+                </h3>
+                <p className="text-white/70 text-lg mb-6 max-w-md">
+                  This folder is empty. Upload some music files to get started!
+                </p>
+                <div className="flex flex-col items-center gap-2 text-white/50">
+                  <p className="text-sm">
+                    💡 Tip: Drag and drop music files to add them to this folder
+                  </p>
                 </div>
               </div>
-            ))}
+            ) : (
+              /* Songs List */
+              songList.map((song, id) => (
+                <div
+                  key={song.id}
+                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                    playingSongId === song.id
+                      ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
+                      : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
+                  }`}
+                  onClick={() => handleSongSingleClick(song)}
+                  onDoubleClick={() => {
+                    handleSongDoubleClick(song);
+                    setPlayer(true);
+                    setIsPlaying(true); // start playing it
+                  }}
+                >
+                  <div className="font-medium text-white drop-shadow-sm">
+                    {id + 1}
+                  </div>
+                  <div className="relative">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (playingSongId === song.id) {
+                          setIsPlaying(!isPlaying); // toggle play/pause
+                        } else {
+                          handleSongSingleClick(song); // load a new song
+                          setPlayer(true);
+                          setIsPlaying(true); // start playing it
+                        }
+                      }}
+                    >
+                      {isPlaying && playingSongId === song.id ? (
+                        <Pause className="h-4 w-4 text-white" />
+                      ) : (
+                        <Play className="h-4 w-4 text-white" />
+                      )}
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-10 gap-3 w-full items-center">
+                    <span className="col-span-6 flex flex-col">
+                      <div className="font-medium truncate text-white drop-shadow-sm">
+                        {song.title || song.filename}
+                      </div>
+                      <span className="col-span-text-sm text-white/70 truncate">
+                        {song.artist}
+                      </span>
+                    </span>
+                    <span className="col-span-3 text-m text-white/70 truncate">
+                      {song.album}
+                    </span>
+                    <span className="col-span-1 text-center text-white/70 truncate">
+                      {song.metadata?.track_length / 60
+                        ? `${Math.floor(song.metadata.track_length / 60)}:${
+                            Math.floor(song.metadata.track_length % 60) < 10
+                              ? "0" +
+                                Math.floor(song.metadata.track_length % 60)
+                              : Math.floor(song.metadata.track_length % 60)
+                          }`
+                        : "0:00"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {playingSongId === song.id && isPlaying && (
+                      <div className="flex items-center gap-1">
+                        <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
+                        <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>
+                        <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
+                      </div>
+                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                    >
+                      <MoreHorizontal className="h-3 w-3 text-white/70" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </ScrollArea>
       </div>
