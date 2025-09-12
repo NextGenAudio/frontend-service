@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Plus, Music, MoreHorizontal, FolderPlus, ListMusic, Upload } from "lucide-react";
+import { Plus, Music, MoreHorizontal, FolderPlus, ListMusic, Upload, ChevronDown } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/app/components/ui/dropdown-menu";
@@ -107,26 +107,44 @@ export const LibraryPanel = () => {
               Your Library
             </h2>
             <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
-                onClick={() => {
-                  router.push("/player/upload");
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Music</span>
-              </Button>
-              <Button
-                size="sm"
-                className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
-                onClick={() => {
-                  router.push("/player/newfolder");
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                <span>New Folder</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Create</span>
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 bg-gray-900/95 backdrop-blur-md border border-white/20 text-white"
+                >
+                  <DropdownMenuItem
+                    onClick={() => router.push("/player/upload")}
+                    className="hover:bg-white/10 focus:bg-white/10"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Add Music
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/player/newfolder")}
+                    className="hover:bg-white/10 focus:bg-white/10"
+                  >
+                    <FolderPlus className="h-4 w-4 mr-2" />
+                    New Folder
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/player/playlist/create")}
+                    className="hover:bg-white/10 focus:bg-white/10"
+                  >
+                    <ListMusic className="h-4 w-4 mr-2" />
+                    Create Playlist
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
