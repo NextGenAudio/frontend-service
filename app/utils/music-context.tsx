@@ -19,13 +19,9 @@ interface Song {
 type MusicContextType = {
   isPlaying: boolean;
   songList: Song[];
-  entityName: string | null;
-  entityArt: string | null;
-  entityType: "folder" | "playlist" | null;
+
   setSongList: (value: Song[]) => void;
-  setEntityName: (value: string | null) => void;
-  setEntityArt: (value: string | null) => void;
-  setEntityType: (value: "folder" | "playlist" | null) => void;
+
   setIsPlaying: (value: boolean) => void;
   duration: number;
   setDuration: (value: number) => void;
@@ -33,10 +29,6 @@ type MusicContextType = {
   playingSong: Song | null;
   setSelectSong: (value: Song | null) => void;
   setPlayingSong: (value: Song | null) => void;
-  folderList: any[];
-  playlistList: any[];
-  setFolderList: (value: any[]) => void;
-  setPlaylistList: (value: any[]) => void;
   playingSongDuration: number;
   setPlayingSongDuration: (value: number) => void;
   soundRef: React.MutableRefObject<Howl | null>;
@@ -56,15 +48,10 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [selectSong, setSelectSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [songList, setSongList] = useState<Song[]>([]);
-  const [entityName, setEntityName] = useState<string | null>(null);
-  const [entityArt, setEntityArt] = useState<string | null>(null);
-  const [entityType, setEntityType] = useState<"folder" | "playlist" | null>(
-    null
-  );
+
   const [duration, setDuration] = useState(0);
   const [playingSong, setPlayingSong] = useState<Song | null>(null);
-  const [folderList, setFolderList] = useState<any[]>([]);
-  const [playlistList, setPlaylistList] = useState<any[]>([]);
+
   const [playingSongDuration, setPlayingSongDuration] = useState(0);
   const soundRef = useRef<Howl | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -72,29 +59,17 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [repeatMode, setRepeatMode] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [entityDescription, setEntityDescription] = useState("")
+
 
   const value = {
     selectSong,
     playingSong,
     isPlaying,
     songList,
-    entityName,
-    entityArt,
-    entityType,
     duration,
-    folderList,
-    playlistList,
-    setFolderList,
-    setPlaylistList,
     setPlayingSong,
     setDuration,
     setSongList,
-    setEntityName,
-    setEntityArt,
-    setEntityType,
-    entityDescription,
-    setEntityDescription,
     setSelectSong,
     setIsPlaying,
     playingSongDuration,

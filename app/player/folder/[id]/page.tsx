@@ -4,14 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { Play, Pause, MoreHorizontal } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { SearchBar } from "./search-bar";
-import { useSidebar } from "../utils/sidebar-context";
-import { useMusicContext } from "../utils/music-context";
+import { SearchBar } from "@/app/components/search-bar";
+import { useSidebar } from "@/app/utils/sidebar-context";
+import { useMusicContext } from "@/app/utils/music-context";
 import { clsx } from "clsx";
-import AudioVisualizer from "./audio-visualizer";
-import App from "next/app";
-import AppLoadingScreen from "./app-loading";
-import { useEntityContext } from "../utils/entity-context";
+import { useEntityContext } from "@/app/utils/entity-context";
 
 interface Song {
   id: string;
@@ -27,7 +24,7 @@ interface Song {
   isLiked: boolean;
 }
 
-export const PlaylistPanel = () => {
+export default function FolderPanel({ params }: { params: { id: number } }) {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
     useMusicContext();
 
@@ -36,16 +33,22 @@ export const PlaylistPanel = () => {
   const [isHeaderCompact, setIsHeaderCompact] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
-
   const { isPlaying, setIsPlaying } = useMusicContext();
   const [selectSongId, setSelectSongId] = useState("1");
   const [playingSongId, setPlayingSongId] = useState("1");
-  const { entityName, entityArt, entityType, entityDescription } =
-    useEntityContext();
-  const { songList } = useMusicContext();
+  const {
+    entityName,
+    entityArt,
+    entityType,
+    entityDescription,
+    setEntityName,
+    setEntityArt,
+    setEntityType,
+    setEntityDescription,
+  } = useEntityContext();
+  const { songList, setSongList } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
     useSidebar();
-
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
@@ -59,6 +62,26 @@ export const PlaylistPanel = () => {
     setSelectSong(song);
     setPlayingSong(song);
   };
+
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/files/list?folderId=${params.id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await res.json();
+        console.log("Songs in folder:", data);
+        setSongList(data);
+      } catch (err) {
+        console.error("Error fetching songs:", err);
+      }
+    };
+    fetchSongs();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,8 +107,8 @@ export const PlaylistPanel = () => {
       onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
     >
       {/* Glass background with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-400/20 to-gray-800/20 backdrop-blur-xl " />
-      <div className="inset-0 bg-white/5 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/20 to-gray-800/20 backdrop-blur-xl " />
+      {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
 
       {searchBar && <SearchBar />}
 
@@ -147,9 +170,9 @@ export const PlaylistPanel = () => {
                 >
                   {songList.length} songs
                 </p>
-                  {entityDescription !== "" && (
-                <hr className="my-4 border-t border-white/20" />
-                  )}
+                {entityDescription !== "" && (
+                  <hr className="my-4 border-t border-white/20" />
+                )}
                 <p className="mt-1 ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose">
                   {entityDescription}
                 </p>
@@ -250,7 +273,7 @@ export const PlaylistPanel = () => {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
                   >
                     <MoreHorizontal className="h-3 w-3 text-white/70" />
                   </Button>
@@ -262,4 +285,4 @@ export const PlaylistPanel = () => {
       </div>
     </div>
   );
-};
+}

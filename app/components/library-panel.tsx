@@ -14,6 +14,7 @@ import MediaCard from "./ui/media-card";
 import { set } from "react-hook-form";
 import { useFileHandling } from "../utils/file-handling-context";
 import { useRouter } from "next/navigation";
+import { useEntityContext } from "../utils/entity-context";
 
 type Folder = {
   id: number;
@@ -39,11 +40,10 @@ interface Song {
 
 export const LibraryPanel = () => {
   const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
-  const { folderList, setFolderList } = useMusicContext();
+  const { folderList, setFolderList, setEntityName, setEntityArt, setEntityType, setEntityDescription } = useEntityContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
-  const { setSongList, setEntityType, setEntityName, setEntityArt } =
-    useMusicContext();
+  const { setSongList } = useMusicContext();
   const { folderCreateRefresh, songUploadRefresh } = useFileHandling();
   const router = useRouter();
   useEffect(() => {
@@ -67,23 +67,13 @@ export const LibraryPanel = () => {
   const handleFolderClick = async (folder: Folder) => {
     setSelectedFolder(folder);
     try {
-      const res = await fetch(
-        `http://localhost:8080/files/list?folderId=${folder.id}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const data = await res.json();
-      console.log("Songs in folder:", data);
       setEntityType("folder");
       setEntityName(folder.name);
       setEntityArt(
         folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : ""
       );
-      setEntityDescription(folder.description)
-      setSongList(data);
-      router.push("/player/playlist");
+      setEntityDescription(folder.description || "");
+      router.push(`/player/folder/${folder.id}`);
     } catch (err) {
       console.error("Error fetching songs:", err);
     }
@@ -111,7 +101,7 @@ export const LibraryPanel = () => {
   return (
     <div className="h-full relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-slate-800/80 to-gray-900/90"></div>
-      <div className="absolute inset-0 backdrop-blur-xl bg-white/10"></div>
+      {/* <div className="absolute inset-0 backdrop-blur-xl bg-white/5"></div> */}
 
       <div className="relative h-full flex flex-col">
         {/* Header */}

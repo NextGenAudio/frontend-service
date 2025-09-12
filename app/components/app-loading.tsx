@@ -22,10 +22,10 @@ export default function AppLoadingScreen() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
       {/* Glassmorphism overlay */}
-      <div className="absolute inset-0 bg-white/10 backdrop-blur-xl" />
+      {/* <div className="absolute inset-0 bg-white/10 backdrop-blur-xl" /> */}
 
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* <div className="absolute inset-0 overflow-hidden">
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
@@ -40,7 +40,7 @@ export default function AppLoadingScreen() {
             <div className="w-2 h-2 bg-white/20 rounded-full" />
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Main loading content */}
       <div className="relative z-10 flex flex-col items-center space-y-8 p-8">
