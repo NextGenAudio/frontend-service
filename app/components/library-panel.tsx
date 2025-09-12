@@ -110,7 +110,7 @@ export const LibraryPanel = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    size="sm"
+                    
                     className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
                   >
                     <Plus className="h-4 w-4" />
