@@ -1,7 +1,11 @@
+"use client"
 import { Button } from "@/app/components/ui/button"
 import { MoreHorizontal, Play, Heart, UserPlus } from "lucide-react"
+import ProfileAvatar from "./profile-avatar"
+import { useSession } from "next-auth/react";
 
 export function ProfilePage() {
+  const { status, data: session } = useSession();
   const topArtists = [
     { name: "The Weeknd", image: "/the-weeknd-artist-photo.png" },
     { name: "Billie Eilish", image: "/billie-eilish-artist-photo.png" },
@@ -58,7 +62,7 @@ export function ProfilePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 text-white overflow-y-auto custom-scrollbar">
+    <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 text-white overflow-y-auto custom-scrollbar">
       {/* Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
@@ -72,7 +76,7 @@ export function ProfilePage() {
           <div className="flex items-end gap-8 mb-8">
             <div className="relative group">
               <div className="w-48 h-48 rounded-full overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl">
-                <img src="/professional-user-profile-photo.png" alt="Profile" className="w-full h-full object-cover" />
+                <ProfileAvatar w={48} h={48} />
               </div>
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
@@ -80,20 +84,20 @@ export function ProfilePage() {
             <div className="flex-1">
               <p className="text-sm text-white/60 mb-2 font-medium">Profile</p>
               <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-white via-orange-100 to-orange-200 bg-clip-text text-transparent">
-                Alex Johnson
+                {session?.user?.name}
               </h1>
               <div className="flex items-center gap-6 text-white/80">
                 <span className="font-medium">{userPlaylists.length} Public Playlists</span>
-                <span>•</span>
+                {/* <span>•</span>
                 <span className="font-medium">1.2K Followers</span>
                 <span>•</span>
-                <span className="font-medium">847 Following</span>
+                <span className="font-medium">847 Following</span> */}
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-4">
+          {/* <div className="flex items-center gap-4">
             <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
               <Play className="w-5 h-5 mr-2" />
               Play
@@ -112,7 +116,7 @@ export function ProfilePage() {
             >
               <MoreHorizontal className="w-5 h-5" />
             </Button>
-          </div>
+          </div> */}
         </div>
 
         {/* Created Playlists */}

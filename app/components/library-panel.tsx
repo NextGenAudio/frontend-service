@@ -15,7 +15,6 @@ import { set } from "react-hook-form";
 import { useFileHandling } from "../utils/file-handling-context";
 import { useRouter } from "next/navigation";
 
-
 type Folder = {
   id: number;
   name: string;
@@ -40,11 +39,12 @@ interface Song {
 
 export const LibraryPanel = () => {
   const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
-  const {folderList , setFolderList} = useMusicContext();
+  const { folderList, setFolderList } = useMusicContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
-  const { setSongList, setEntityType, setEntityName, setEntityArt } = useMusicContext();
-  const {folderCreateRefresh, songUploadRefresh} = useFileHandling();
+  const { setSongList, setEntityType, setEntityName, setEntityArt } =
+    useMusicContext();
+  const { folderCreateRefresh, songUploadRefresh } = useFileHandling();
   const router = useRouter();
   useEffect(() => {
     const fetchFolders = async () => {
@@ -78,10 +78,12 @@ export const LibraryPanel = () => {
       console.log("Songs in folder:", data);
       setEntityType("folder");
       setEntityName(folder.name);
-      setEntityArt(folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : "");
+      setEntityArt(
+        folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : ""
+      );
+      setEntityDescription(folder.description)
       setSongList(data);
       router.push("/player/playlist");
-      
     } catch (err) {
       console.error("Error fetching songs:", err);
     }
@@ -145,75 +147,94 @@ export const LibraryPanel = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="all" className="h-full flex flex-col">
-  <TabsList className="grid grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
-    <TabsTrigger value="all" className="data-[state=active]:bg-white/30 rounded-l-xl text-white/80 hover:text-white">
-      All
-    </TabsTrigger>
-    <TabsTrigger value="playlists" className="data-[state=active]:bg-white/30 text-white/80 hover:text-white">
-      Playlists
-    </TabsTrigger>
-    <TabsTrigger value="folders" className="data-[state=active]:bg-white/30 rounded-r-xl text-white/80 hover:text-white">
-      Folders
-    </TabsTrigger>
-  </TabsList>
+          <TabsList className="grid grid-cols-3 m-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl">
+            <TabsTrigger
+              value="all"
+              className="data-[state=active]:bg-white/30 rounded-l-xl text-white/80 hover:text-white"
+            >
+              All
+            </TabsTrigger>
+            <TabsTrigger
+              value="playlists"
+              className="data-[state=active]:bg-white/30 text-white/80 hover:text-white"
+            >
+              Playlists
+            </TabsTrigger>
+            <TabsTrigger
+              value="folders"
+              className="data-[state=active]:bg-white/30 rounded-r-xl text-white/80 hover:text-white"
+            >
+              Folders
+            </TabsTrigger>
+          </TabsList>
 
-  {/* All = playlists + folders */}
-  <TabsContent value="all" className="flex-1 px-3 overflow-y-auto">
-    <div className="space-y-2">
-      {playlists.map((playlist) => (
-        <MediaCard
-          key={`playlist-${playlist.id}`}
-          name={playlist.name}
-          image={playlist.image || defaultImage}
-          count={playlist.songCount}
-          type="playlist"
-        />
-      ))}
-      {folderList.map((folder) => (
-        <MediaCard
-          key={`folder-${folder.id}`}
-          name={folder.name}
-          image={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
-          count={folder.musicCount}
-          type="folder"
-          onClick={() => handleFolderClick(folder)}
-        />
-      ))}
-    </div>
-  </TabsContent>
+          {/* All = playlists + folders */}
+          <TabsContent value="all" className="flex-1 px-3 overflow-y-auto">
+            <div className="space-y-2">
+              {playlists.map((playlist) => (
+                <MediaCard
+                  key={`playlist-${playlist.id}`}
+                  name={playlist.name}
+                  image={playlist.image || defaultImage}
+                  count={playlist.songCount}
+                  type="playlist"
+                />
+              ))}
+              {folderList.map((folder) => (
+                <MediaCard
+                  key={`folder-${folder.id}`}
+                  name={folder.name}
+                  image={
+                    folder.folderArt
+                      ? `http://localhost:8080/${folder.folderArt}`
+                      : defaultImage
+                  }
+                  count={folder.musicCount}
+                  type="folder"
+                  onClick={() => handleFolderClick(folder)}
+                />
+              ))}
+            </div>
+          </TabsContent>
 
-  {/* Playlists only */}
-  <TabsContent value="playlists" className="flex-1 px-3 overflow-y-auto">
-    <div className="space-y-2">
-      {playlists.map((playlist) => (
-        <MediaCard
-          key={`playlist-${playlist.id}`}
-          name={playlist.name}
-          image={playlist.image || defaultImage}
-          count={playlist.songCount}
-          type="playlist"
-        />
-      ))}
-    </div>
-  </TabsContent>
+          {/* Playlists only */}
+          <TabsContent
+            value="playlists"
+            className="flex-1 px-3 overflow-y-auto"
+          >
+            <div className="space-y-2">
+              {playlists.map((playlist) => (
+                <MediaCard
+                  key={`playlist-${playlist.id}`}
+                  name={playlist.name}
+                  image={playlist.image || defaultImage}
+                  count={playlist.songCount}
+                  type="playlist"
+                />
+              ))}
+            </div>
+          </TabsContent>
 
-  {/* Folders only */}
-  <TabsContent value="folders" className="flex-1 px-3 overflow-y-auto">
-    <div className="space-y-2">
-      {folderList.map((folder) => (
-        <MediaCard
-          key={`folder-${folder.id}`}
-          name={folder.name}
-          image={folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : defaultImage}
-          count={folder.musicCount}
-          onClick={() => handleFolderClick(folder)}
-          type="folder"
-        />
-      ))}
-    </div>
-  </TabsContent>
-</Tabs>
-
+          {/* Folders only */}
+          <TabsContent value="folders" className="flex-1 px-3 overflow-y-auto">
+            <div className="space-y-2">
+              {folderList.map((folder) => (
+                <MediaCard
+                  key={`folder-${folder.id}`}
+                  name={folder.name}
+                  image={
+                    folder.folderArt
+                      ? `http://localhost:8080/${folder.folderArt}`
+                      : defaultImage
+                  }
+                  count={folder.musicCount}
+                  onClick={() => handleFolderClick(folder)}
+                  type="folder"
+                />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

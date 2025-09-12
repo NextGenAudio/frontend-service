@@ -72,6 +72,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [repeatMode, setRepeatMode] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [entityDescription, setEntityDescription] = useState("")
 
   const value = {
     selectSong,
@@ -92,6 +93,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setEntityName,
     setEntityArt,
     setEntityType,
+    entityDescription,
+    setEntityDescription,
     setSelectSong,
     setIsPlaying,
     playingSongDuration,
@@ -105,6 +108,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     dataArrayRef,
     isLiked,
     setIsLiked,
+
   };
 
   return (

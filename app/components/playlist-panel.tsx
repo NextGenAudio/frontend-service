@@ -39,7 +39,7 @@ export const PlaylistPanel = () => {
   const { isPlaying, setIsPlaying } = useMusicContext();
   const [selectSongId, setSelectSongId] = useState("1");
   const [playingSongId, setPlayingSongId] = useState("1");
-  const { songList, entityName, entityArt, entityType } = useMusicContext();
+  const { songList, entityName, entityArt, entityType, entityDescription } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
     useSidebar();
 
@@ -96,7 +96,7 @@ export const PlaylistPanel = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div
-                className="rounded-xl overflow-hidden relative flex-shrink-0 transition-all duration-700 ease-out"
+                className="rounded-xl  overflow-hidden relative flex-shrink-0 transition-all duration-700 ease-out"
                 style={{
                   width: isHeaderCompact ? "60px" : "208px",
                   height: isHeaderCompact ? "60px" : "208px",
@@ -111,7 +111,7 @@ export const PlaylistPanel = () => {
                 <img
                   src={entityArt ?? undefined}
                   alt={entityName ?? undefined}
-                  className=" rounded-xl object-cover shadow-md"
+                  className=" rounded-xl object-cover h-full w-auto shadow-md"
                 />
                 <div className="absolute inset-0" />
                 <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />
@@ -144,6 +144,7 @@ export const PlaylistPanel = () => {
                 >
                   {songList.length} songs
                 </p>
+                <p>{}</p>
               </div>
             </div>
           </div>

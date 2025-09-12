@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   if (!password) {
     const { data, error } = await supabase
-      .from("profiles") // case-sensitive table name
+      .from("profiles") 
       .select("*")
       .eq("email", email)
       .single();

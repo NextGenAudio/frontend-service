@@ -16,6 +16,10 @@ import { SongDetailsPanel } from "../components/song-details-panel";
 import { FileHandlingProvider } from "../utils/file-handling-context";
 import { Howl } from "howler";
 import AudioVisualizer from "../components/audio-visualizer";
+import { ProfileDropdown } from "../components/profile-dropdown";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const {
@@ -43,7 +47,13 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   } = useMusicContext();
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
-
+  const { status } = useSession();
+  const router = useRouter();
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
   useEffect(() => {
     if (!selectSong) return;
 
@@ -114,7 +124,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         <div className="absolute top-0 left-0 z-10">
           <Sidebar />
         </div>
-
+        {profile && <ProfileDropdown />}
         <div className="bg-slate-900 h-screen ml-[115px] rounded-[32px] bg-background text-foreground flex flex-col overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] drop-shadow-xl">
           <div className="flex-1 min-h-0 h-full">
             <ResizablePanelGroup direction="horizontal" className="h-full">

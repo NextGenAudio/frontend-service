@@ -17,8 +17,8 @@ interface UploadedFile {
 export function FolderCreate() {
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
+    name: "New Folder",
+    description: "description",
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -158,7 +158,7 @@ export function FolderCreate() {
                 </Label>
                 <Input
                   id="name"
-                  value={formData.name || "New Folder"}
+                  value={formData.name}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }

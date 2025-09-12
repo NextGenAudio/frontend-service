@@ -165,7 +165,7 @@ export function MusicUpload() {
   };
 
   return (
-    <div className="h-full overflow-y-auto pb-40 bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 p-6">
+    <div className="h-screen overflow-y-auto pb-40 bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 p-6">
       {/* Background Effects */}
       <div className=" inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
