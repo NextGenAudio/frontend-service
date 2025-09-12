@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Heart, Share2, MoreHorizontal, ChevronDown, X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import Image from "next/image";
@@ -14,6 +14,8 @@ import SongCover from "./song-cover";
 import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
+import axios from "axios";
+import { set } from "react-hook-form";
 interface Song {
   id: string;
   title: string | undefined;
@@ -24,7 +26,7 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 interface GlassSongDetailsPanelProps {
@@ -32,11 +34,36 @@ interface GlassSongDetailsPanelProps {
 }
 
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
-  const { isLiked, setIsLiked } = useMusicContext();
+  const [liked, setliked] = useState(false);
   const { player, setDetailPanel } = useSidebar();
   useEffect(() => {
     console.log(song?.metadata);
+    if (song) {
+      setliked(song.liked);
+    }
   }, [song]);
+
+  const handleLikeClick = async () => {
+    try {
+      const newLikeStatus = !liked; // Calculate the new status first
+      const response = await fetch(
+        `http://localhost:8080/files/${song!.id}/like?like=${newLikeStatus}`,
+
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      console.log(response);
+      if (response.status === 200) {
+        setliked(newLikeStatus);
+        song!.liked = newLikeStatus; // Update local song object
+        console.log("Like status updated successfully");
+      }
+    } catch (err) {
+      console.error("Failed to update like:", err);
+    }
+  };
 
   return (
     <div className="h-full overflow-y-auto relative overflow-hidden">
@@ -83,15 +110,15 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
               size="icon"
               variant="ghost"
               className={`bg-white/10 rounded-xl backdrop-blur-md border border-white/20 hover:bg-white/20 hover:scale-110 transition-all duration-300 shadow-lg ${
-                isLiked
-                  ? "text-red-400 bg-red-500/20 border-red-400/30"
+                liked
+                  ? "text-orange-400 bg-orange-500/20 border-orange-400/30"
                   : "text-white/70 hover:text-white/90"
               }`}
-              onClick={() => setIsLiked(!isLiked)}
+              onClick={handleLikeClick}
             >
               <Heart
                 className={`h-5 w-5 transition-all duration-300 ${
-                  isLiked ? "fill-current scale-110" : ""
+                  liked ? "fill-current scale-110" : ""
                 }`}
               />
             </Button>

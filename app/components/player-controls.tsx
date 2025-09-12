@@ -41,12 +41,11 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isShuffle, setIsShuffle] = useState(false);
- 
 
   // const [progress, setProgress] = useState(0);
 
@@ -62,15 +61,24 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
   const [progress, setProgress] = useState(0); // in percentage 0-100
   const [isDragging, setIsDragging] = useState(false);
-
+  const [liked, setliked] = useState(false);
   const toggleShuffle = () => setIsShuffle(!isShuffle);
-  const toggleRepeat = () => setRepeatMode(((repeatMode + 1) % 3));
+  const toggleRepeat = () => setRepeatMode((repeatMode + 1) % 3);
   const toggleMute = () => setIsMuted(!isMuted);
-  const toggleLike = () => setIsLiked(!isLiked);
 
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
-  const { isPlaying, setIsPlaying, currentTime, setCurrentTime , soundRef , playingSongDuration, setPlayingSongDuration , repeatMode, setRepeatMode , isLiked, setIsLiked } = useMusicContext();
+  const {
+    isPlaying,
+    setIsPlaying,
+    currentTime,
+    setCurrentTime,
+    soundRef,
+    playingSongDuration,
+    setPlayingSongDuration,
+    repeatMode,
+    setRepeatMode,
+  } = useMusicContext();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -78,6 +86,11 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   };
 
   // const soundRef = useRef<Howl | null>(null);
+  useEffect(() => {
+    if (song) {
+      setliked(song.liked);
+    }
+  }, [song]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -101,7 +114,6 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
         case "KeyL":
           if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
-            toggleLike();
           }
           break;
         case "KeyM":
@@ -181,6 +193,28 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     }
   }, [isPlaying]);
 
+  const handleLikeClick = async () => {
+    try {
+      const newLikeStatus = !liked; // Calculate the new status first
+      const response = await fetch(
+        `http://localhost:8080/files/${song!.id}/like?like=${newLikeStatus}`,
+
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      console.log(response);
+      if (response.status === 200) {
+        setliked(newLikeStatus);
+        song!.liked = newLikeStatus; // Update local song object
+        console.log("Like status updated successfully");
+      }
+    } catch (err) {
+      console.error("Failed to update like:", err);
+    }
+  };
+
   return (
     <TooltipProvider>
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[85%] max-w-[1800px]">
@@ -233,19 +267,19 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                         size="icon"
                         variant="ghost"
                         className={`h-7 w-7 rounded-full backdrop-blur-sm border border-orange-300/20 transition-all duration-300 hover:scale-110 hover:bg-orange-400/30 ${
-                          isLiked
+                          liked
                             ? "text-red-400 bg-red-400/20"
                             : "text-orange-200/80 hover:text-red-400"
                         }`}
-                        onClick={toggleLike}
+                        onClick={handleLikeClick}
                       >
                         <Heart
-                          className={`h-3 w-3 ${isLiked ? "fill-current" : ""}`}
+                          className={`h-3 w-3 ${liked ? "fill-current" : ""}`}
                         />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{isLiked ? "Remove from liked" : "Add to liked"}</p>
+                      <p>{liked ? "Remove from liked" : "Add to liked"}</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -497,7 +531,9 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                 <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </div>
               <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
-                {`${Math.floor(playingSongDuration / 60)}:${(playingSongDuration % 60)
+                {`${Math.floor(playingSongDuration / 60)}:${(
+                  playingSongDuration % 60
+                )
                   .toFixed(0)
                   .padStart(2, "0")}`}
               </span>

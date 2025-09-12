@@ -3,7 +3,6 @@ import React, { useRef } from "react";
 
 import { createContext, useState, useContext } from "react";
 
-
 type Folder = {
   id: number;
   name: string;
@@ -11,7 +10,6 @@ type Folder = {
   folderArt?: string; // comes from DB
   musicCount?: number;
 };
-
 
 type EntityContextType = {
   entityName: string | null;
@@ -46,7 +44,7 @@ export function EntityProvider({ children }: { children: React.ReactNode }) {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const [repeatMode, setRepeatMode] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
+  const [liked, setliked] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [entityDescription, setEntityDescription] = useState("");
 

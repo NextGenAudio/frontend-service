@@ -1,9 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Plus, Music, MoreHorizontal, FolderPlus, ListMusic, Upload, ChevronDown } from "lucide-react";
+import {
+  Plus,
+  Music,
+  MoreHorizontal,
+  FolderPlus,
+  ListMusic,
+  Upload,
+  ChevronDown,
+} from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/app/components/ui/dropdown-menu";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/app/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/app/components/ui/dropdown-menu";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import MediaCard from "./ui/media-card";
@@ -31,12 +50,19 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  // isLiked: boolean;
+  // liked: boolean;
 }
 
 export const LibraryPanel = () => {
   const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
-  const { folderList, setFolderList, setEntityName, setEntityArt, setEntityType, setEntityDescription } = useEntityContext();
+  const {
+    folderList,
+    setFolderList,
+    setEntityName,
+    setEntityArt,
+    setEntityType,
+    setEntityDescription,
+  } = useEntityContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const { setSongList } = useMusicContext();
@@ -109,17 +135,14 @@ export const LibraryPanel = () => {
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    
-                    className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
-                  >
+                  <Button className="p-5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white">
                     <Plus className="h-4 w-4" />
                     <span>Create</span>
                     <ChevronDown className="h-4 w-4 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
+                <DropdownMenuContent
+                  align="end"
                   className="w-48 bg-gray-900/95 backdrop-blur-md border border-white/20 text-white"
                 >
                   <DropdownMenuItem

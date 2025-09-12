@@ -19,7 +19,7 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 export function SearchBar() {
@@ -29,7 +29,8 @@ export function SearchBar() {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { songList, setPlayingSong, setIsPlaying, setSelectSong } = useMusicContext();
+  const { songList, setPlayingSong, setIsPlaying, setSelectSong } =
+    useMusicContext();
   const { player, setPlayer } = useSidebar();
 
   useEffect(() => {
@@ -73,7 +74,6 @@ export function SearchBar() {
         e.preventDefault();
         if (selectedIndex >= 0) {
           handleSongSelect(suggestions[selectedIndex]);
-
         }
         break;
       case "Escape":
@@ -86,7 +86,7 @@ export function SearchBar() {
 
   const handleSongSelect = (song: Song) => {
     // setSearchValue(`${song.title} - ${song.artist}`);
-    setSearchValue("")
+    setSearchValue("");
     setShowSuggestions(false);
     setSelectedIndex(-1);
     setSelectSong(song);

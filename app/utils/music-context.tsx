@@ -13,7 +13,7 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 type MusicContextType = {
@@ -38,8 +38,6 @@ type MusicContextType = {
   setCurrentTime: (value: number) => void;
   repeatMode: number;
   setRepeatMode: (value: number) => void;
-  isLiked: boolean;
-  setIsLiked: (value: boolean) => void;
 };
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -57,9 +55,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const [repeatMode, setRepeatMode] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-
 
   const value = {
     selectSong,
@@ -81,9 +77,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setRepeatMode,
     analyserRef,
     dataArrayRef,
-    isLiked,
-    setIsLiked,
-
   };
 
   return (

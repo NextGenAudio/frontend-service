@@ -25,7 +25,7 @@ interface Song {
   // duration: string;
   source: string;
   metadata: any;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 export const PlaylistPanel = () => {

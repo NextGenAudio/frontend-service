@@ -15,7 +15,7 @@ import { Button } from "@/app/components/ui/button";
 
 interface SongOptionsDropdownProps {
   songId: string;
-  isLiked?: boolean;
+  liked?: boolean;
   isInPlaylist?: boolean;
   onAddToPlaylist?: () => void;
   onRemoveFromPlaylist?: () => void;
@@ -29,7 +29,7 @@ interface SongOptionsDropdownProps {
 
 export function SongOptionsDropdown({
   songId,
-  isLiked = false,
+  liked = false,
   isInPlaylist = false,
   onAddToPlaylist,
   onRemoveFromPlaylist,
@@ -98,10 +98,10 @@ export function SongOptionsDropdown({
           >
             <Heart
               className={`h-4 w-4 group-hover:scale-110 transition-transform ${
-                isLiked ? "text-red-400 fill-red-400" : "text-orange-400"
+                liked ? "text-red-400 fill-red-400" : "text-orange-400"
               }`}
             />
-            {isLiked ? "Remove from liked songs" : "Add to liked songs"}
+            {liked ? "Remove from liked songs" : "Add to liked songs"}
           </button>
 
           {/* Divider */}

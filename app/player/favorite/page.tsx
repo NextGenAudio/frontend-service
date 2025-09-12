@@ -26,7 +26,7 @@ interface Song {
   uploadedAt: Date;
   source: string;
   metadata: any;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 export default function FavoritePage() {
