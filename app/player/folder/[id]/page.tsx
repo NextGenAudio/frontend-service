@@ -9,6 +9,7 @@ import { useSidebar } from "@/app/utils/sidebar-context";
 import { useMusicContext } from "@/app/utils/music-context";
 import { clsx } from "clsx";
 import { useEntityContext } from "@/app/utils/entity-context";
+import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 
 interface Song {
   id: string;
@@ -36,6 +37,9 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   const { isPlaying, setIsPlaying } = useMusicContext();
   const [selectSongId, setSelectSongId] = useState("1");
   const [playingSongId, setPlayingSongId] = useState("1");
+  const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
+    null
+  );
   const {
     entityName,
     entityArt,
@@ -82,6 +86,29 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     };
     fetchSongs();
   }, []);
+
+  const deleteSong = async (songId: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        console.log("Song deleted successfully");
+        // Optional: update state to remove song from UI
+        setSongList(songList.filter((song) => song.id !== songId));
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to delete song:", errorText);
+      }
+    } catch (err) {
+      console.error("Error deleting song:", err);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -200,7 +227,9 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
                   playingSongId === song.id
                     ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
-                    : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
+                    : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30 "
+                } ${
+                  openDropdownSongId === song.id ? "relative z-[10000]" : ""
                 }`}
                 onClick={() => handleSongSingleClick(song)}
                 onDoubleClick={() => {
@@ -274,9 +303,25 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                     size="icon"
                     variant="ghost"
                     className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenDropdownSongId(
+                        openDropdownSongId === song.id ? null : song.id
+                      );
+                    }}
                   >
                     <MoreHorizontal className="h-3 w-3 text-white/70" />
                   </Button>
+                  {openDropdownSongId === song.id && (
+                    <SongOptionsDropdown
+                      songId={song.id}
+                      onDelete={() => {
+                        deleteSong(song.id);
+                        setOpenDropdownSongId(null);
+                      }}
+                      onClose={() => setOpenDropdownSongId(null)}
+                    />
+                  )}
                 </div>
               </div>
             ))}

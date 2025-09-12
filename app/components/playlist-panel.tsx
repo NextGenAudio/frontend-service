@@ -12,6 +12,7 @@ import AudioVisualizer from "./audio-visualizer";
 import App from "next/app";
 import AppLoadingScreen from "./app-loading";
 import { useEntityContext } from "../utils/entity-context";
+import { SongOptionsDropdown } from "./song-options-dropdown";
 
 interface Song {
   id: string;
@@ -42,10 +43,12 @@ export const PlaylistPanel = () => {
   const [playingSongId, setPlayingSongId] = useState("1");
   const { entityName, entityArt, entityType, entityDescription } =
     useEntityContext();
-  const { songList } = useMusicContext();
+  const { songList, setSongList } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
     useSidebar();
-
+  const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
+    null
+  );
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
@@ -76,6 +79,35 @@ export const PlaylistPanel = () => {
       return () => scrollElement.removeEventListener("scroll", handleScroll);
     }
   }, []);
+
+  const handleSongOptionsClick = (songId: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Implement your options logic here, e.g., open a modal or dropdown
+    setOpenDropdownSongId((prev) => (prev === songId ? null : songId));
+    console.log("Options clicked for song ID:", songId);
+  };
+  const deleteSong = async (songId: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // if you use JWT
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        console.log("Song deleted successfully");
+        // Optional: update state to remove song from UI
+        setSongList(songList.filter((song) => song.id !== songId));
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to delete song:", errorText);
+      }
+    } catch (err) {
+      console.error("Error deleting song:", err);
+    }
+  };
 
   return (
     <div
@@ -147,9 +179,9 @@ export const PlaylistPanel = () => {
                 >
                   {songList.length} songs
                 </p>
-                  {entityDescription !== "" && (
-                <hr className="my-4 border-t border-white/20" />
-                  )}
+                {entityDescription !== "" && (
+                  <hr className="my-4 border-t border-white/20" />
+                )}
                 <p className="mt-1 ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose">
                   {entityDescription}
                 </p>
@@ -261,9 +293,13 @@ export const PlaylistPanel = () => {
                     size="icon"
                     variant="ghost"
                     className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    onClick={handleSongOptionsClick(song.id)}
                   >
                     <MoreHorizontal className="h-3 w-3 text-white/70" />
                   </Button>
+                  {openDropdownSongId === song.id && (
+                    <SongOptionsDropdown songId={song.id} />
+                  )}
                 </div>
               </div>
             ))}

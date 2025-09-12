@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Heart, Share2, MoreHorizontal, ChevronDown } from "lucide-react";
+import { Heart, Share2, MoreHorizontal, ChevronDown, X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import Image from "next/image";
 import {
@@ -32,11 +32,11 @@ interface GlassSongDetailsPanelProps {
 }
 
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
-  const {isLiked, setIsLiked} = useMusicContext();
-  const { player } = useSidebar();
-  useEffect(()=>{
+  const { isLiked, setIsLiked } = useMusicContext();
+  const { player, setDetailPanel } = useSidebar();
+  useEffect(() => {
     console.log(song?.metadata);
-  }, [song]);       
+  }, [song]);
 
   return (
     <div className="h-full overflow-y-auto relative overflow-hidden">
@@ -48,7 +48,17 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
       <div className="relative h-full flex flex-col">
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
           <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
-            <h2 className="text-lg font-semibold text-white/90">Music Details</h2>
+            <h2 className="text-lg font-semibold text-white/90">
+              Music Details
+            </h2>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 rounded-xl bg-white/10 hover:bg-red-500/20 border border-white/20 text-white/70 hover:text-red-400 transition-all duration-300"
+              onClick={() => setDetailPanel(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
             {/* <ChevronDown
                   className={`h-4 w-4 text-white/70 transition-all duration-300 ${isOpen ? "rotate-180" : ""} group-hover:text-white/90`}
                 /> */}
@@ -58,7 +68,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         <div className="space-y-6 mx-3">
           <div className="overflow-hidden aspect-square bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20  transition-all duration-500 group">
             <div className="text-center">
-              <SongCover song={song}  />
+              <SongCover song={song} />
             </div>
           </div>
 
@@ -102,7 +112,12 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
           </div>
 
           <div className={"p-4 space-y-4"}>
-            <div className={clsx("backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg", player ? "mb-52" : "mb-8")}>
+            <div
+              className={clsx(
+                "backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg",
+                player ? "mb-52" : "mb-8"
+              )}
+            >
               <h4 className="font-medium text-white/80 mb-4 text-center">
                 Metadata
               </h4>
@@ -115,24 +130,40 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Bitrate</span>
-                  <span className="text-white/80 font-medium">{(song?.metadata?.bitrate / 1000).toFixed(0)} kbps</span>
+                  <span className="text-white/80 font-medium">
+                    {(song?.metadata?.bitrate / 1000).toFixed(0)} kbps
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Sample Rate</span>
-                  <span className="text-white/80 font-medium">{(song?.metadata?.sample_rate / 1000).toFixed(0)} kHz</span>
+                  <span className="text-white/80 font-medium">
+                    {(song?.metadata?.sample_rate / 1000).toFixed(0)} kHz
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">File Format</span>
-                  <span className="text-white/80 font-medium">{song?.metadata?.format || "Unknown"}</span>
+                  <span className="text-white/80 font-medium">
+                    {song?.metadata?.format || "Unknown"}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Duration</span>
-                  <span className="text-white/80 font-medium">{`${Math.floor(song?.metadata?.track_length / 60)}:${(song?.metadata?.track_length % 60).toString().padStart(2, "0")} min` || "Unknown"}</span>
+                  <span className="text-white/80 font-medium">
+                    {`${Math.floor(song?.metadata?.track_length / 60)}:${(
+                      song?.metadata?.track_length % 60
+                    )
+                      .toString()
+                      .padStart(2, "0")} min` || "Unknown"}
+                  </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Added</span>
-                  <span className="text-white/80 font-medium">{song?.uploadedAt ? new Date(song.uploadedAt).toLocaleDateString() : ""}</span>
+                  <span className="text-white/80 font-medium">
+                    {song?.uploadedAt
+                      ? new Date(song.uploadedAt).toLocaleDateString()
+                      : ""}
+                  </span>
                 </div>
               </div>
             </div>

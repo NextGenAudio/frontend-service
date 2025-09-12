@@ -28,6 +28,7 @@ import axios from "axios";
 import { useMusicContext } from "../utils/music-context";
 import router from "next/router";
 import { useFileHandling } from "../utils/file-handling-context";
+import { useEntityContext } from "../utils/entity-context";
 interface UploadedFile {
   file: File;
   progress: number;
@@ -54,7 +55,7 @@ export function MusicUpload() {
 
   const musicInputRef = useRef<HTMLInputElement>(null);
   const artworkInputRef = useRef<HTMLInputElement>(null);
-  const { folderList, playlistList } = useMusicContext();
+  const { folderList, playlistList } = useEntityContext();
   const { setSongUploadRefresh } = useFileHandling();
   const handleMusicDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -130,7 +131,9 @@ export function MusicUpload() {
       }
       if (formData.selectedFolder) {
         const folder = folderList.find(f => f.name === formData.selectedFolder);
-        formDataToSend.append("folderId", folder?.id);
+        if (folder) {
+          formDataToSend.append("folderId", String(folder.id));
+        }
       }
       if (formData) {
         Object.entries(formData).forEach(([key, value]) => {
