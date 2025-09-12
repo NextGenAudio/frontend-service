@@ -155,6 +155,16 @@ export const PlaylistPanel = () => {
                 </p>
               </div>
             </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
         </div>
 

@@ -1,13 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Plus, Music, MoreHorizontal } from "lucide-react";
+import { Plus, Music, MoreHorizontal, FolderPlus, ListMusic, Upload } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/app/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/app/components/ui/dropdown-menu";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import MediaCard from "./ui/media-card";
@@ -39,7 +35,7 @@ interface Song {
 }
 
 export const LibraryPanel = () => {
-  const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
+  const { setUpload, setHome, setCreateFolder, setPlaylist, setCreatePlaylist } = useSidebar();
   const { folderList, setFolderList, setEntityName, setEntityArt, setEntityType, setEntityDescription } = useEntityContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
