@@ -44,6 +44,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     repeatMode,
     analyserRef,
     dataArrayRef,
+    isLiked
   } = useMusicContext();
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();

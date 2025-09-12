@@ -109,30 +109,6 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     }
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (scrollRef.current) {
-        const scrollTop = scrollRef.current.scrollTop;
-        setScrollY(scrollTop);
-
-        // Use hysteresis to prevent flickering
-        // Show header when scrolling down past 100px
-        // Hide header when scrolling up past 80px
-        if (scrollTop > 100 && !isHeaderCompact) {
-          setIsHeaderCompact(true);
-        } else if (scrollTop < 80 && isHeaderCompact) {
-          setIsHeaderCompact(false);
-        }
-      }
-    };
-
-    const scrollElement = scrollRef.current;
-    if (scrollElement) {
-      scrollElement.addEventListener("scroll", handleScroll, { passive: true });
-      return () => scrollElement.removeEventListener("scroll", handleScroll);
-    }
-  }, [isHeaderCompact]);
-
   return (
     <div
       ref={scrollRef}
@@ -146,30 +122,18 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
       <div className="pt-5 relative z-10 h-full flex flex-col">
         {/* Main Header */}
-        <div
+        <div 
           className={`p-4 cursor-pointer group border-b border-white/10 z-20 transition-all duration-500 ease-out ${
-            isHeaderCompact
-              ? "fixed top-0 left-0 right-0 backdrop-blur-xl bg-gray-900/90"
-              : ""
+            isHeaderCompact ? 'fixed top-0 left-0 right-0 backdrop-blur-xl bg-gray-900/90' : ''
           }`}
           style={{
-            marginLeft:
-              isHeaderCompact && searchBar
-                ? "0"
-                : isHeaderCompact
-                ? "280px"
-                : "0",
-            width:
-              isHeaderCompact && searchBar
-                ? "100%"
-                : isHeaderCompact
-                ? "calc(100% - 280px)"
-                : "100%",
-            transform: isHeaderCompact ? "scale(0.6)" : "scale(1)",
-            transformOrigin: "top left",
+            marginLeft: isHeaderCompact && searchBar ? "0" : isHeaderCompact ? "280px" : "0",
+            width: isHeaderCompact && searchBar ? "100%" : isHeaderCompact ? "calc(100% - 280px)" : "100%",
+            transform: isHeaderCompact ? 'scale(0.6)' : 'scale(1)',
+            transformOrigin: 'top left'
           }}
         >
-          <div className="flex items-center justify-between">
+          <div className=" flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="rounded-xl overflow-hidden relative flex-shrink-0 w-52 h-52">
                 <img
@@ -201,18 +165,15 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
           </div>
         </div>
 
-        {/* Spacer to prevent content jump when header becomes fixed */}
-        {isHeaderCompact && <div style={{ height: "200px" }} />}
-
         {/* Table Header - Sticky */}
         <div
-          className="sticky top-0 z-[10002] px-4 pt-4 pb-2 backdrop-blur-xl bg-gray-900/80"
+          className="sticky top-0 z-[10002] px-4 pt-4 pb-2 backdrop-blur-xl bg-gray-800/10"
           style={{
-            marginTop: isHeaderCompact ? "120px" : "0px", // Adjust for scaled header height
+            marginTop: isHeaderCompact ? "60px" : "0px",
             transition: "margin-top 0.5s ease-out",
           }}
         >
-          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/5 border-white/20">
             <div className="col-span-1">#</div>
             <div className="col-span-5 ">Title</div>
             <div className="col-span-3">Album</div>

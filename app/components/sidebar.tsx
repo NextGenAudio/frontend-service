@@ -63,10 +63,10 @@ export const Sidebar = () => {
       setSearchBar(!searchBar);
     }
     if (label === "Notifications") {
-      setNotifications(true);
+      setNotifications(true); 
     }
     if (label === "Favorites") {
-      setFavorites(true);
+      router.push("/player/favorite");
     }
     if (label === "Settings") {
       setSettings(true);
