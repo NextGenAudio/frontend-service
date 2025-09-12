@@ -35,7 +35,7 @@ interface Song {
 }
 
 export const LibraryPanel = () => {
-  const { setUpload, setHome, setCreateFolder, setPlaylist, setCreatePlaylist } = useSidebar();
+  const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
   const { folderList, setFolderList, setEntityName, setEntityArt, setEntityType, setEntityDescription } = useEntityContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
