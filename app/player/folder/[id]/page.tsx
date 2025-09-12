@@ -122,12 +122,10 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     }
   }, []);
 
-  
-
   return (
     <div
       ref={scrollRef}
-      className="relative h-full flex flex-col overflow-y-scroll pt-5"
+      className="relative h-full flex flex-col  pt-5"
       onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
     >
       {/* Glass background with gradient */}
@@ -138,12 +136,24 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
       <div className="pt-5 relative z-10 h-full flex flex-col">
         <div
-          className="p-4 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl"
+          className="h-fit p-4 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
           style={{
             transform: `translateY(${Math.min(scrollY * 0.3, 30)}px)`,
           }}
         >
-          <div className="flex items-center justify-between">
+          {/* Background Image in Right Bottom Corner */}
+          <div
+            className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-cover bg-center opacity-30 pointer-events-none"
+            style={{
+              backgroundImage: "url('/assets/file-icon-back2.png')",
+              transform: `translateX(30px) translateY(20px)`,
+              maskImage:
+                "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
+            }}
+          />
+          <div className="flex items-center justify-between relative z-10">
             <div className="flex items-center gap-4">
               <div
                 className="rounded-xl  overflow-hidden relative flex-shrink-0 transition-all duration-700 ease-out"
@@ -237,7 +247,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
           </div>
         </div>
 
-        <ScrollArea>
+        <ScrollArea className="flex-1">
           <div className={clsx("p-4 space-y-2", player ? "pb-56" : "pb-8")}>
             {loading ? (
               /* Loading State */

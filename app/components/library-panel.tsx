@@ -92,7 +92,7 @@ export const LibraryPanel = () => {
       setEntityType("folder");
       setEntityName(folder.name);
       setEntityArt(
-        folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : ""
+        folder.folderArt ? `http://localhost:8080/${folder.folderArt}` : "assets/file-icon.png"
       );
       setEntityDescription(folder.description || "");
       router.push(`/player/folder/${folder.id}`);
@@ -118,7 +118,7 @@ export const LibraryPanel = () => {
     },
   ];
 
-  const defaultImage = "/placeholder.svg";
+  const defaultImage = "/assets/file-icon.png";
 
   return (
     <div className="h-full relative overflow-hidden">
