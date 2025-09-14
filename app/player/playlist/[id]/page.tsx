@@ -1,11 +1,11 @@
-import { PlaylistPanel } from "@/app/components/playlist-panel";
+import { PlaylistDetailsPanel } from "../../../components/playlist-details-panel";
 import React from "react";
 
-const page = () => {
+const page = ({ params }: { params: { id: number } }) => {
   return (
     <div>
       <div className="h-screen">
-        <PlaylistPanel />
+        <PlaylistDetailsPanel playlistId={params.id} />
       </div>
     </div>
   );
