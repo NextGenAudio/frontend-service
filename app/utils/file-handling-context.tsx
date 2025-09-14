@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
+import { useMusicContext } from "./music-context";
 
 const FileHandlingContext = createContext<FileHandlingContextType | null>(null);
-
 
 type FileHandlingContextType = {
   songUploadRefresh: number;
@@ -10,16 +10,21 @@ type FileHandlingContextType = {
   setFolderCreateRefresh: React.Dispatch<React.SetStateAction<number>>;
 };
 
-
-export const FileHandlingProvider = ({ children }: { children: React.ReactNode }) => {
+export const FileHandlingProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [songUploadRefresh, setSongUploadRefresh] = useState(0);
   const [folderCreateRefresh, setFolderCreateRefresh] = useState(0);
+  const { setSelectSong, setPlayingSong, setSelectSongId, setPlayingSongId } = useMusicContext();
 
   const value = {
     songUploadRefresh,
     setSongUploadRefresh,
     folderCreateRefresh,
     setFolderCreateRefresh,
+
   };
 
   return (
@@ -32,7 +37,9 @@ export const FileHandlingProvider = ({ children }: { children: React.ReactNode }
 export function useFileHandling() {
   const context = useContext(FileHandlingContext);
   if (!context) {
-    throw new Error("useFileHandling must be used within a FileHandlingProvider");
+    throw new Error(
+      "useFileHandling must be used within a FileHandlingProvider"
+    );
   }
   return context;
 }

@@ -32,7 +32,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [detailPanel, setDetailPanel] = useState(false);
   const [upload, setUpload] = useState(false);
   const [createFolder, setCreateFolder] = useState(false);
-  const [visualizer, setVisualizer] = useState(false);
+  const [visualizer, setVisualizer] = useState(true);
   const [profile, setProfile] = useState(false);
   const [playlist, setPlaylist] = useState(false);
   const soundRef = useRef<Howl | null>(null);

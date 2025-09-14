@@ -31,6 +31,7 @@ import SongCover from "./song-cover";
 import * as RadixSlider from "@radix-ui/react-slider";
 import { usePlayerSettings } from "@/app/hooks/use-player-settings";
 import MusicContext, { useMusicContext } from "../utils/music-context";
+import { useFileHandling } from "../utils/file-handling-context";
 
 interface Song {
   id: string;
@@ -49,7 +50,6 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
   // const [progress, setProgress] = useState(0);
 
-  const [metadata, setMetadata] = useState<any>(null);
   const [showQueue, setShowQueue] = useState(false);
   const [crossfade, setCrossfade] = useState([3]);
   const [playbackSpeed, setPlaybackSpeed] = useState([1]);
@@ -78,14 +78,17 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     setPlayingSongDuration,
     repeatMode,
     setRepeatMode,
+    songList,
+    playingSong,
   } = useMusicContext();
+  const { setSelectSong, setPlayingSong, setSelectSongId, setPlayingSongId } =
+    useMusicContext();
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // const soundRef = useRef<Howl | null>(null);
   useEffect(() => {
     if (song) {
       setliked(song.liked);
@@ -214,7 +217,24 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
       console.error("Failed to update like:", err);
     }
   };
-
+  function handleSongDoubleClick(song: any) {
+    setPlayingSongId(song.id);
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    setPlayingSong(song);
+  }
+  const handleNextClick = () => {
+    const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
+    const nextIndex = (currentIndex + 1) % songList.length;
+    const nextSong = songList[nextIndex];
+    handleSongDoubleClick(nextSong);
+  };
+  const handlePreviousClick = () => {
+    const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
+    const previousIndex = (currentIndex - 1 + songList.length) % songList.length;
+    const previousSong = songList[previousIndex];
+    handleSongDoubleClick(previousSong);
+  };
   return (
     <TooltipProvider>
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[85%] max-w-[1800px]">
@@ -328,6 +348,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8 rounded-full backdrop-blur-sm border border-orange-300/20 text-orange-200/80 hover:text-white hover:scale-110 hover:bg-orange-400/30 transition-all duration-300"
+                        onClick={handlePreviousClick}
                       >
                         <SkipBack className="h-4 w-4" />
                       </Button>
@@ -362,6 +383,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8 rounded-full backdrop-blur-sm border border-orange-300/20 text-orange-200/80 hover:text-white hover:scale-110 hover:bg-orange-400/30 transition-all duration-300"
+                        onClick={handleNextClick}
                       >
                         <SkipForward className="h-4 w-4" />
                       </Button>
@@ -420,7 +442,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                     </TooltipContent>
                   </Tooltip>
 
-                  <Tooltip>
+                  {/* <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         size="icon"
@@ -458,7 +480,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                     <TooltipContent>
                       <p>Settings</p>
                     </TooltipContent>
-                  </Tooltip>
+                  </Tooltip> */}
                 </div>
 
                 <div className="flex items-center gap-2">

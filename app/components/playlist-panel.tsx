@@ -204,7 +204,8 @@ export const PlaylistPanel = () => {
 
         <div className="px-4 pt-4">
           <div className="z-10 grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
-            <div className="col-span-6 ml-14">Title</div>
+          <div className="col-span-1 ml-14">#</div>
+            <div className="col-span-5 ml-14">Title</div>
 
             <div className="col-span-3">Album</div>
             <div className="col-span-1">Duration</div>

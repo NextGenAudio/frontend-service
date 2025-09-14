@@ -25,7 +25,7 @@ interface Song {
 }
 
 export default function FolderPanel({ params }: { params: { id: number } }) {
-  const { selectSong, setSelectSong, playingSong, setPlayingSong } =
+  const { selectSong, setSelectSong, playingSong, setPlayingSong, selectSongId, setSelectSongId, playingSongId, setPlayingSongId } =
     useMusicContext();
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -34,8 +34,6 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
   const { isPlaying, setIsPlaying } = useMusicContext();
-  const [selectSongId, setSelectSongId] = useState("1");
-  const [playingSongId, setPlayingSongId] = useState("1");
     const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
   );
@@ -59,10 +57,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   };
 
   const handleSongDoubleClick = (song: Song) => {
+    handleSongSingleClick(song);
     setPlayingSongId(song.id);
-    setDetailPanel(true);
-    setSelectSongId(song.id);
-    setSelectSong(song);
     setPlayingSong(song);
   };
 
@@ -193,7 +189,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 }}
               >
                 <img
-                  src={entityArt ?? undefined}
+                  src={entityArt ?? "/assets/folder-icon.png"}
                   alt={entityName ?? undefined}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
                 />

@@ -38,6 +38,10 @@ type MusicContextType = {
   setCurrentTime: (value: number) => void;
   repeatMode: number;
   setRepeatMode: (value: number) => void;
+  selectSongId: string | null;
+  playingSongId: string | null;
+  setSelectSongId: (value: string | null) => void;
+  setPlayingSongId: (value: string | null) => void;
 };
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -56,7 +60,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const [repeatMode, setRepeatMode] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-
+  const [selectSongId, setSelectSongId] = useState<string | null>(null);
+  const [playingSongId, setPlayingSongId] = useState<string | null>(null);
   const value = {
     selectSong,
     playingSong,
@@ -77,6 +82,10 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setRepeatMode,
     analyserRef,
     dataArrayRef,
+    selectSongId,
+    playingSongId,
+    setSelectSongId,
+    setPlayingSongId,
   };
 
   return (
