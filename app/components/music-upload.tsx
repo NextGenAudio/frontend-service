@@ -26,9 +26,11 @@ import {
 } from "@/app/components/ui/select";
 import axios from "axios";
 import { useMusicContext } from "../utils/music-context";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { useFileHandling } from "../utils/file-handling-context";
 import { useEntityContext } from "../utils/entity-context";
+import clsx from "clsx";
+import { useSidebar } from "../utils/sidebar-context";
 interface UploadedFile {
   file: File;
   progress: number;
@@ -57,6 +59,10 @@ export function MusicUpload() {
   const artworkInputRef = useRef<HTMLInputElement>(null);
   const { folderList, playlistList } = useEntityContext();
   const { setSongUploadRefresh } = useFileHandling();
+  const { player } = useSidebar();
+
+  const router = useRouter();
+
   const handleMusicDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
@@ -184,7 +190,7 @@ export function MusicUpload() {
           {/* <p className="text-gray-400">Share your creativity with the world</p> */}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className={clsx("p-4 space-y-8", player ? "pb-64" : "pb-16")}>
           {/* Music Upload Section */}
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
@@ -392,7 +398,7 @@ export function MusicUpload() {
 
                   <Button
                     type="button"
-                    onClick={() => router.push("/create-folder")}
+                    onClick={() => router.push("/player/newfolder")}
                     className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
                     <FolderPlus className="w-4 h-4 mr-2" />

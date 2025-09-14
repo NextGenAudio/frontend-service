@@ -8,6 +8,8 @@ import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import axios from "axios";
 import { useFileHandling } from "../utils/file-handling-context";
+import clsx from "clsx";
+import { useSidebar } from "../utils/sidebar-context";
 
 interface UploadedFile {
   file: File;
@@ -25,6 +27,7 @@ export function FolderCreate() {
 
   const artworkInputRef = useRef<HTMLInputElement>(null);
   const { folderCreateRefresh, setFolderCreateRefresh } = useFileHandling();
+  const { player } = useSidebar();
   // Handle drag-drop for artwork
   const handleArtworkDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -79,14 +82,14 @@ export function FolderCreate() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 p-6">
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 p-6">
       {/* Background Effects */}
-      <div className="fixed  inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-400/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="relative h-full max-w-4xl mx-auto">
+      <div className={clsx(`relative max-w-4xl mx-auto min-h-full`)}>
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-orange-200 to-orange-400 bg-clip-text text-transparent mb-2">
@@ -94,9 +97,16 @@ export function FolderCreate() {
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-8">
+        <form
+          onSubmit={handleSubmit}
+          className={clsx(`grid md:grid-cols-2 gap-8 pb-8 ${player ? "mb-64" : "mb-8"}`)}
+        >
           {/* Artwork Upload */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+          <div
+            className=
+              "bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl" 
+             
+          >
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
               <ImageIcon className="w-6 h-6 text-orange-400" />
               Folder Artwork
@@ -188,7 +198,12 @@ export function FolderCreate() {
           </div>
 
           {/* Submit Button */}
-          <div className="col-span-2 text-center mt-6">
+          <div
+            className={clsx(
+              "col-span-2 text-center mt-6",
+              player ? "mb-32" : "mb-8"
+            )}
+          >
             <Button
               type="submit"
               disabled={!formData.name || loading}
