@@ -43,6 +43,11 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     repeatMode,
     analyserRef,
     dataArrayRef,
+    songList,
+    setSelectSong,
+    setSelectSongId,
+    setPlayingSongId,
+    playingSongId,
   } = useMusicContext();
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
@@ -73,7 +78,19 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       }
     };
   }, [playingSong?.filename]);
-
+  function handleSongDoubleClick(song: any) {
+    setPlayingSongId(song.id);
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    setPlayingSong(song);
+  }
+  const handleNextClick = () => {
+    const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
+    const nextIndex = (currentIndex + 1) % songList.length;
+    const nextSong = songList[nextIndex];
+    handleSongDoubleClick(nextSong);
+    setIsPlaying(true);
+  };
   useEffect(() => {
     if (!playingSong?.source) return;
 
@@ -105,7 +122,10 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         setIsPlaying(true);
       },
       onpause: () => setIsPlaying(false),
-      onend: () => setIsPlaying(false),
+      onend: () => {
+        setIsPlaying(false);
+        handleNextClick(); // 🎵 Automatically move to next song
+      },
     });
     (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
 
