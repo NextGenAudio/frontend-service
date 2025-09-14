@@ -53,6 +53,17 @@ interface Song {
   // liked: boolean;
 }
 
+interface Playlist {
+  playlistId: number;
+  name: string;
+  description?: string;
+  coverImage?: string;
+  image?: string; // for compatibility with existing code
+  songCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const LibraryPanel = () => {
   const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
   const {
@@ -65,9 +76,12 @@ export const LibraryPanel = () => {
   } = useEntityContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const { setSongList } = useMusicContext();
   const { folderCreateRefresh, songUploadRefresh } = useFileHandling();
   const router = useRouter();
+
+  // Fetch folders
   useEffect(() => {
     const fetchFolders = async () => {
       try {
@@ -83,6 +97,41 @@ export const LibraryPanel = () => {
       }
     };
     fetchFolders();
+  }, [folderCreateRefresh, songUploadRefresh]);
+
+  // Fetch playlists
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+      try {
+        console.log("Fetching playlists from /api/playlists...");
+        const res = await fetch("/api/playlists", {
+          method: "GET",
+          credentials: "include",
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        console.log("Raw playlists response:", data);
+        console.log("Is array?", Array.isArray(data));
+        console.log("Type of data:", typeof data);
+        
+        // Ensure data is an array
+        if (Array.isArray(data)) {
+          setPlaylists(data);
+          console.log(`Successfully set ${data.length} playlists`);
+        } else {
+          console.warn("Playlists data is not an array:", data);
+          setPlaylists([]);
+        }
+      } catch (err) {
+        console.error("Error fetching playlists:", err);
+        setPlaylists([]); // Ensure playlists is always an array
+      }
+    };
+    fetchPlaylists();
   }, [folderCreateRefresh, songUploadRefresh]);
 
   // Handle folder click
@@ -101,22 +150,18 @@ export const LibraryPanel = () => {
     }
   };
 
-  const playlists = [
-    {
-      id: "1",
-      name: "My Favorites",
-      songCount: 42,
-      image:
-        "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&h=100&fit=crop&crop=center",
-    },
-    {
-      id: "2",
-      name: "Chill Vibes",
-      songCount: 28,
-      image:
-        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100&h=100&fit=crop&crop=center",
-    },
-  ];
+  // Handle playlist click
+  const handlePlaylistClick = async (playlist: Playlist) => {
+    try {
+      setEntityType("playlist");
+      setEntityName(playlist.name);
+      setEntityArt(playlist.coverImage || playlist.image || "assets/file-icon.png");
+      setEntityDescription(playlist.description || "");
+      router.push(`/player/playlist/${playlist.playlistId}`);
+    } catch (err) {
+      console.error("Error navigating to playlist:", err);
+    }
+  };
 
   const defaultImage = "/assets/file-icon.png";
 
@@ -198,13 +243,14 @@ export const LibraryPanel = () => {
           {/* All = playlists + folders */}
           <TabsContent value="all" className="flex-1 px-3 overflow-y-auto">
             <div className="space-y-2">
-              {playlists.map((playlist) => (
+              {Array.isArray(playlists) && playlists.map((playlist) => (
                 <MediaCard
-                  key={`playlist-${playlist.id}`}
+                  key={`playlist-${playlist.playlistId}`}
                   name={playlist.name}
-                  image={playlist.image || defaultImage}
+                  image={playlist.coverImage || playlist.image || defaultImage}
                   count={playlist.songCount}
                   type="playlist"
+                  onClick={() => handlePlaylistClick(playlist)}
                 />
               ))}
               {folderList.map((folder) => (
@@ -230,13 +276,14 @@ export const LibraryPanel = () => {
             className="flex-1 px-3 overflow-y-auto"
           >
             <div className="space-y-2">
-              {playlists.map((playlist) => (
+              {Array.isArray(playlists) && playlists.map((playlist) => (
                 <MediaCard
-                  key={`playlist-${playlist.id}`}
+                  key={`playlist-${playlist.playlistId}`}
                   name={playlist.name}
-                  image={playlist.image || defaultImage}
+                  image={playlist.coverImage || playlist.image || defaultImage}
                   count={playlist.songCount}
                   type="playlist"
+                  onClick={() => handlePlaylistClick(playlist)}
                 />
               ))}
             </div>
