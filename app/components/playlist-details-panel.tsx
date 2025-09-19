@@ -25,7 +25,11 @@ interface Song {
   liked: boolean;
 }
 
-export const PlaylistDetailsPanel = ({ playlistId }: { playlistId: number }) => {
+export const PlaylistDetailsPanel = ({
+  playlistId,
+}: {
+  playlistId: number;
+}) => {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
     useMusicContext();
 
@@ -91,45 +95,36 @@ export const PlaylistDetailsPanel = ({ playlistId }: { playlistId: number }) => 
     const fetchSongs = async () => {
       try {
         setLoading(true);
-        console.log("[PlaylistPanel] Fetching songs for playlist ID:", playlistId);
-        
-        // First, let's check the debug endpoint to see what's in the playlist
-        const debugRes = await fetch(
-          `/api/playlists/${playlistId}/debug`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
+        console.log(
+          "[PlaylistPanel] Fetching songs for playlist ID:",
+          playlistId
         );
-        
-        if (debugRes.ok) {
-          const debugData = await debugRes.json();
-          console.log("[PlaylistPanel] Debug data:", debugData);
-        }
-        
+
         const res = await fetch(
-          `/api/playlists/${playlistId}/tracks`,
+          `http://localhost:8082/playlist-service/playlists/${playlistId}/tracks`,
           {
             method: "GET",
             credentials: "include",
           }
         );
-        
+
         console.log("[PlaylistPanel] API response status:", res.status);
-        
+
         if (!res.ok) {
           const errorText = await res.text();
-          console.error("[PlaylistPanel] Failed to fetch playlist songs, status:", res.status);
+          console.error(
+            "[PlaylistPanel] Failed to fetch playlist songs, status:",
+            res.status
+          );
           console.error("[PlaylistPanel] Error response:", errorText);
           setSongList([]);
           return;
         }
-        
+
         const data = await res.json();
         console.log("[PlaylistPanel] Songs received:", data);
         console.log("[PlaylistPanel] Number of songs:", data.length);
         setSongList(data);
-        
       } catch (err) {
         console.error("[PlaylistPanel] Error fetching songs:", err);
         setSongList([]);
@@ -137,7 +132,7 @@ export const PlaylistDetailsPanel = ({ playlistId }: { playlistId: number }) => 
         setLoading(false);
       }
     };
-    
+
     if (playlistId) {
       fetchSongs();
     }
@@ -384,7 +379,8 @@ export const PlaylistDetailsPanel = ({ playlistId }: { playlistId: number }) => 
                       {song.metadata?.track_length / 60
                         ? `${Math.floor(song.metadata.track_length / 60)}:${
                             Math.floor(song.metadata.track_length % 60) < 10
-                              ? "0" + Math.floor(song.metadata.track_length % 60)
+                              ? "0" +
+                                Math.floor(song.metadata.track_length % 60)
                               : Math.floor(song.metadata.track_length % 60)
                           }`
                         : "0:00"}
@@ -404,7 +400,9 @@ export const PlaylistDetailsPanel = ({ playlistId }: { playlistId: number }) => 
                       className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenDropdownSongId((prev) => (prev === song.id ? null : song.id));
+                        setOpenDropdownSongId((prev) =>
+                          prev === song.id ? null : song.id
+                        );
                       }}
                     >
                       <MoreHorizontal className="h-3 w-3 text-white/70" />

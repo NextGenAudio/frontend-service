@@ -122,7 +122,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   }, []);
     const deleteSong = async (songId: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+      const response = await fetch(`http://localhost:8080/files/${params.id}/${songId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {

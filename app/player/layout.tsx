@@ -124,7 +124,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       onpause: () => setIsPlaying(false),
       onend: () => {
         setIsPlaying(false);
-        handleNextClick(); // 🎵 Automatically move to next song
+        handleNextClick(); // Automatically move to next song
       },
     });
     (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";

@@ -11,17 +11,20 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 
 // Backend service URLs
-const PLAYLIST_SERVICE_URL =
-  "http://localhost:8082/playlist-service/api/playlists";
-const MUSIC_SERVICE_URL = "/api/songs";
+const PLAYLIST_SERVICE_URL = "http://localhost:8082/playlist-service/playlists";
+const MUSIC_SERVICE_URL = "http://localhost:8080/files/list";
 
 interface Song {
   id: string;
-  title: string;
-  artist: string;
-  album?: string;
-  duration: number;
-  genre: string;
+  title: string | undefined;
+  filename: string;
+  artist: string | undefined;
+  album: string | undefined;
+  path: string;
+  uploadedAt: Date;
+  source: string;
+  metadata: any;
+  liked: boolean;
 }
 
 interface PlaylistFormData {
@@ -135,7 +138,7 @@ export function PlaylistCreatePage() {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
-      song.title?.toLowerCase().includes(query) ||
+      (song.title || song.filename)?.toLowerCase().includes(query) ||
       song.artist?.toLowerCase().includes(query) ||
       song.album?.toLowerCase().includes(query)
     );
@@ -246,10 +249,10 @@ export function PlaylistCreatePage() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-white font-medium text-lg truncate">
-                                {song.title}
+                                {song.title || song.filename}
                               </p>
                               <p className="text-gray-400 text-base truncate">
-                                {song.artist}
+                                {song.artist || "Unknown Artist"}
                               </p>
                               {song.album && (
                                 <p className="text-gray-500 text-sm truncate">
@@ -261,7 +264,7 @@ export function PlaylistCreatePage() {
                           <div className="flex items-center space-x-4 flex-shrink-0">
                             <span className="text-gray-400 text-base flex items-center">
                               <Clock className="w-4 h-4 mr-2" />
-                              {formatDuration(song.duration)}
+                              {formatDuration(song.metadata?.track_length || 0)}
                             </span>
                             <div
                               className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
@@ -319,10 +322,10 @@ export function PlaylistCreatePage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-white text-base font-medium truncate">
-                            {song.title}
+                            {song.title || song.filename}
                           </p>
                           <p className="text-gray-400 text-sm truncate">
-                            {song.artist}
+                            {song.artist || "Unknown Artist"}
                           </p>
                         </div>
                         <button
@@ -348,7 +351,8 @@ export function PlaylistCreatePage() {
                       Total duration:{" "}
                       {formatDuration(
                         selectedSongs.reduce(
-                          (total, song) => total + song.duration,
+                          (total, song) =>
+                            total + (song.metadata?.track_length || 0),
                           0
                         )
                       )}

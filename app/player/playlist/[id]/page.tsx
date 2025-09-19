@@ -1,14 +1,412 @@
-import { PlaylistDetailsPanel } from "../../../components/playlist-details-panel";
-import React from "react";
+"use client";
 
-const page = ({ params }: { params: { id: number } }) => {
+import { useState, useEffect, useRef } from "react";
+import { Play, Pause, MoreHorizontal, Shuffle, Music } from "lucide-react";
+import { Button } from "@/app/components/ui/button";
+import { ScrollArea } from "@/app/components/ui/scroll-area";
+import { SearchBar } from "@/app/components/search-bar";
+import { useSidebar } from "@/app/utils/sidebar-context";
+import { useMusicContext } from "@/app/utils/music-context";
+import { clsx } from "clsx";
+import { useEntityContext } from "@/app/utils/entity-context";
+import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
+interface Song {
+  id: string;
+  title: string | undefined;
+  filename: string;
+  artist: string | undefined;
+  album: string | undefined;
+  path: string;
+  uploadedAt: Date;
+  // duration: string;
+  source: string;
+  metadata: any;
+  liked: boolean;
+}
+
+export default function PlaylistPanel({ params }: { params: { id: number } }) {
+  const { selectSong, setSelectSong, playingSong, setPlayingSong, selectSongId, setSelectSongId, playingSongId, setPlayingSongId } =
+    useMusicContext();
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollY, setScrollY] = useState(0);
+  const [isHeaderCompact, setIsHeaderCompact] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
+  const { isPlaying, setIsPlaying } = useMusicContext();
+    const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
+    null
+  );
+  const {
+    entityName,
+    entityArt,
+    entityType,
+    entityDescription,
+    setEntityName,
+    setEntityArt,
+    setEntityType,
+    setEntityDescription,
+  } = useEntityContext();
+  const { songList, setSongList } = useMusicContext();
+  const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
+    useSidebar();
+  const handleSongSingleClick = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    setDetailPanel(true);
+  };
+
+  const handleSongDoubleClick = (song: Song) => {
+    handleSongSingleClick(song);
+    setPlayingSongId(song.id);
+    setPlayingSong(song);
+  };
+
+  const handlePlayAll = () => {
+    if (songList.length > 0) {
+      const firstSong = songList[0];
+      handleSongDoubleClick(firstSong);
+      setPlayer(true);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleShuffle = () => {
+    if (songList.length > 0) {
+      const randomIndex = Math.floor(Math.random() * songList.length);
+      const randomSong = songList[randomIndex];
+      handleSongDoubleClick(randomSong);
+      setPlayer(true);
+      setIsPlaying(true);
+    }
+  };
+
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `http://localhost:8082/playlist-service/playlists/list?playlistId=${params.id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await res.json();
+        console.log("Songs in playlist:", data);
+        setSongList(data);
+      } catch (err) {
+        console.error("Error fetching songs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSongs();
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollRef.current) {
+        const scrollTop = scrollRef.current.scrollTop;
+        setScrollY(scrollTop);
+
+        setIsHeaderCompact(scrollTop > 120);
+      }
+    };
+
+    const scrollElement = scrollRef.current;
+    if (scrollElement) {
+      scrollElement.addEventListener("scroll", handleScroll, { passive: true });
+      return () => scrollElement.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
+    const deleteSong = async (songId: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        console.log("Song deleted successfully");
+        // Optional: update state to remove song from UI
+        setSongList(songList.filter((song) => song.id !== songId));
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to delete song:", errorText);
+      }
+    } catch (err) {
+      console.error("Error deleting song:", err);
+    }
+  };
   return (
-    <div>
-      <div className="h-screen">
-        <PlaylistDetailsPanel playlistId={params.id} />
+    <div
+      ref={scrollRef}
+      className="relative h-full flex flex-col  pt-5"
+      onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
+    >
+      {/* Glass background with gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/20 to-gray-800/20 backdrop-blur-xl " />
+      {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
+
+      {searchBar && <SearchBar />}
+
+      <div className="pt-5 relative z-10 h-full flex flex-col">
+        <div
+          className="h-fit p-4 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
+          style={{
+            transform: `translateY(${Math.min(scrollY * 0.3, 30)}px)`,
+          }}
+        >
+          {/* Background Image in Right Bottom Corner */}
+          <div
+            className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-cover bg-center opacity-30 pointer-events-none"
+            style={{
+              backgroundImage: "url('/assets/file-icon-back2.png')",
+              transform: `translateX(30px) translateY(20px)`,
+              maskImage:
+                "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
+            }}
+          />
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-4">
+              <div
+                className="rounded-xl  overflow-hidden relative flex-shrink-0 transition-all duration-700 ease-out"
+                style={{
+                  width: isHeaderCompact ? "60px" : "208px",
+                  height: isHeaderCompact ? "60px" : "208px",
+                  opacity: isHeaderCompact
+                    ? 0
+                    : Math.max(0.3, 1 - scrollY / 200),
+                  transform: `scale(${
+                    isHeaderCompact ? 0.3 : Math.max(0.8, 1 - scrollY / 400)
+                  })`,
+                }}
+              >
+                <img
+                  src={entityArt ?? "/assets/folder-icon.png"}
+                  alt={entityName ?? undefined}
+                  className=" rounded-xl object-cover h-full w-full shadow-md"
+                />
+                <div className="absolute inset-0" />
+                <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />
+              </div>
+
+              <div className="hidden sm:block transition-all duration-700 ease-out">
+                <h2
+                  className="font-extrabold text-white drop-shadow-lg transition-all duration-700 ease-out"
+                  style={{
+                    fontSize: isHeaderCompact
+                      ? "2rem"
+                      : `${Math.max(2, 6 - scrollY / 50)}rem`,
+                    lineHeight: isHeaderCompact ? "2.5rem" : "1",
+                    transform: `translateX(${
+                      isHeaderCompact ? "-60px" : "0px"
+                    })`,
+                  }}
+                >
+                  {entityName}
+                </h2>
+                <p
+                  className="text-white/80 transition-all duration-700 ease-out ml-2 mt-1"
+                  style={{
+                    fontSize: isHeaderCompact ? "0.875rem" : "1rem",
+                    transform: `translateX(${
+                      isHeaderCompact ? "-60px" : "0px"
+                    })`,
+                    opacity: isHeaderCompact ? 0.9 : 0.8,
+                  }}
+                >
+                  {songList.length} songs
+                </p>
+
+                {/* Action Buttons */}
+                {!isHeaderCompact && songList.length > 0 && (
+                  <div className="flex items-center gap-4 mt-4">
+                    <Button
+                      onClick={handlePlayAll}
+                      className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300"
+                    >
+                      <Play className="w-5 h-5 mr-2" fill="currentColor" />
+                      Play All
+                    </Button>
+                    <Button
+                      onClick={handleShuffle}
+                      variant="outline"
+                      className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 px-6 py-3 rounded-full transition-all duration-300"
+                    >
+                      <Shuffle className="w-4 h-4 mr-2" />
+                      Shuffle
+                    </Button>
+                  </div>
+                )}
+                {entityDescription !== "" && (
+                  <hr className="mt-4 mb-2 border-t border-white/20" />
+                )}
+                <p className="ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose">
+                  {entityDescription}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Glass Visualizer Area */}
+
+        <div className="px-4 pt-4">
+          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+            <div className="col-span-6 ml-14">Title</div>
+
+            <div className="col-span-3">Album</div>
+            <div className="col-span-1">Duration</div>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className={clsx("p-4 space-y-2", player ? "pb-56" : "pb-8")}>
+            {loading ? (
+              /* Loading State */
+              <div className="flex flex-col items-center justify-center py-20">
+                <div className="relative">
+                  <Music className="w-16 h-16 text-orange-400 animate-pulse" />
+                  <div className="absolute inset-0 w-16 h-16 border-4 border-orange-400/30 border-t-orange-400 rounded-full animate-spin" />
+                </div>
+                <p className="text-white/70 mt-4 text-lg">Loading songs...</p>
+              </div>
+            ) : songList.length === 0 ? (
+              /* Empty State */
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-sm border border-orange-400/20 flex items-center justify-center">
+                    <Music className="w-16 h-16 text-orange-400/60" />
+                  </div>
+                  <div className="absolute -top-2 -right-2">
+                    <Play className="w-8 h-8 text-white/40 animate-bounce" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  No songs found
+                </h3>
+                <p className="text-white/70 text-lg mb-6 max-w-md">
+                  This folder is empty. Upload some music files to get started!
+                </p>
+                <div className="flex flex-col items-center gap-2 text-white/50">
+                  <p className="text-sm">
+                    💡 Tip: Drag and drop music files to add them to this folder
+                  </p>
+                </div>
+              </div>
+            ) : (
+              /* Songs List */
+              songList.map((song, id) => (
+                <div
+                  key={song.id}
+                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                    playingSongId === song.id
+                      ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
+                      : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
+                  } ${
+                    openDropdownSongId === song.id ? "relative z-[10000]" : ""
+                  }`}
+                  onClick={() => handleSongSingleClick(song)}
+                  onDoubleClick={() => {
+                    handleSongDoubleClick(song);
+                    setPlayer(true);
+                    setIsPlaying(true); // start playing it
+                  }}
+                >
+                  <div className="font-medium text-white drop-shadow-sm">
+                    {id + 1}
+                  </div>
+                  <div className="relative">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (playingSongId === song.id) {
+                          setIsPlaying(!isPlaying); // toggle play/pause
+                        } else {
+                          handleSongSingleClick(song); // load a new song
+                          setPlayer(true);
+                          setIsPlaying(true); // start playing it
+                        }
+                      }}
+                    >
+                      {isPlaying && playingSongId === song.id ? (
+                        <Pause className="h-4 w-4 text-white" />
+                      ) : (
+                        <Play className="h-4 w-4 text-white" />
+                      )}
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-10 gap-3 w-full items-center">
+                    <span className="col-span-6 flex flex-col">
+                      <div className="font-medium truncate text-white drop-shadow-sm">
+                        {song.title || song.filename}
+                      </div>
+                      <span className="col-span-text-sm text-white/70 truncate">
+                        {song.artist}
+                      </span>
+                    </span>
+                    <span className="col-span-3 text-m text-white/70 truncate">
+                      {song.album}
+                    </span>
+                    <span className="col-span-1 text-center text-white/70 truncate">
+                      {song.metadata?.track_length / 60
+                        ? `${Math.floor(song.metadata.track_length / 60)}:${
+                            Math.floor(song.metadata.track_length % 60) < 10
+                              ? "0" +
+                                Math.floor(song.metadata.track_length % 60)
+                              : Math.floor(song.metadata.track_length % 60)
+                          }`
+                        : "0:00"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {playingSongId === song.id && isPlaying && (
+                      <div className="flex items-center gap-1">
+                        <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
+                        <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>
+                        <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
+                      </div>
+                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                            onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenDropdownSongId(
+                        openDropdownSongId === song.id ? null : song.id
+                      );
+                    }}
+                    >
+                      <MoreHorizontal className="h-3 w-3 text-white/70" />
+                    </Button>
+                           {openDropdownSongId === song.id && (
+                    <SongOptionsDropdown
+                      songId={song.id}
+                      onDelete={() => {
+                        deleteSong(song.id);
+                        setOpenDropdownSongId(null);
+                      }}
+                      onClose={() => setOpenDropdownSongId(null)}
+                    />
+                  )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );
-};
-
-export default page;
+}

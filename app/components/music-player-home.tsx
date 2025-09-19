@@ -137,7 +137,7 @@ export function MusicPlayerHome() {
 
   return (
     <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
-      <div className="fixed -top-72 left-1/2 transform -translate-x-1/2 z-0">
+      <div className="fixed -top-32 left-1/2 transform -translate-x-1/2 z-0">
         <div
           className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-80"
           style={{ backgroundImage: "url('/assets/sonex-wall.png')" }}

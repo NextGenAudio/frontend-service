@@ -18,24 +18,24 @@ export default function AudioVisualizer() {
       | undefined;
     if (!audioEl || !canvasRef.current) return;
 
-    // ✅ Create AudioContext once
+    // Create AudioContext once
     if (!audioCtxRef.current) {
       audioCtxRef.current = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
     }
 
-    // ✅ Create analyser once
+    // Create analyser once
     if (!analyserRef.current) {
       analyserRef.current = audioCtxRef.current.createAnalyser();
       analyserRef.current.fftSize = 128;
     }
 
-    // ✅ Only create MediaElementSource once per <audio>
+    // Only create MediaElementSource once per <audio>
     if (!sourceRef.current) {
       sourceRef.current = audioCtxRef.current.createMediaElementSource(audioEl);
       sourceRef.current.connect(analyserRef.current);
       analyserRef.current.connect(audioCtxRef.current.destination);
-      console.log("Audio source connected ✅");
+      console.log("Audio source connected ");
     } else {
       console.log("Reusing existing audio source ♻️");
     }
