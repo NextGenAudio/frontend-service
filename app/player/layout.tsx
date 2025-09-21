@@ -118,7 +118,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         loop: repeatMode === 1,
         onload: () => {
           // Auto-play when the song is loaded and isPlaying is true
-          setPlayingSongDuration(sound.duration() || 0);
+          setPlayingSongDuration(parseFloat(playingSong.metadata?.track_length) || 0);
         },
         onplay: () => {
           setIsPlaying(true);

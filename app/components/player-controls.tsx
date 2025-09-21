@@ -254,7 +254,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
               <div className="flex items-center gap-3 min-w-0 w-1/4">
                 <div className="relative group">
                   <div
-                    className={`overflow-hidden w-16 h-16 bg-${theme.primary}/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105`}
+                    className={`overflow-hidden w-16 h-16 ${themeColors.hoverBg} backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105`}
                   >
                     <SongCover song={song} />
                     {/* />
@@ -407,7 +407,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                         <Repeat className="h-3.5 w-3.5" />
                         {repeatMode === 2 && (
                           <span
-                            className={`absolute -top-1 -right-1 text-xs bg-${theme.primary} text-white rounded-full w-3 h-3 flex items-center justify-center font-bold`}
+                            className={`absolute -top-1 -right-1 text-xs bg-gradient-to-r ${theme.preview} text-white rounded-full w-3 h-3 flex items-center justify-center font-bold`}
                           >
                             1
                           </span>
@@ -521,7 +521,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                       <RadixSlider.Track className="bg-white/20 relative grow rounded-full h-3">
                         {/* Filled portion */}
                         <RadixSlider.Range
-                          className={`absolute bg-gradient-to-r ${theme.preview} h-full rounded-full`}
+                          className={`absolute ${themeColors.solidBg} h-full rounded-full`}
                         />
                       </RadixSlider.Track>
 
@@ -546,29 +546,30 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                     setIsDragging(true); // user is dragging
                     setProgress(val); // update UI
                   }}
-                  onValueCommit={handleSeek}
+                  onValueCommit={([val]) => {
+                    handleSeek([val]);
+                    setIsDragging(false); // stop dragging
+                  }}
                   max={100}
                   step={0.1}
                   className="w-full relative flex items-center select-none touch-none h-5 cursor-pointer"
                 >
                   <RadixSlider.Track className="bg-white/20 relative grow rounded-full h-3">
                     <RadixSlider.Range
-                      className={`absolute bg-gradient-to-r ${theme.preview} h-full rounded-full`}
+                      className={`absolute ${themeColors.solidBg} h-full rounded-full`}
                     />
                   </RadixSlider.Track>
                   {/* <RadixSlider.Thumb className="hidden group-hover:block w-5 h-5 rounded-full bg-orange-500 shadow-lg " /> */}
                 </RadixSlider.Root>
-
-                <div
-                  className={`absolute inset-0 ${theme.primary} rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
-                />
               </div>
               <span className="font-mono text-sm text-orange-200/80 whitespace-nowrap min-w-[3rem]">
-                {`${Math.floor(playingSongDuration / 60)}:${(
-                  playingSongDuration % 60
-                )
-                  .toFixed(0)
-                  .padStart(2, "0")}`}
+                {playingSongDuration > 0
+                  ? `${Math.floor(playingSongDuration / 60)}:${(
+                      playingSongDuration % 60
+                    )
+                      .toFixed(0)
+                      .padStart(2, "0")}`
+                  : "0:00"}
               </span>
             </div>
           </div>

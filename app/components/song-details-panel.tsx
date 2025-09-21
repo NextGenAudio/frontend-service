@@ -77,9 +77,9 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
           <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
             <h2 className="text-lg font-semibold text-white/90">
-             { entityName}
-             <span className="text-2xl text-white/60 font-normal ml-2">|</span>
-             <span className="text-sm text-white/60 font-normal ml-2">{entityType}</span>
+             Music Details
+             {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
+             <span className="text-sm text-white/60 font-normal ml-2"></span> */}
             </h2>
             <Button
               size="icon"
