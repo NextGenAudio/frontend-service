@@ -10,6 +10,8 @@ import { useMusicContext } from "@/app/utils/music-context";
 import { clsx } from "clsx";
 import { useEntityContext } from "@/app/utils/entity-context";
 import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
+import { useTheme } from "@/app/utils/theme-context";
+import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 interface Song {
   id: string;
   title: string | undefined;
@@ -25,8 +27,16 @@ interface Song {
 }
 
 export default function FolderPanel({ params }: { params: { id: number } }) {
-  const { selectSong, setSelectSong, playingSong, setPlayingSong, selectSongId, setSelectSongId, playingSongId, setPlayingSongId } =
-    useMusicContext();
+  const {
+    selectSong,
+    setSelectSong,
+    playingSong,
+    setPlayingSong,
+    selectSongId,
+    setSelectSongId,
+    playingSongId,
+    setPlayingSongId,
+  } = useMusicContext();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
@@ -34,19 +44,15 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
   const { isPlaying, setIsPlaying } = useMusicContext();
-    const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
+  const { theme, setTheme } = useTheme();
+
+  // Get theme-specific colors
+  const themeColors = getGeneralThemeColors(theme.primary);
+
+  const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
   );
-  const {
-    entityName,
-    entityArt,
-    entityType,
-    entityDescription,
-    setEntityName,
-    setEntityArt,
-    setEntityType,
-    setEntityDescription,
-  } = useEntityContext();
+  const { entityName, entityArt, entityDescription } = useEntityContext();
   const { songList, setSongList } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
     useSidebar();
@@ -120,15 +126,18 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       return () => scrollElement.removeEventListener("scroll", handleScroll);
     }
   }, []);
-    const deleteSong = async (songId: string) => {
+  const deleteSong = async (songId: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/files/${params.id}/${songId}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8080/files/${params.id}/${songId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         console.log("Song deleted successfully");
@@ -230,7 +239,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                   <div className="flex items-center gap-4 mt-4">
                     <Button
                       onClick={handlePlayAll}
-                      className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300"
+                      className={`bg-gradient-to-r ${theme.preview} hover:${themeColors.gradient} text-white font-semibold px-8 py-3 rounded-full transition-all duration-300`}
                     >
                       <Play className="w-5 h-5 mr-2" fill="currentColor" />
                       Play All
@@ -238,7 +247,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                     <Button
                       onClick={handleShuffle}
                       variant="outline"
-                      className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 px-6 py-3 rounded-full transition-all duration-300"
+                      className={`${themeColors.border} ${themeColors.text} ${themeColors.hoverBg} px-6 py-3 rounded-full transition-all duration-300`}
                     >
                       <Shuffle className="w-4 h-4 mr-2" />
                       Shuffle
@@ -273,8 +282,10 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
               /* Loading State */
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="relative">
-                  <Music className="w-16 h-16 text-orange-400 animate-pulse" />
-                  <div className="absolute inset-0 w-16 h-16 border-4 border-orange-400/30 border-t-orange-400 rounded-full animate-spin" />
+                  <Music
+                    className={`w-16 h-16 ${themeColors.text} animate-pulse`}
+                  />
+                  <div className="absolute inset-0 w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin" />
                 </div>
                 <p className="text-white/70 mt-4 text-lg">Loading songs...</p>
               </div>
@@ -282,8 +293,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
               /* Empty State */
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="relative mb-6">
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-sm border border-orange-400/20 flex items-center justify-center">
-                    <Music className="w-16 h-16 text-orange-400/60" />
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                    <Music className={`w-16 h-16 ${themeColors.text}/60`} />
                   </div>
                   <div className="absolute -top-2 -right-2">
                     <Play className="w-8 h-8 text-white/40 animate-bounce" />
@@ -308,7 +319,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                   key={song.id}
                   className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
                     playingSongId === song.id
-                      ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
+                      ? `bg-gradient-to-r ${theme.preview} border-white/40 shadow-lg ${themeColors.shadow}`
                       : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"
                   } ${
                     openDropdownSongId === song.id ? "relative z-[10000]" : ""
@@ -327,7 +338,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                      className={`h-8 w-8 rounded-xl bg-white/10 ${themeColors.hoverBg} border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm`}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (playingSongId === song.id) {
@@ -372,34 +383,34 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                   <div className="flex items-center gap-2">
                     {playingSongId === song.id && isPlaying && (
                       <div className="flex items-center gap-1">
-                        <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
-                        <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>
-                        <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
+                        <div className="w-1 h-3 bg-gradient-to-t from-white to-slate-200 animate-pulse rounded-full shadow-sm"></div>
+                        <div className="w-1 h-2 bg-gradient-to-t from-white to-slate-200 animate-pulse delay-100 rounded-full shadow-sm"></div>
+                        <div className="w-1 h-4 bg-gradient-to-t from-white to-slate-200 animate-pulse delay-200 rounded-full shadow-sm"></div>
                       </div>
                     )}
                     <Button
                       size="icon"
                       variant="ghost"
                       className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
-                            onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenDropdownSongId(
-                        openDropdownSongId === song.id ? null : song.id
-                      );
-                    }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenDropdownSongId(
+                          openDropdownSongId === song.id ? null : song.id
+                        );
+                      }}
                     >
                       <MoreHorizontal className="h-3 w-3 text-white/70" />
                     </Button>
-                           {openDropdownSongId === song.id && (
-                    <SongOptionsDropdown
-                      songId={song.id}
-                      onDelete={() => {
-                        deleteSong(song.id);
-                        setOpenDropdownSongId(null);
-                      }}
-                      onClose={() => setOpenDropdownSongId(null)}
-                    />
-                  )}
+                    {openDropdownSongId === song.id && (
+                      <SongOptionsDropdown
+                        songId={song.id}
+                        onDelete={() => {
+                          deleteSong(song.id);
+                          setOpenDropdownSongId(null);
+                        }}
+                        onClose={() => setOpenDropdownSongId(null)}
+                      />
+                    )}
                   </div>
                 </div>
               ))

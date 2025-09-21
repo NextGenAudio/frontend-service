@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Slider } from "@/app/components/ui/slider";
+import { getControlThemeColors } from "@/app/lib/theme-colors";
 import {
   Tooltip,
   TooltipContent,
@@ -87,82 +88,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const { theme } = useTheme();
 
   // Get theme-specific hover colors
-  const getThemeColors = () => {
-    switch (theme.primary) {
-      case "orange-500":
-        return {
-          hover: "hover:text-orange-400",
-          hoverBg: "hover:bg-orange-400/30",
-          border: "border-orange-300/20",
-          activeBg: "bg-orange-400/30",
-          hoverFrom: "hover:from-orange-500",
-          hoverTo: "hover:to-orange-400",
-          shadow: "hover:shadow-orange-400/50",
-        };
-      case "purple-500":
-        return {
-          hover: "hover:text-purple-400",
-          hoverBg: "hover:bg-purple-400/30",
-          border: "border-purple-300/20",
-          activeBg: "bg-purple-400/30",
-          hoverFrom: "hover:from-purple-500",
-          hoverTo: "hover:to-purple-400",
-          shadow: "hover:shadow-purple-400/50",
-        };
-      case "blue-500":
-        return {
-          hover: "hover:text-blue-400",
-          hoverBg: "hover:bg-blue-400/30",
-          border: "border-blue-300/20",
-          activeBg: "bg-blue-400/30",
-          hoverFrom: "hover:from-blue-500",
-          hoverTo: "hover:to-blue-400",
-          shadow: "hover:shadow-blue-400/50",
-        };
-      case "green-500":
-        return {
-          hover: "hover:text-green-400",
-          hoverBg: "hover:bg-green-400/30",
-          border: "border-green-300/20",
-          activeBg: "bg-green-400/30",
-          hoverFrom: "hover:from-green-500",
-          hoverTo: "hover:to-green-400",
-          shadow: "hover:shadow-green-400/50",
-        };
-      case "pink-500":
-        return {
-          hover: "hover:text-pink-400",
-          hoverBg: "hover:bg-pink-400/30",
-          border: "border-pink-300/20",
-          activeBg: "bg-pink-400/30",
-          hoverFrom: "hover:from-pink-500",
-          hoverTo: "hover:to-pink-400",
-          shadow: "hover:shadow-pink-400/50",
-        };
-      case "teal-500":
-        return {
-          hover: "hover:text-teal-400",
-          hoverBg: "hover:bg-teal-400/30",
-          border: "border-teal-300/20",
-          activeBg: "bg-teal-400/30",
-          hoverFrom: "hover:from-teal-500",
-          hoverTo: "hover:to-teal-400",
-          shadow: "hover:shadow-teal-400/50",
-        };
-      default:
-        return {
-          hover: "hover:text-orange-400",
-          hoverBg: "hover:bg-orange-400/30",
-          border: "border-orange-300/20",
-          activeBg: "bg-orange-400/30",
-          hoverFrom: "hover:from-orange-500",
-          hoverTo: "hover:to-orange-400",
-          shadow: "hover:shadow-orange-400/50",
-        };
-    }
-  };
-
-  const themeColors = getThemeColors();
+  const themeColors = getControlThemeColors(theme.primary);
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -327,7 +253,9 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3 min-w-0 w-1/4">
                 <div className="relative group">
-                  <div className={`overflow-hidden w-16 h-16 bg-${theme.primary}/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105`}>
+                  <div
+                    className={`overflow-hidden w-16 h-16 bg-${theme.primary}/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105`}
+                  >
                     <SongCover song={song} />
                     {/* />
                     ) : (

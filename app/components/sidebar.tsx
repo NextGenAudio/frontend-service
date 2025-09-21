@@ -83,9 +83,9 @@ export const Sidebar = () => {
 
   return (
     <div className="absolute top-0 left-0 h-screen rounded-[32px] w-32 items-center flex flex-col justify-between py-6 pr-5">
-      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center shadow-lg">
+      {/* <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center shadow-lg">
         Logo
-      </div>
+      </div> */}
 
       {/* Glass buttons */}
       <div className="flex flex-col space-y-3 mt-8">

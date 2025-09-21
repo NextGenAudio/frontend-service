@@ -13,6 +13,7 @@ import {
 import { useSession, signOut } from "next-auth/react";
 import { Sign } from "crypto";
 import { useRouter } from "next/navigation";
+import { useTheme } from "../utils/theme-context";
 
 
 
@@ -20,6 +21,7 @@ export function ProfileDropdown(
 ) {
   const [isOpen, setIsOpen] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const {theme , setTheme} = useTheme();
   const { status, data: session } = useSession();
       const router = useRouter();
   useEffect(() => {
@@ -53,7 +55,7 @@ export function ProfileDropdown(
       {isOpen && (
         <div className="fixed bottom-8 left-28  w-72 bg-slate-800/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
           {/* User Info Header */}
-          <div className="p-4 border-b border-white/10 bg-gradient-to-r from-orange-500/10 to-orange-600/10">
+          <div className={`p-4 border-b border-white/10 bg-${theme.primary}/10`}>
             <div className="flex items-center gap-3">
               {/* <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-orange-400 to-orange-600 p-0.5">
                 <img

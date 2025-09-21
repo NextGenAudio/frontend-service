@@ -9,6 +9,8 @@ import { Label } from "@/app/components/ui/label";
 import { Badge } from "@/app/components/ui/badge";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useTheme } from "../utils/theme-context";
+import { getGeneralThemeColors } from "../lib/theme-colors";
 
 // Backend service URLs
 const PLAYLIST_SERVICE_URL = "http://localhost:8082/playlist-service/playlists";
@@ -33,6 +35,8 @@ interface PlaylistFormData {
 
 export function PlaylistCreatePage() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const themeColors = getGeneralThemeColors(theme.primary);
   const [formData, setFormData] = useState<PlaylistFormData>({ name: "" });
   const [selectedSongs, setSelectedSongs] = useState<Song[]>([]);
   const [availableSongs, setAvailableSongs] = useState<Song[]>([]);
@@ -159,15 +163,9 @@ export function PlaylistCreatePage() {
         {/* Header */}
         <div className="p-6 border-b border-white/20 backdrop-blur-sm">
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.back()}
-              className="text-white hover:bg-white/10 p-2"
+            <h1
+              className={`text-2xl font-bold bg-gradient-to-r ${themeColors.gradient} bg-clip-text text-transparent`}
             >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-orange-200 to-orange-400 bg-clip-text text-transparent">
               Create New Playlist
             </h1>
           </div>
@@ -194,7 +192,7 @@ export function PlaylistCreatePage() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ name: e.target.value })}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 h-12 text-lg"
+                    className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-12 text-lg`}
                     placeholder="My Awesome Playlist"
                     required
                   />
@@ -214,7 +212,7 @@ export function PlaylistCreatePage() {
                       placeholder="Search songs in your library..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400 h-12"
+                      className={`pl-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-12`}
                     />
                   </div>
 
@@ -227,9 +225,9 @@ export function PlaylistCreatePage() {
                         <div
                           key={song.id}
                           onClick={() => toggleSongSelection(song)}
-                          className={`flex items-center justify-between p-5 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.01] ${
+                          className={`flex items-center justify-between p-5 rounded-xl cursor-pointer transition-all duration-200 ${
                             isSelected
-                              ? "bg-orange-500/20 border border-orange-500/30 shadow-lg"
+                              ? `${themeColors.hoverBg} border ${themeColors.border} shadow-lg`
                               : "bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10"
                           }`}
                         >
@@ -237,7 +235,7 @@ export function PlaylistCreatePage() {
                             <div
                               className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${
                                 isSelected
-                                  ? "bg-orange-500 scale-110"
+                                  ? `bg-gradient-to-r ${themeColors.gradient} scale-110`
                                   : "bg-white/10"
                               }`}
                             >
@@ -269,8 +267,8 @@ export function PlaylistCreatePage() {
                             <div
                               className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                                 isSelected
-                                  ? "border-orange-500 bg-orange-500"
-                                  : "border-gray-400 hover:border-orange-400"
+                                  ? `${themeColors.border} bg-gradient-to-r ${themeColors.gradient}`
+                                  : `border-gray-400 ${themeColors.hover}`
                               }`}
                             >
                               {isSelected && (
@@ -296,7 +294,7 @@ export function PlaylistCreatePage() {
                   </h2>
                   <Badge
                     variant="secondary"
-                    className="bg-orange-500/20 text-orange-300 px-3 py-1 text-base"
+                    className={`${themeColors.hoverBg} ${themeColors.text} px-3 py-1 text-base`}
                   >
                     {selectedSongs.length} songs
                   </Badge>
@@ -315,9 +313,11 @@ export function PlaylistCreatePage() {
                     {selectedSongs.map((song, index) => (
                       <div
                         key={song.id}
-                        className="flex items-center space-x-3 p-4 bg-orange-500/10 rounded-xl border border-orange-500/20"
+                        className={`flex items-center space-x-3 p-4 ${themeColors.hoverBg} rounded-xl border ${themeColors.border}`}
                       >
-                        <div className="text-orange-400 text-base font-medium w-8">
+                        <div
+                          className={`${themeColors.text} text-base font-medium w-8`}
+                        >
                           {index + 1}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -366,7 +366,7 @@ export function PlaylistCreatePage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={loading || !formData.name}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 h-12 text-base font-medium"
+                  className={`w-full bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 h-12 text-base font-medium`}
                 >
                   {loading ? "Creating..." : "Create Playlist"}
                 </Button>

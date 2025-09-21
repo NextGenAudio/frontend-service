@@ -15,6 +15,8 @@ import { useSidebar } from "@/app/utils/sidebar-context";
 import { useMusicContext } from "@/app/utils/music-context";
 import { clsx } from "clsx";
 import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
+import { useTheme } from "@/app/utils/theme-context";
+import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { set } from "react-hook-form";
 
 interface Song {
@@ -33,6 +35,8 @@ interface Song {
 export default function FavoritePage() {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
     useMusicContext();
+  const { theme } = useTheme();
+  const themeColors = getGeneralThemeColors(theme.primary);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [favoritesSongs, setFavoritesSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,16 +115,16 @@ export default function FavoritePage() {
       {/* Dynamic Background with Heart Pattern - Fixed */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/20 to-gray-800/20 backdrop-blur-xl" />
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 left-10 text-orange-400">
+        <div className={`absolute top-10 left-10 ${themeColors.text}`}>
           <Heart className="w-8 h-8 animate-pulse" />
         </div>
-        <div className="absolute top-32 right-20 text-pink-400">
+        <div className={`absolute top-32 right-20 ${themeColors.text}`}>
           <Heart className="w-6 h-6 animate-pulse delay-1000" />
         </div>
-        <div className="absolute top-64 left-1/3 text-orange-300">
+        <div className={`absolute top-64 left-1/3 ${themeColors.text}`}>
           <Heart className="w-4 h-4 animate-pulse delay-2000" />
         </div>
-        <div className="absolute bottom-32 right-1/4 text-pink-300">
+        <div className={`absolute bottom-32 right-1/4 ${themeColors.text}`}>
           <Heart className="w-5 h-5 animate-pulse delay-500" />
         </div>
       </div>
@@ -139,24 +143,30 @@ export default function FavoritePage() {
             <div className="flex items-center gap-6">
               {/* Animated Heart Icon */}
               <div className="relative flex-shrink-0 w-40 h-40">
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-orange-500/30 to-pink-500/30 backdrop-blur-sm border border-orange-400/30 flex items-center justify-center relative overflow-hidden">
+                <div
+                  className={`w-full h-full rounded-full bg-gradient-to-br ${theme.preview}  backdrop-blur-sm border ${themeColors.border} flex items-center justify-center relative overflow-hidden`}
+                >
                   {/* Animated background circles */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/20 to-pink-400/20 animate-pulse" />
-                  <div className="absolute inset-2 rounded-full bg-gradient-to-br from-orange-500/10 to-pink-500/10 animate-pulse delay-1000" />
+                  <div
+                    className={`absolute inset-0 rounded-full bg-gradient-to-br ${theme.preview} animate-pulse`}
+                  />
+                  <div
+                    className={`absolute inset-2 rounded-full bg-gradient-to-br ${theme.preview}  animate-pulse delay-1000`}
+                  />
 
                   <Heart
-                    className="w-12 h-12 text-orange-400 drop-shadow-lg"
+                    className="w-12 h-12 text-white drop-shadow-lg"
                     fill="currentColor"
                   />
 
                   {/* Floating hearts animation */}
                   <div className="absolute inset-0 pointer-events-none">
                     <Heart
-                      className="absolute top-2 right-2 w-3 h-3 text-orange-300 animate-bounce delay-500"
+                      className={`absolute top-2 right-2 w-3 h-3 ${themeColors.text} animate-bounce delay-500`}
                       fill="currentColor"
                     />
                     <Heart
-                      className="absolute bottom-2 left-2 w-2 h-2 text-pink-300 animate-bounce delay-1500"
+                      className={`absolute bottom-2 left-2 w-2 h-2 ${themeColors.text} animate-bounce delay-1500`}
                       fill="currentColor"
                     />
                   </div>
@@ -164,14 +174,11 @@ export default function FavoritePage() {
               </div>
 
               <div className="flex flex-col">
-                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 drop-shadow-lg">
-                  Loved Songs
-                </h1>
-                <p className="text-white/80 mt-2 text-lg flex items-center gap-2">
-                  <Heart
-                    className="w-4 h-4 text-orange-400"
-                    fill="currentColor"
-                  />
+                <h1
+                  className={`text-4xl font-extrabold text-transparent bg-clip-text text-white drop-shadow-lg pb-2`}
+                >Loved Musics</h1>
+                <p className="text-white/80text-lg flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-red-400" fill="currentColor" />
                   {favoritesSongs.length} favorites
                 </p>
 
@@ -180,7 +187,7 @@ export default function FavoritePage() {
                   <Button
                     onClick={handlePlayAll}
                     disabled={favoritesSongs.length === 0}
-                    className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg shadow-orange-500/25 transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                    className={`bg-gradient-to-r ${theme.preview} hover:${themeColors.gradient} text-white font-semibold px-8 py-3 rounded-full ${themeColors.shadow} transition-all duration-300 hover:scale-105 disabled:opacity-50`}
                   >
                     <Play className="w-5 h-5 mr-2" fill="currentColor" />
                     Play All
@@ -189,7 +196,7 @@ export default function FavoritePage() {
                     onClick={handleShuffle}
                     disabled={favoritesSongs.length === 0}
                     variant="outline"
-                    className="border-orange-400/50 text-orange-400 hover:bg-orange-400/10 px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                    className={`${themeColors.border} ${themeColors.text} ${themeColors.hoverBg} px-6 py-3 rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50`}
                   >
                     <Shuffle className="w-4 h-4 mr-2" />
                     Shuffle
@@ -224,10 +231,10 @@ export default function FavoritePage() {
             <div className="flex flex-col items-center justify-center py-20">
               <div className="relative">
                 <Heart
-                  className="w-16 h-16 text-orange-400 animate-pulse"
+                  className={`w-16 h-16 ${themeColors.text} animate-pulse`}
                   fill="currentColor"
                 />
-                <div className="absolute inset-0 w-16 h-16 border-4 border-orange-400/30 border-t-orange-400 rounded-full animate-spin" />
+                <div className="absolute inset-0 w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin" />
               </div>
               <p className="text-white/70 mt-4 text-lg">
                 Loading your favorites...
@@ -237,8 +244,8 @@ export default function FavoritePage() {
             /* Empty State */
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="relative mb-6">
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500/20 to-pink-500/20 backdrop-blur-sm border border-orange-400/20 flex items-center justify-center">
-                  <Heart className="w-16 h-16 text-orange-400/60" />
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                  <Heart className={`w-16 h-16 ${themeColors.text}/60`} />
                 </div>
                 <div className="absolute -top-2 -right-2">
                   <Music className="w-8 h-8 text-white/40 animate-bounce" />
@@ -265,8 +272,8 @@ export default function FavoritePage() {
                 key={song.id}
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
                   playingSongId === song.id
-                    ? "bg-gradient-to-r from-orange-500/30 to-pink-500/20 border-orange-400/40 shadow-lg shadow-orange-500/20"
-                    : "bg-white/10 border-white/20 hover:bg-orange-500/10 hover:border-orange-400/30"
+                    ? `bg-gradient-to-r ${theme.preview} border-white/40 shadow-lg ${themeColors.shadow}`
+                    : `bg-white/10 border-white/20 ${themeColors.hoverBg} hover:border-white/30`
                 } ${
                   openDropdownSongId === song.id ? "relative z-[10000]" : ""
                 }`}
@@ -284,7 +291,7 @@ export default function FavoritePage() {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-8 w-8 rounded-xl bg-white/10 hover:bg-orange-500/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                    className={`h-8 w-8 rounded-xl bg-white/10 hover:bg-${theme.primary}/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm`}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (playingSongId === song.id) {
@@ -308,7 +315,7 @@ export default function FavoritePage() {
                     <div className="font-medium truncate text-white drop-shadow-sm flex items-center gap-2">
                       {song.title || song.filename}
                       <Heart
-                        className="w-3 h-3 text-orange-400"
+                        className={`w-3 h-3 ${themeColors.text}`}
                         fill="currentColor"
                       />
                     </div>
@@ -332,9 +339,15 @@ export default function FavoritePage() {
                 <div className="flex items-center gap-2">
                   {playingSongId === song.id && isPlaying && (
                     <div className="flex items-center gap-1">
-                      <div className="w-1 h-3 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse rounded-full shadow-sm"></div>
-                      <div className="w-1 h-2 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-100 rounded-full shadow-sm"></div>
-                      <div className="w-1 h-4 bg-gradient-to-t from-orange-400 to-pink-400 animate-pulse delay-200 rounded-full shadow-sm"></div>
+                      <div
+                        className={`w-1 h-3 bg-gradient-to-t ${themeColors.gradient} animate-pulse rounded-full shadow-sm`}
+                      ></div>
+                      <div
+                        className={`w-1 h-2 bg-gradient-to-t ${themeColors.gradient} animate-pulse delay-100 rounded-full shadow-sm`}
+                      ></div>
+                      <div
+                        className={`w-1 h-4 bg-gradient-to-t ${themeColors.gradient} animate-pulse delay-200 rounded-full shadow-sm`}
+                      ></div>
                     </div>
                   )}
                   <Button

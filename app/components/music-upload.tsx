@@ -29,6 +29,8 @@ import { useMusicContext } from "../utils/music-context";
 import { useRouter } from "next/navigation";
 import { useFileHandling } from "../utils/file-handling-context";
 import { useEntityContext } from "../utils/entity-context";
+import { useTheme } from "../utils/theme-context";
+import { getGeneralThemeColors } from "../lib/theme-colors";
 import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
 interface UploadedFile {
@@ -37,9 +39,6 @@ interface UploadedFile {
   status: "uploading" | "completed" | "error";
   preview?: string;
 }
-
-
-
 
 export function MusicUpload() {
   const [musicFile, setMusicFile] = useState<UploadedFile | null>(null);
@@ -54,6 +53,8 @@ export function MusicUpload() {
     description: "",
     selectedFolder: "", // Added selectedFolder property
   });
+  const { theme } = useTheme();
+  const themeColors = getGeneralThemeColors(theme.primary);
 
   const musicInputRef = useRef<HTMLInputElement>(null);
   const artworkInputRef = useRef<HTMLInputElement>(null);
@@ -136,7 +137,9 @@ export function MusicUpload() {
         formDataToSend.append("artwork", artworkFile.file);
       }
       if (formData.selectedFolder) {
-        const folder = folderList.find(f => f.name === formData.selectedFolder);
+        const folder = folderList.find(
+          (f) => f.name === formData.selectedFolder
+        );
         if (folder) {
           formDataToSend.append("folderId", String(folder.id));
         }
@@ -174,27 +177,36 @@ export function MusicUpload() {
   };
 
   return (
-    <div className="h-screen overflow-y-auto pb-40 bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900/20 p-6">
+    <div className="h-screen overflow-y-auto pb-40 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
       {/* Background Effects */}
-      <div className=" inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-400/5 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
+      {/* <div className=" inset-0 overflow-hidden pointer-events-none">
+        <div
+          className={`absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-3xl animate-pulse`}
+        />
+        <div
+          className={`absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r ${themeColors.gradient} opacity-5 rounded-full blur-3xl animate-pulse delay-1000`}
+        />
+      </div> */}
 
       <div className="min-h-screen relative max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-orange-200 to-orange-400 bg-clip-text text-transparent mb-2">
+          <h1
+            className={`text-4xl font-bold bg-gradient-to-r ${themeColors.gradient} bg-clip-text text-transparent mb-2`}
+          >
             Upload Your Music
           </h1>
           {/* <p className="text-gray-400">Share your creativity with the world</p> */}
         </div>
 
-        <form onSubmit={handleSubmit} className={clsx("p-4 space-y-8", player ? "pb-64" : "pb-16")}>
+        <form
+          onSubmit={handleSubmit}
+          className={clsx("p-4 space-y-8", player ? "pb-64" : "pb-16")}
+        >
           {/* Music Upload Section */}
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-              <Music className="w-6 h-6 text-orange-400" />
+              <Music className={`w-6 h-6 ${themeColors.text}`} />
               Music File
             </h2>
 
@@ -203,9 +215,11 @@ export function MusicUpload() {
                 onDrop={handleMusicDrop}
                 onDragOver={(e) => e.preventDefault()}
                 onClick={() => musicInputRef.current?.click()}
-                className="border-2 border-dashed border-orange-400/30 rounded-xl p-12 text-center cursor-pointer hover:border-orange-400/50 hover:bg-white/5 transition-all duration-300 group"
+                className={`border-2 border-dashed ${themeColors.border} rounded-xl p-12 text-center cursor-pointer hover:border-white/50 ${themeColors.hoverBg} transition-all duration-300 group`}
               >
-                <Upload className="w-16 h-16 text-orange-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                <Upload
+                  className={`w-16 h-16 ${themeColors.text} mx-auto mb-4 group-hover:scale-110 transition-transform`}
+                />
                 <p className="text-xl text-white mb-2">
                   Drop your music file here
                 </p>
@@ -223,10 +237,10 @@ export function MusicUpload() {
                 />
               </div>
             ) : (
-              <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+              <div className={`rounded-xl p-6 border border-white/10`}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <Music className="w-8 h-8 text-orange-400" />
+                    <Music className={`w-8 h-8 ${themeColors.text}`} />
                     <div>
                       <p className="text-white font-medium">
                         {musicFile.file.name}
@@ -242,7 +256,7 @@ export function MusicUpload() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setIsPlaying(!isPlaying)}
-                      className="text-orange-400 hover:text-orange-300 hover:bg-orange-400/10"
+                      className={`${themeColors.text} hover:text-white ${themeColors.hoverBg}`}
                     >
                       {isPlaying ? (
                         <Pause className="w-4 h-4" />
@@ -255,7 +269,7 @@ export function MusicUpload() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setMusicFile(null)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                      className={`text-red-400 hover:text-red-300 ${themeColors.hoverBg}`}
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -265,7 +279,7 @@ export function MusicUpload() {
                 {/* Progress Bar */}
                 <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
                   <div
-                    className="bg-gradient-to-r from-orange-500 to-orange-400 h-2 rounded-full transition-all duration-300"
+                    className={`bg-gradient-to-r ${themeColors.gradient} h-2 rounded-full transition-all duration-300`}
                     style={{ width: `${musicFile.progress}%` }}
                   />
                 </div>
@@ -295,7 +309,7 @@ export function MusicUpload() {
             {/* Artwork Upload */}
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
               <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-                <ImageIcon className="w-6 h-6 text-orange-400" />
+                <ImageIcon className={`w-6 h-6 ${themeColors.text}`} />
                 Music Artwork
               </h2>
 
@@ -304,9 +318,11 @@ export function MusicUpload() {
                   onDrop={handleArtworkDrop}
                   onDragOver={(e) => e.preventDefault()}
                   onClick={() => artworkInputRef.current?.click()}
-                  className="aspect-square border-2 border-dashed border-orange-400/30 rounded-xl p-8 text-center cursor-pointer hover:border-orange-400/50 hover:bg-white/5 transition-all duration-300 group flex flex-col items-center justify-center"
+                  className={`aspect-square border-2 border-dashed ${themeColors.border} rounded-xl p-8 text-center cursor-pointer hover:border-white/50 ${themeColors.hoverBg} transition-all duration-300 group flex flex-col items-center justify-center`}
                 >
-                  <ImageIcon className="w-12 h-12 text-orange-400 mb-4 group-hover:scale-110 transition-transform" />
+                  <ImageIcon
+                    className={`w-12 h-12 ${themeColors.text} mb-4 group-hover:scale-110 transition-transform`}
+                  />
                   <p className="text-white mb-2">Drop artwork here</p>
                   <p className="text-gray-400 text-sm">
                     JPG, PNG (min 500x500)
@@ -335,7 +351,7 @@ export function MusicUpload() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setArtworkFile(null)}
-                      className="text-white hover:text-red-400 hover:bg-red-400/10"
+                      className={`text-white hover:text-red-400 ${themeColors.hoverBg}`}
                     >
                       <X className="w-6 h-6" />
                     </Button>
@@ -346,66 +362,66 @@ export function MusicUpload() {
 
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
               <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-                <FolderPlus className="w-6 h-6 text-orange-400" />
+                <FolderPlus className={`w-6 h-6 ${themeColors.text}`} />
                 Folder Selection
               </h2>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <>
-                  <div>
-                    <Label
-                      htmlFor="folder-select"
-                      className="text-white mb-2 block"
-                    >
-                      Select Folder *
-                    </Label>
-                    <Select
-                      value={formData.selectedFolder}
-                      onValueChange={(value) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          selectedFolder: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="bg-white/10 border-white/20 text-white focus:border-orange-400 focus:ring-orange-400/20">
-                        <SelectValue placeholder="Choose an existing folder" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800/95 backdrop-blur-xl border-white/20">
-                        {folderList.map((folder) => (
-                          <SelectItem
-                            key={folder.id}
-                            value={folder.name}
-                            className="text-white hover:bg-white/10 focus:bg-white/10"
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span>{folder.name}</span>
-                              <span className="text-gray-400 text-sm ml-2">
-                                {folder.musicCount} songs
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 h-px bg-white/20"></div>
-                    <span className="text-gray-400 text-sm">or</span>
-                    <div className="flex-1 h-px bg-white/20"></div>
-                  </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => router.push("/player/newfolder")}
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              <div className="space-y-6">
+                <div>
+                  <Label
+                    htmlFor="folder-select"
+                    className="text-white mb-2 block"
                   >
-                    <FolderPlus className="w-4 h-4 mr-2" />
-                    Create New Folder
-                  </Button>
-                </>
-              </form>
+                    Select Folder *
+                  </Label>
+                  <Select
+                    value={formData.selectedFolder}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        selectedFolder: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={`bg-white/10 border-white/20 text-white focus:${themeColors.border} focus:ring-white/20`}
+                    >
+                      <SelectValue placeholder="Choose an existing folder" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800/95 backdrop-blur-xl border-white/20">
+                      {folderList.map((folder) => (
+                        <SelectItem
+                          key={folder.id}
+                          value={folder.name}
+                          className="text-white hover:bg-white/10 focus:bg-white/10"
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <span>{folder.name}</span>
+                            <span className="text-gray-400 text-sm ml-2">
+                              {folder.musicCount} songs
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="flex-1 h-px bg-white/20"></div>
+                  <span className="text-gray-400 text-sm">or</span>
+                  <div className="flex-1 h-px bg-white/20"></div>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={() => router.push("/player/newfolder")}
+                  className={`w-full bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+                >
+                  <FolderPlus className="w-4 h-4 mr-2" />
+                  Create New Folder
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -414,7 +430,7 @@ export function MusicUpload() {
             <Button
               type="submit"
               disabled={!musicFile || musicFile.status !== "completed"}
-              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className={`bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
             >
               Upload Track
             </Button>

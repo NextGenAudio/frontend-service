@@ -1,9 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useMusicContext } from "../utils/music-context";
+import { useTheme } from "../utils/theme-context";
+import { getThemeHexColors } from "../lib/theme-colors";
 
 export default function AudioVisualizer() {
   const { soundRef } = useMusicContext();
+  const { theme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
 
@@ -60,11 +63,22 @@ export default function AudioVisualizer() {
       ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
       const barWidth = canvas.clientWidth / bufferLength;
+      const themeColors = getThemeHexColors(theme.primary);
       let x = 0;
 
       for (let i = 0; i < bufferLength; i++) {
         const barHeight = (dataArray[i] / 255) * canvas.clientHeight;
-        ctx.fillStyle = "#f97316";
+
+        // Create a gradient effect using theme colors
+        const intensity = dataArray[i] / 255;
+        if (intensity > 0.7) {
+          ctx.fillStyle = themeColors.accent;
+        } else if (intensity > 0.4) {
+          ctx.fillStyle = themeColors.primary;
+        } else {
+          ctx.fillStyle = themeColors.secondary;
+        }
+
         ctx.fillRect(
           x,
           canvas.clientHeight - barHeight,
@@ -84,7 +98,7 @@ export default function AudioVisualizer() {
   }, [soundRef.current]);
 
   return (
-    <div className="overflow-hidden rounded-lg h-full w-full bg-gradient-to-br from-gray-700/20 via-slate-400/20 to-gray-700/30 flex items-center justify-center relative">
+    <div className="overflow-hidden rounded-lg h-full w-full bg-gradient-to-br from-gray-700/20 via-slate-700/20 to-gray-700/30 flex items-center justify-center relative">
       <div
         className="absolute left-1/2 -translate-x-1/2 h-64 w-96 bg-cover bg-center z-0 opacity-90"
         style={{ backgroundImage: "url('/assets/sonex-v-wall.png')" }}

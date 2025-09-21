@@ -11,10 +11,14 @@ import {
   Shuffle,
   SkipForward,
 } from "lucide-react";
+import { useTheme } from "../utils/theme-context";
+import { getGeneralThemeColors } from "../lib/theme-colors";
 
 export function MusicPlayerHome() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeCard, setActiveCard] = useState<number | null>(null);
+  const { theme } = useTheme();
+  const themeColors = getGeneralThemeColors(theme.primary);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -72,28 +76,28 @@ export function MusicPlayerHome() {
       name: "Chill Vibes",
       description: "Relax and unwind",
       songs: 42,
-      color: "from-orange-500/20 to-amber-500/20",
+      color: themeColors.gradient,
     },
     {
       id: 2,
       name: "Workout Energy",
       description: "High energy beats",
       songs: 38,
-      color: "from-orange-600/20 to-red-500/20",
+      color: themeColors.gradient,
     },
     {
       id: 3,
       name: "Focus Flow",
       description: "Deep concentration",
       songs: 29,
-      color: "from-amber-500/20 to-orange-400/20",
+      color: themeColors.gradient,
     },
     {
       id: 4,
       name: "Night Drive",
       description: "Late night cruising",
       songs: 35,
-      color: "from-orange-400/20 to-yellow-500/20",
+      color: themeColors.gradient,
     },
   ];
 
@@ -145,9 +149,15 @@ export function MusicPlayerHome() {
       </div>
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-orange-500/10 to-amber-500/10 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-amber-500/10 to-orange-600/10 rounded-full blur-lg animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-1/3 w-40 h-40 bg-gradient-to-r from-orange-400/10 to-yellow-500/10 rounded-full blur-2xl animate-pulse delay-2000"></div>
+        <div
+          className={`absolute top-20 left-10 w-32 h-32 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-xl animate-pulse`}
+        ></div>
+        <div
+          className={`absolute top-40 right-20 w-24 h-24 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-lg animate-pulse delay-1000`}
+        ></div>
+        <div
+          className={`absolute bottom-32 left-1/3 w-40 h-40 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-2xl animate-pulse delay-2000`}
+        ></div>
       </div>
 
       <div className="relative z-10 p-8 pt-96 space-y-8">
@@ -156,15 +166,19 @@ export function MusicPlayerHome() {
           <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
+                <h1
+                  className={`text-4xl font-bold bg-gradient-to-r ${themeColors.gradient} bg-clip-text text-transparent pb-2`}
+                >
                   {getGreeting()}
                 </h1>
-                <p className="text-white/80 text-lg mt-2">
+                <p className="text-white/80 text-lg">
                   Ready to discover your next favorite song?
                 </p>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-4 rounded-full shadow-lg">
+                <div
+                  className={`bg-gradient-to-r ${theme.preview} p-4 rounded-full shadow-lg`}
+                >
                   <Headphones className="w-8 h-8 text-white" />
                 </div>
               </div>
@@ -175,7 +189,7 @@ export function MusicPlayerHome() {
               {[...Array(20)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-gradient-to-t from-orange-500 to-amber-400 rounded-full animate-pulse"
+                  className={`bg-gradient-to-t from-white to-slate-200 rounded-full animate-pulse`}
                   style={{
                     width: "4px",
                     height: `${Math.random() * 40 + 20}px`,
@@ -190,7 +204,7 @@ export function MusicPlayerHome() {
             <div className="grid grid-cols-3 gap-6">
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
                 <div className="flex items-center space-x-3">
-                  <Music className="w-6 h-6 text-orange-400" />
+                  <Music className={`w-6 h-6 ${themeColors.text}`} />
                   <div>
                     <p className="text-2xl font-bold text-white">1,247</p>
                     <p className="text-white/70 text-sm">Songs Played</p>
@@ -199,7 +213,7 @@ export function MusicPlayerHome() {
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
                 <div className="flex items-center space-x-3">
-                  <Clock className="w-6 h-6 text-orange-400" />
+                  <Clock className={`w-6 h-6 ${themeColors.text}`} />
                   <div>
                     <p className="text-2xl font-bold text-white">42h</p>
                     <p className="text-white/70 text-sm">This Week</p>
@@ -208,7 +222,7 @@ export function MusicPlayerHome() {
               </div>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
                 <div className="flex items-center space-x-3">
-                  <Heart className="w-6 h-6 text-orange-400" />
+                  <Heart className={`w-6 h-6 ${themeColors.text}`} />
                   <div>
                     <p className="text-2xl font-bold text-white">89</p>
                     <p className="text-white/70 text-sm">Favorites</p>
@@ -223,7 +237,9 @@ export function MusicPlayerHome() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Recently Played</h2>
-            <button className="text-orange-400 hover:text-orange-300 transition-colors">
+            <button
+              className={`${themeColors.text} ${themeColors.hover} transition-colors`}
+            >
               View All
             </button>
           </div>
@@ -263,7 +279,9 @@ export function MusicPlayerHome() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Made For You</h2>
-            <button className="text-orange-400 hover:text-orange-300 transition-colors">
+            <button
+              className={`${themeColors.text} ${themeColors.hover} transition-colors`}
+            >
               Refresh
             </button>
           </div>
@@ -272,6 +290,7 @@ export function MusicPlayerHome() {
               <div
                 key={playlist.id}
                 className={`bg-gradient-to-br ${playlist.color} backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer group`}
+                style={{ opacity: 0.8 }}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div>
@@ -280,7 +299,9 @@ export function MusicPlayerHome() {
                     </h3>
                     <p className="text-white/70">{playlist.description}</p>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-md rounded-full p-3 group-hover:bg-orange-500 transition-colors duration-300">
+                  <div
+                    className={`bg-white/20 backdrop-blur-md rounded-full p-3 group-hover:bg-gradient-to-r group-hover:${theme.preview} transition-colors duration-300`}
+                  >
                     <Play className="w-6 h-6 text-white" />
                   </div>
                 </div>
@@ -294,7 +315,9 @@ export function MusicPlayerHome() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-white">Top Charts</h2>
-            <button className="text-orange-400 hover:text-orange-300 transition-colors">
+            <button
+              className={`${themeColors.text} ${themeColors.hover} transition-colors`}
+            >
               See More
             </button>
           </div>
@@ -305,7 +328,9 @@ export function MusicPlayerHome() {
                   key={track.rank}
                   className="flex items-center space-x-4 p-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group"
                 >
-                  <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full text-white font-bold text-sm">
+                  <div
+                    className={`flex items-center justify-center w-8 h-8 bg-gradient-to-r ${theme.preview} rounded-full text-white font-bold text-sm`}
+                  >
                     {track.rank}
                   </div>
                   <div className="flex-1">
@@ -321,7 +346,7 @@ export function MusicPlayerHome() {
                     <span className="text-white/60 text-sm">{track.plays}</span>
                   </div>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play className="w-5 h-5 text-orange-400" />
+                    <Play className={`w-5 h-5 ${themeColors.text}`} />
                   </div>
                 </div>
               ))}
@@ -331,16 +356,18 @@ export function MusicPlayerHome() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-3 gap-4">
-          <button className="bg-gradient-to-r from-orange-500 to-amber-500 backdrop-blur-xl rounded-2xl p-6 hover:scale-105 transition-all duration-300 shadow-lg">
+          <button
+            className={`bg-gradient-to-r ${theme.preview} backdrop-blur-xl rounded-2xl p-6 hover:scale-105 transition-all duration-300 shadow-lg`}
+          >
             <Shuffle className="w-8 h-8 text-white mb-2" />
             <p className="text-white font-semibold">Shuffle Play</p>
           </button>
           <button className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
-            <Heart className="w-8 h-8 text-orange-400 mb-2" />
+            <Heart className={`w-8 h-8 ${themeColors.text} mb-2`} />
             <p className="text-white font-semibold">Liked Songs</p>
           </button>
           <button className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
-            <SkipForward className="w-8 h-8 text-orange-400 mb-2" />
+            <SkipForward className={`w-8 h-8 ${themeColors.text} mb-2`} />
             <p className="text-white font-semibold">Queue</p>
           </button>
         </div>
