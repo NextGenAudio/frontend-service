@@ -19,6 +19,7 @@ import Image from "next/image";
 import ProfileAvatar from "./profile-avatar";
 import { useSidebar } from "../utils/sidebar-context";
 import { useRouter } from "next/navigation";
+import { useTheme } from "../utils/theme-context";
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("Home");
@@ -27,7 +28,7 @@ export const Sidebar = () => {
   const [favorites, setFavorites] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [settings, setSettings] = useState(false);
-
+  const {theme, setTheme} = useTheme();
   const {
     home, 
     player,
@@ -83,9 +84,7 @@ export const Sidebar = () => {
   return (
     <div className="absolute top-0 left-0 h-screen rounded-[32px] w-32 items-center flex flex-col justify-between py-6 pr-5">
       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center shadow-lg">
-        <div className="w-8 h-8 rounded-xl bg-black/20 flex items-center justify-center">
-          <div className="w-6 h-6 rounded-full bg-orange-300" />
-        </div>
+        Logo
       </div>
 
       {/* Glass buttons */}

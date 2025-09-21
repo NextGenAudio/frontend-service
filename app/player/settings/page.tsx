@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Palette,
   Volume2,
@@ -20,20 +20,27 @@ import {
   Speaker,
   Check,
 } from "lucide-react";
+import { useTheme } from "@/app/utils/theme-context";
 
 export default function SettingsPage() {
-  const [selectedTheme, setSelectedTheme] = useState("orange");
+  const { theme, setTheme } = useTheme();
+  const [selectedTheme, setSelectedTheme] = useState(theme);
   const [audioQuality, setAudioQuality] = useState("high");
   const [notifications, setNotifications] = useState(true);
   const [autoDownload, setAutoDownload] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+
+  // Update selectedTheme when theme changes (after hydration)
+  useEffect(() => {
+    setSelectedTheme(theme);
+  }, [theme]);
 
   const themeOptions = [
     {
       id: "orange",
       name: "Sunset Orange",
       description: "Warm and energetic",
-      primary: "from-orange-500 to-red-500",
+      primary: "orange-500",
       accent: "from-orange-400 to-amber-500",
       preview: "bg-gradient-to-r from-orange-500 to-red-500",
     },
@@ -41,7 +48,7 @@ export default function SettingsPage() {
       id: "purple",
       name: "Deep Purple",
       description: "Rich and mysterious",
-      primary: "from-purple-500 to-indigo-600",
+      primary: "purple-500",
       accent: "from-purple-400 to-pink-500",
       preview: "bg-gradient-to-r from-purple-500 to-indigo-600",
     },
@@ -49,7 +56,7 @@ export default function SettingsPage() {
       id: "blue",
       name: "Ocean Blue",
       description: "Calm and focused",
-      primary: "from-blue-500 to-cyan-500",
+      primary: "blue-500",
       accent: "from-blue-400 to-teal-500",
       preview: "bg-gradient-to-r from-blue-500 to-cyan-500",
     },
@@ -57,7 +64,7 @@ export default function SettingsPage() {
       id: "green",
       name: "Forest Green",
       description: "Natural and fresh",
-      primary: "from-green-500 to-emerald-600",
+      primary: "green-500",
       accent: "from-green-400 to-lime-500",
       preview: "bg-gradient-to-r from-green-500 to-emerald-600",
     },
@@ -65,7 +72,7 @@ export default function SettingsPage() {
       id: "pink",
       name: "Rose Pink",
       description: "Soft and elegant",
-      primary: "from-pink-500 to-rose-500",
+      primary: "pink-500",
       accent: "from-pink-400 to-purple-500",
       preview: "bg-gradient-to-r from-pink-500 to-rose-500",
     },
@@ -73,7 +80,7 @@ export default function SettingsPage() {
       id: "teal",
       name: "Electric Teal",
       description: "Modern and vibrant",
-      primary: "from-teal-500 to-cyan-600",
+      primary: "teal-500",
       accent: "from-teal-400 to-blue-500",
       preview: "bg-gradient-to-r from-teal-500 to-cyan-600",
     },
@@ -87,7 +94,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
+    <div className="h-screen pb-80 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
       {/* Background Image */}
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-0">
         <div
@@ -106,7 +113,9 @@ export default function SettingsPage() {
       <div className="relative z-10 p-8 space-y-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent mb-2">
+          <h1
+            className={`text-4xl font-bold bg-gradient-to-r ${selectedTheme.preview} bg-clip-text text-transparent pb-2`}
+          >
             Settings
           </h1>
           <p className="text-white/70 text-lg">
@@ -117,7 +126,9 @@ export default function SettingsPage() {
         {/* Theme Selection */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-3 rounded-xl">
+            <div
+              className={`bg-gradient-to-r ${selectedTheme.preview} p-3 rounded-xl`}
+            >
               <Palette className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -129,28 +140,32 @@ export default function SettingsPage() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            {themeOptions.map((theme) => (
+            {themeOptions.map((themeOption) => (
               <div
-                key={theme.id}
-                className={`relative bg-white/10 backdrop-blur-md border-2 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 ${
-                  selectedTheme === theme.id
-                    ? "border-orange-400 bg-white/15"
+                key={themeOption.id}
+                className={`relative bg-white/10 backdrop-blur-md border-2 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:bg-white/20 ${
+                  selectedTheme.id === themeOption.id
+                    ? "border-white bg-white/15"
                     : "border-white/20 hover:border-white/40"
                 }`}
-                onClick={() => setSelectedTheme(theme.id)}
+                onClick={() => setSelectedTheme(themeOption)}
               >
-                {selectedTheme === theme.id && (
-                  <div className="absolute top-3 right-3 bg-orange-500 rounded-full p-1">
-                    <Check className="w-4 h-4 text-white" />
+                {themeOption.id === theme.id && (
+                  <div className="absolute top-3 right-3 bg-white rounded-full p-1">
+                    <Check className="w-4 h-4 text-black" />
                   </div>
                 )}
 
                 <div
-                  className={`w-full h-16 rounded-xl mb-4 ${theme.preview}`}
+                  className={`w-full h-16 rounded-xl mb-4 ${themeOption.preview}`}
                 ></div>
 
-                <h3 className="font-semibold text-white mb-1">{theme.name}</h3>
-                <p className="text-white/60 text-sm">{theme.description}</p>
+                <h3 className="font-semibold text-white mb-1">
+                  {themeOption.name}
+                </h3>
+                <p className="text-white/60 text-sm">
+                  {themeOption.description}
+                </p>
               </div>
             ))}
           </div>
@@ -159,7 +174,9 @@ export default function SettingsPage() {
         {/* Audio Settings */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-3 rounded-xl">
+            <div
+              className={`bg-gradient-to-r ${selectedTheme.preview} p-3 rounded-xl`}
+            >
               <Headphones className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -174,9 +191,9 @@ export default function SettingsPage() {
             {audioQualityOptions.map((quality) => (
               <div
                 key={quality.id}
-                className={`bg-white/10 backdrop-blur-md border-2 rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-105 ${
+                className={`bg-white/10 backdrop-blur-md border-2 rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:bg-white/20 ${
                   audioQuality === quality.id
-                    ? "border-orange-400 bg-white/15"
+                    ? ` ${selectedTheme.preview} bg-white/15`
                     : "border-white/20 hover:border-white/40"
                 }`}
                 onClick={() => setAudioQuality(quality.id)}
@@ -189,8 +206,8 @@ export default function SettingsPage() {
                     </p>
                   </div>
                   {audioQuality === quality.id && (
-                    <div className="bg-orange-500 rounded-full p-1">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="bg-white rounded-full p-1">
+                      <Check className="w-4 h-4 text-black" />
                     </div>
                   )}
                 </div>
@@ -204,7 +221,9 @@ export default function SettingsPage() {
           {/* Playback Settings */}
           <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-3 rounded-xl">
+              <div
+                className={`bg-gradient-to-r ${selectedTheme.preview} p-3 rounded-xl`}
+              >
                 <Music className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -218,7 +237,9 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
                 <div className="flex items-center space-x-3">
-                  <Download className="w-5 h-5 text-orange-400" />
+                  <Download
+                    className={`w-5 h-5 text-${selectedTheme.primary}`}
+                  />
                   <div>
                     <p className="font-medium text-white">Auto Download</p>
                     <p className="text-white/60 text-sm">
@@ -229,7 +250,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setAutoDownload(!autoDownload)}
                   className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-                    autoDownload ? "bg-orange-500" : "bg-white/20"
+                    autoDownload ? `bg-${selectedTheme.primary}` : "bg-white/20"
                   }`}
                 >
                   <div
@@ -242,7 +263,7 @@ export default function SettingsPage() {
 
               <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
                 <div className="flex items-center space-x-3">
-                  <Bell className="w-5 h-5 text-orange-400" />
+                  <Bell className={`w-5 h-5 text-${selectedTheme.primary}`} />
                   <div>
                     <p className="font-medium text-white">Notifications</p>
                     <p className="text-white/60 text-sm">
@@ -253,7 +274,9 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setNotifications(!notifications)}
                   className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-                    notifications ? "bg-orange-500" : "bg-white/20"
+                    notifications
+                      ? `bg-${selectedTheme.primary}`
+                      : "bg-white/20"
                   }`}
                 >
                   <div
@@ -269,7 +292,9 @@ export default function SettingsPage() {
           {/* System Settings */}
           <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-3 rounded-xl">
+              <div
+                className={`bg-gradient-to-r ${selectedTheme.preview} p-3 rounded-xl`}
+              >
                 <Monitor className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -281,7 +306,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
                 <div className="flex items-center space-x-3">
-                  <Moon className="w-5 h-5 text-orange-400" />
+                  <Moon className={`w-5 h-5 text-${selectedTheme.primary}`} />
                   <div>
                     <p className="font-medium text-white">Dark Mode</p>
                     <p className="text-white/60 text-sm">Use dark theme</p>
@@ -290,7 +315,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setDarkMode(!darkMode)}
                   className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
-                    darkMode ? "bg-orange-500" : "bg-white/20"
+                    darkMode ? `bg-${selectedTheme.primary}` : "bg-white/20"
                   }`}
                 >
                   <div
@@ -303,7 +328,9 @@ export default function SettingsPage() {
 
               <div className="p-4 bg-white/10 rounded-xl">
                 <div className="flex items-center space-x-3 mb-3">
-                  <HardDrive className="w-5 h-5 text-orange-400" />
+                  <HardDrive
+                    className={`w-5 h-5 text-${selectedTheme.primary}`}
+                  />
                   <div>
                     <p className="font-medium text-white">Storage</p>
                     <p className="text-white/60 text-sm">
@@ -312,7 +339,9 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="bg-white/10 rounded-full h-2 mb-2">
-                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 h-2 rounded-full w-3/4"></div>
+                  <div
+                    className={`bg-gradient-to-r ${selectedTheme.preview} h-2 rounded-full w-3/4`}
+                  ></div>
                 </div>
                 <p className="text-white/60 text-xs">7.2 GB of 10 GB used</p>
               </div>
@@ -323,7 +352,9 @@ export default function SettingsPage() {
         {/* Device Settings */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-3 rounded-xl">
+            <div
+              className={`bg-gradient-to-r ${selectedTheme.preview} p-3 rounded-xl`}
+            >
               <Speaker className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -375,7 +406,10 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="text-center">
-          <button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">
+          <button
+            className={`bg-gradient-to-r ${selectedTheme.preview} hover:${selectedTheme.accent} text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-white/25 transition-all duration-300 transform hover:bg-gradient-to-l`}
+            onClick={() => setTheme(selectedTheme)}
+          >
             Save Settings
           </button>
         </div>

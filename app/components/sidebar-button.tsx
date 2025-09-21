@@ -3,6 +3,7 @@ import { LucideIcon } from "lucide-react";
 import React, { ForwardRefExoticComponent, RefAttributes } from "react";
 import { useState } from "react";
 import { deflate } from "zlib";
+import { useTheme } from "../utils/theme-context";
 
 interface SidebarButtonProps {
   Icon: LucideIcon;
@@ -17,7 +18,7 @@ const SidebarButton = ({
   handleItemClick,
   isActive,
 }: SidebarButtonProps) => {
-  
+  const { theme, setTheme } = useTheme();
   return (
     <div>
       <button
@@ -28,13 +29,13 @@ const SidebarButton = ({
                   transition-all duration-300 ease-out
                   hover:scale-110 hover:bg-white/25 hover:border-white/30
                   active:scale-95 active:bg-white/35 active:border-white/40
-                  hover:shadow-lg hover:shadow-orange-500/25
-                  active:shadow-xl active:shadow-orange-500/40
+                  hover:shadow-lg hover:shadow-white/25
+                  active:shadow-xl active:${theme.primary}/40
                   focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-transparent
                   cursor-pointer
                   ${
                     isActive
-                      ? "bg-white/50 shadow-lg shadow-orange-500/30 border-white/30 scale-105"
+                      ? `bg-white/50 shadow-lg shadow-${theme.primary}/30 border-white/30 scale-105`
                       : "bg-white/10 hover:bg-white/20"
                   }
                 `}
@@ -43,9 +44,9 @@ const SidebarButton = ({
 
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-tl from-orange-400/15 to-white/10 opacity-0 group-active:opacity-100 transition-opacity duration-150" />
 
-        {isActive && (
+        {/* {isActive && (
           <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-orange-400/30 to-red-500/30 animate-pulse" />
-        )}
+        )} */}
 
         <Icon
           className={`

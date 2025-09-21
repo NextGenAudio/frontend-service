@@ -6,6 +6,8 @@ import { MusicProvider } from "./utils/music-context";
 import { SidebarProvider } from "./utils/sidebar-context";
 import { AudioCtxProvider } from "./utils/audio-context";
 import { EntityProvider } from "./utils/entity-context";
+import { Theme } from "@radix-ui/themes";
+import { ThemeProvider } from "./utils/theme-context";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,15 +34,15 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <SidebarProvider>
-            <AudioCtxProvider>
-              <EntityProvider>
-                <MusicProvider>
-                  {children}
-                </MusicProvider>
-              </EntityProvider>
-            </AudioCtxProvider>
-          </SidebarProvider>
+          <ThemeProvider>
+            <SidebarProvider>
+              <AudioCtxProvider>
+                <EntityProvider>
+                  <MusicProvider>{children}</MusicProvider>
+                </EntityProvider>
+              </AudioCtxProvider>
+            </SidebarProvider>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

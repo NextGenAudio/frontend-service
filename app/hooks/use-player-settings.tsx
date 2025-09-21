@@ -5,7 +5,6 @@ export const usePlayerSettings = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
   const [progress, setProgress] = useState(0);
-
   // Load saved settings once on client
   useEffect(() => {
     if (typeof window === "undefined") return; // ✅ guard
@@ -15,10 +14,12 @@ export const usePlayerSettings = () => {
     const savedRepeat = localStorage.getItem("isRepeat");
     const savedProgress = localStorage.getItem("progress");
 
+
     if (savedVolume !== null) setVolume(Number(savedVolume));
     if (savedMuted !== null) setIsMuted(savedMuted === "true");
     if (savedRepeat !== null) setIsRepeat(savedRepeat === "true");
     if (savedProgress !== null) setProgress(Number(savedProgress));
+
   }, []);
 
   // Save whenever values change
