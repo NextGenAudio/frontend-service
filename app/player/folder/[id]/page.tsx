@@ -198,7 +198,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 }}
               >
                 <img
-                  src={entityArt ?? "/assets/folder-icon.png"}
+                  src={entityArt ?? "/assets/file-icon.png"}
                   alt={entityName ?? undefined}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
                 />

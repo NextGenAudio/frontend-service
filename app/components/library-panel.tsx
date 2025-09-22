@@ -151,7 +151,7 @@ export const LibraryPanel = () => {
       setEntityArt(
         folder.folderArt
           ? `http://localhost:8080/${folder.folderArt}`
-          : "assets/file-icon.png"
+          : "/assets/file-icon.png"
       );
       setEntityDescription(folder.description || "");
       router.push(`/player/folder/${folder.id}`);
@@ -166,7 +166,7 @@ export const LibraryPanel = () => {
       setEntityType("playlist");
       setEntityName(playlist.name);
       setEntityArt(
-        playlist.coverImage || playlist.image || "assets/file-icon.png"
+        playlist.coverImage || playlist.image || "/assets/music-icon.png"
       );
       setEntityDescription(playlist.description || "");
       router.push(`/player/playlist/${playlist.playlistId}`);
