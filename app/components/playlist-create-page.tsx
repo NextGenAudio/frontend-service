@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
+import clsx from "clsx";
+import { useSidebar } from "../utils/sidebar-context";
+import AlertBar from "./alert-bar";
 
 // Backend service URLs
 const PLAYLIST_SERVICE_URL = "http://localhost:8082/playlist-service/playlists";
@@ -44,7 +47,7 @@ export function PlaylistCreatePage() {
   const [loading, setLoading] = useState(false);
   // Remove step state since we're showing everything on one page
   const [message, setMessage] = useState<string | null>(null);
-
+  const { player } = useSidebar();
   useEffect(() => {
     fetchAvailableSongs();
   }, []);
@@ -155,24 +158,23 @@ export function PlaylistCreatePage() {
   };
 
   return (
-    <div className="h-full w-full relative overflow-hidden">
+    <div className="h-screen w-full relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-slate-800/80 to-gray-900/90"></div>
 
-      <div className="relative h-full flex flex-col">
+      <div className={clsx(`relative h-full flex flex-col ${player ? "pb-80" : "pb-44"}`)}>
         {/* Header */}
-        <div className="p-6 border-b border-white/20 backdrop-blur-sm">
-          <div className="flex items-center gap-4">
-            <h1
-              className={`text-2xl font-bold bg-gradient-to-r ${themeColors.gradient} bg-clip-text text-transparent`}
-            >
-              Create New Playlist
-            </h1>
-          </div>
+
+        <div className="text-center mb-8">
+          <h1
+            className={`text-4xl font-bold bg-gradient-to-r ${themeColors.gradient} bg-clip-text text-transparent pb-2`}
+          >
+            Create New Playlist
+          </h1>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-hidden p-6">
+        <div className=" flex-1 overflow-hidden p-6">
           <div className="h-full flex gap-8">
             {/* Left Side - Inputs and Song Selection */}
             <div className="flex-1 flex flex-col space-y-6 overflow-hidden">
@@ -285,7 +287,7 @@ export function PlaylistCreatePage() {
             </div>
 
             {/* Right Side - Selected Songs Output */}
-            <div className="w-96 flex flex-col space-y-6">
+            <div className="w-[450px] flex flex-col space-y-6">
               {/* Selected Songs Preview */}
               <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
@@ -309,7 +311,7 @@ export function PlaylistCreatePage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="flex-1 overflow-y-auto space-y-3">
+                  <div className="flex-1 h-full overflow-y-auto space-y-3 pr-2">
                     {selectedSongs.map((song, index) => (
                       <div
                         key={song.id}
@@ -381,13 +383,7 @@ export function PlaylistCreatePage() {
             </div>
           </div>
 
-          {message && (
-            <div className="absolute bottom-6 left-6 right-6">
-              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-                <p className="text-white text-center text-lg">{message}</p>
-              </div>
-            </div>
-          )}
+          {message && <AlertBar message={message} setMessage={setMessage} />}
         </div>
       </div>
     </div>

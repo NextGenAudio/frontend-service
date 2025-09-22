@@ -33,6 +33,7 @@ import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
+import AlertBar from "./alert-bar";
 interface UploadedFile {
   file: File;
   progress: number;
@@ -175,7 +176,7 @@ export function MusicUpload() {
       console.log("Upload successful:", response.data);
       setMessage("✅ File uploaded successfully!");
       setSongUploadRefresh((prev) => prev + 1);
-      
+
       // Reset form after successful upload
       setTimeout(() => {
         setMusicFile(null);
@@ -452,7 +453,9 @@ export function MusicUpload() {
           <div className="text-center">
             <Button
               type="submit"
-              disabled={!musicFile || musicFile.status !== "completed" || loading}
+              disabled={
+                !musicFile || musicFile.status !== "completed" || loading
+              }
               className={`bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
             >
               {loading ? (
@@ -469,25 +472,7 @@ export function MusicUpload() {
 
         {/* Custom Alert Bar */}
         {message && (
-          <div className="fixed bottom-6 left-6 right-6 z-50">
-            <div className={`backdrop-blur-xl border border-white/20 rounded-xl p-4 shadow-2xl transition-all duration-500 ${
-              message.includes("✅") 
-                ? "bg-green-500/20 border-green-400/30" 
-                : "bg-red-500/20 border-red-400/30"
-            }`}>
-              <div className="flex items-center justify-between">
-                <p className="text-white text-center text-lg flex-1">{message}</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setMessage(null)}
-                  className="text-white hover:bg-white/10 ml-4"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
+          <AlertBar message={message} setMessage={setMessage} />
         )}
       </div>
     </div>

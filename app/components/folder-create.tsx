@@ -12,6 +12,7 @@ import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
+import AlertBar from "./alert-bar";
 
 interface UploadedFile {
   file: File;
@@ -97,7 +98,7 @@ export function FolderCreate() {
         />
       </div> */}
 
-      <div className={clsx(`relative max-w-4xl mx-auto min-h-full`)}>
+      <div className={clsx(`h-screen overflow-y-auto relative max-w-4xl mx-auto min-h-full ${player ? "mb-64" : "mb-8"}`)}>
         {/* Header */}
         <div className="text-center mb-8">
           <h1
@@ -110,7 +111,7 @@ export function FolderCreate() {
         <form
           onSubmit={handleSubmit}
           className={clsx(
-            `grid md:grid-cols-2 gap-8 pb-8 ${player ? "pb-64" : "pb-8"}`
+            `grid md:grid-cols-2  gap-8`
           )}
         >
           
@@ -222,7 +223,7 @@ export function FolderCreate() {
             >
               {loading ? "Creating..." : "Create Folder"}
             </Button>
-            {message && <p className="mt-4 text-white">{message}</p>}
+            {message && <AlertBar message={message} setMessage={setMessage} />}
           </div>
         </form>
       </div>

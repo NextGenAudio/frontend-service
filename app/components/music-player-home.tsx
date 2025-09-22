@@ -27,9 +27,9 @@ export function MusicPlayerHome() {
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
   };
 
   const recentlyPlayed = [
@@ -143,12 +143,12 @@ export function MusicPlayerHome() {
     <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
       <div className="fixed -top-32 left-1/2 transform -translate-x-1/2 z-0">
         <div
-          className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-80"
+          className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-90"
           style={{ backgroundImage: "url('/assets/sonex-wall.png')" }}
         />
       </div>
       {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
           className={`absolute top-20 left-10 w-32 h-32 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-xl animate-pulse`}
         ></div>
@@ -158,7 +158,7 @@ export function MusicPlayerHome() {
         <div
           className={`absolute bottom-32 left-1/3 w-40 h-40 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-2xl animate-pulse delay-2000`}
         ></div>
-      </div>
+      </div> */}
 
       <div className="relative z-10 p-8 pt-96 space-y-8">
         {/* Hero Section */}
