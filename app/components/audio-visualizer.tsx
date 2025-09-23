@@ -101,7 +101,7 @@ export default function AudioVisualizer() {
     <div className="overflow-hidden rounded-lg h-full w-full bg-gradient-to-br from-gray-700/20 via-slate-700/20 to-gray-700/30 flex items-center justify-center relative">
       <div
         className="absolute left-1/2 -translate-x-1/2 h-64 w-96 bg-cover bg-center z-0 opacity-90"
-        style={{ backgroundImage: "url('/assets/sonex-v-wall.png')" }}
+        style={{ backgroundImage: "url('/assets/sonex-v-wall.webp')" }}
       />
       <canvas ref={canvasRef} className="w-full h-full relative z-10" />
     </div>

@@ -12,6 +12,7 @@ import { useEntityContext } from "@/app/utils/entity-context";
 import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
+import { useRouter } from "next/navigation";
 interface Song {
   id: string;
   title: string | undefined;
@@ -45,6 +46,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   const [isOpen, setIsOpen] = useState(true);
   const { isPlaying, setIsPlaying } = useMusicContext();
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
 
   // Get theme-specific colors
   const themeColors = getGeneralThemeColors(theme.primary);
@@ -128,16 +130,13 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   }, []);
   const deleteSong = async (songId: string) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/files/${params.id}/${songId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
         console.log("Song deleted successfully");
@@ -174,7 +173,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
           <div
             className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-cover bg-center opacity-30 pointer-events-none"
             style={{
-              backgroundImage: "url('/assets/file-icon-back2.png')",
+              backgroundImage: "url('/assets/file-icon-back2.webp')",
               transform: `translateX(30px) translateY(20px)`,
               maskImage:
                 "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
@@ -198,7 +197,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 }}
               >
                 <img
-                  src={entityArt ?? "/assets/file-icon.png"}
+                  src={entityArt ?? "/assets/file-icon.webp"}
                   alt={entityName ?? undefined}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
                 />
@@ -415,6 +414,17 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 </div>
               ))
             )}
+
+            {/* Add More Music Button */}
+            <div className="flex justify-center pt-6 pb-4">
+              <Button
+                onClick={() => router.push("/player/upload")}
+                variant="outline"
+                className={`${themeColors.border} ${themeColors.text} ${themeColors.hoverBg} px-8 py-3 rounded-full `}
+              >
+                <Music className="w-5 h-5 mr-2" />+ More Musics
+              </Button>
+            </div>
           </div>
         </ScrollArea>
       </div>

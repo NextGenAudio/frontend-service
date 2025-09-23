@@ -144,7 +144,7 @@ export function MusicPlayerHome() {
       <div className="fixed -top-32 left-1/2 transform -translate-x-1/2 z-0">
         <div
           className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-90"
-          style={{ backgroundImage: "url('/assets/sonex-wall.png')" }}
+          style={{ backgroundImage: "url('/assets/sonex-wall.webp')" }}
         />
       </div>
       {/* Animated Background Elements */}

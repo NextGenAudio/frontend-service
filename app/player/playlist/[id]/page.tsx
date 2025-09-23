@@ -177,7 +177,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
           <div
             className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-cover bg-center opacity-30 pointer-events-none"
             style={{
-              backgroundImage: "url('/assets/music-icon.png')",
+              backgroundImage: "url('/assets/music-icon.webp')",
               transform: `translateX(30px) translateY(20px)`,
               maskImage:
                 "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
@@ -201,7 +201,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                 }}
               >
                 <img
-                  src={entityArt ?? "/assets/music-icon.png"}
+                  src={entityArt ?? "/assets/music-icon.webp"}
                   alt={entityName ?? undefined}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
                 />

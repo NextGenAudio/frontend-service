@@ -34,7 +34,7 @@ export function Landing() {
         const result = await fetch(`/api/user?email=${session.user.email}`);
         const data = await result.json();
         set_first_name(data.data?.first_name);
-        set_last_name(data.data.last_name);
+        set_last_name(data.data?.last_name);
         set_email(data.data.email);
         console.log("User data:", data.data);
 
