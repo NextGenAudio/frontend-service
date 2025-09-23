@@ -208,7 +208,7 @@ export const PlaylistDetailsPanel = ({
           <div
             className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-cover bg-center opacity-30 pointer-events-none"
             style={{
-              backgroundImage: "url('/assets/sonex-wall.png')",
+              backgroundImage: "url('/assets/sonex-wall.webp')",
               transform: `translateX(30px) translateY(20px)`,
               maskImage:
                 "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0) 100%)",
@@ -232,7 +232,7 @@ export const PlaylistDetailsPanel = ({
                 }}
               >
                 <img
-                  src={entityArt ?? "/assets/sonex-wall.png"}
+                  src={entityArt ?? "/assets/sonex-wall.webp"}
                   alt={entityName ?? "Playlist"}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
                 />
