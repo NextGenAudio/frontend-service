@@ -34,6 +34,7 @@ import { getGeneralThemeColors } from "../lib/theme-colors";
 import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
 import AlertBar from "./alert-bar";
+import Image from "next/image";
 interface UploadedFile {
   file: File;
   progress: number;
@@ -364,10 +365,12 @@ export function MusicUpload() {
                 </div>
               ) : (
                 <div className="relative aspect-square rounded-xl overflow-hidden group">
-                  <img
+                  <Image
                     src={artworkFile.preview || "/placeholder.svg"}
                     alt="Album artwork"
                     className="w-full h-full object-cover"
+                    width={256}
+                    height={256}
                   />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Button

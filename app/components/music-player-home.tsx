@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
+import Image from "next/image";
 
 export function MusicPlayerHome() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -252,10 +253,12 @@ export function MusicPlayerHome() {
                 onMouseLeave={() => setActiveCard(null)}
               >
                 <div className="relative mb-4">
-                  <img
+                  <Image
                     src={track.image || "/placeholder.svg"}
                     alt={track.title}
                     className="w-full aspect-square rounded-xl object-cover"
+                    width={256}
+                    height={256}
                   />
                   <div
                     className={`absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center transition-opacity duration-300 ${

@@ -5,6 +5,7 @@ import ProfileAvatar from "./profile-avatar";
 import { useSession } from "next-auth/react";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
+import Image from "next/image";
 
 export function ProfilePage() {
   const { status, data: session } = useSession();
@@ -76,7 +77,7 @@ export function ProfilePage() {
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-y-auto custom-scrollbar">
       {/* Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
           className={`absolute top-20 left-20 w-96 h-96 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-3xl animate-pulse`}
         />
@@ -86,7 +87,7 @@ export function ProfilePage() {
         <div
           className={`absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r ${themeColors.gradient} opacity-8 rounded-full blur-3xl animate-pulse delay-500`}
         />
-      </div>
+      </div> */}
 
       <div className="relative z-10 p-8">
         {/* Profile Header */}
@@ -157,9 +158,11 @@ export function ProfilePage() {
               <div key={index} className="group cursor-pointer">
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
                   <div className="relative mb-4">
-                    <img
+                    <Image
                       src={playlist.image || "/placeholder.svg"}
                       alt={playlist.name}
+                      width={256}
+                      height={256}
                       className="w-full aspect-square object-cover rounded-xl"
                     />
                     <div
@@ -203,10 +206,12 @@ export function ProfilePage() {
               <div key={index} className="flex-shrink-0 group cursor-pointer">
                 <div className={`bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl w-48`}>
                   <div className="relative mb-4">
-                    <img
+                    <Image
                       src={artist.image || "/placeholder.svg"}
                       alt={artist.name}
                       className="w-full aspect-square object-cover rounded-full"
+                      width={256}
+                      height={256}
                     />
                     <div
                       className={`absolute inset-0 bg-gradient-to-br ${theme.preview} rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
@@ -252,10 +257,12 @@ export function ProfilePage() {
                 >
                   <Play className="w-4 h-4" />
                 </Button>
-                <img
+                <Image
                   src={track.image || "/placeholder.svg"}
                   alt={track.title}
                   className="w-12 h-12 rounded-lg object-cover"
+                  width={256}
+                  height={256}
                 />
                 <div className="flex-1">
                   <h4

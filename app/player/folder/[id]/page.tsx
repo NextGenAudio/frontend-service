@@ -13,6 +13,7 @@ import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 interface Song {
   id: string;
   title: string | undefined;
@@ -58,6 +59,10 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   const { songList, setSongList } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
     useSidebar();
+  // Add caching to prevent duplicate requests
+  const [cache, setCache] = useState<Map<number, Song[]>>(new Map());
+  const [loadingStates, setLoadingStates] = useState<Set<number>>(new Set());
+
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
@@ -91,10 +96,22 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
   useEffect(() => {
     const fetchSongs = async () => {
+      const folderId = params.id;
+      // Check cache first
+      if (cache.has(folderId)) {
+        setSongList(cache.get(folderId)!);
+        setLoading(false);
+        return;
+      }
+
+      // Check if already loading
+      if (loadingStates.has(folderId)) {
+        return;
+      }
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:8080/files/list?folderId=${params.id}`,
+          `http://localhost:8080/files/list?folderId=${folderId}`,
           {
             method: "GET",
             credentials: "include",
@@ -102,6 +119,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         );
         const data = await res.json();
         console.log("Songs in folder:", data);
+        setCache(prev => new Map(prev).set(folderId, data));
         setSongList(data);
       } catch (err) {
         console.error("Error fetching songs:", err);
@@ -110,7 +128,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       }
     };
     fetchSongs();
-  }, []);
+  }, [params.id]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -196,10 +214,12 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                   })`,
                 }}
               >
-                <img
+                <Image
                   src={entityArt ?? "/assets/file-icon.webp"}
-                  alt={entityName ?? undefined}
+                  alt={entityName ?? "Folder"}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
+                  width={256}
+                  height={256}
                 />
                 <div className="absolute inset-0" />
                 <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />

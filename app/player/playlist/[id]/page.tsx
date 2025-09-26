@@ -12,6 +12,7 @@ import { useEntityContext } from "@/app/utils/entity-context";
 import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
+import Image from "next/image";
 interface Song {
   id: string;
   title: string | undefined;
@@ -200,9 +201,11 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                   })`,
                 }}
               >
-                <img
+                <Image
                   src={entityArt ?? "/assets/music-icon.webp"}
-                  alt={entityName ?? undefined}
+                  alt={entityName ?? "Folder"}
+                  width={256}
+                  height={256}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
                 />
                 <div className="absolute inset-0" />

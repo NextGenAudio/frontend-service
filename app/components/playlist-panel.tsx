@@ -13,6 +13,7 @@ import App from "next/app";
 import AppLoadingScreen from "./app-loading";
 import { useEntityContext } from "../utils/entity-context";
 import { SongOptionsDropdown } from "./song-options-dropdown";
+import Image from "next/image";
 
 interface Song {
   id: string;
@@ -143,10 +144,12 @@ export const PlaylistPanel = () => {
                   })`,
                 }}
               >
-                <img
-                  src={entityArt ?? undefined}
-                  alt={entityName ?? undefined}
+                <Image
+                  src={entityArt ?? "/assets/music-icon.webp"}
+                  alt={entityName ?? "Playlist"}
                   className=" rounded-xl object-cover h-full w-full shadow-md"
+                  width={256}
+                  height={256}
                 />
                 <div className="absolute inset-0" />
                 <div className="absolute inset-0 ring-1 ring-white/20 rounded-xl" />

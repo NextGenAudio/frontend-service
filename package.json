@@ -71,6 +71,7 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
+    "@types/css-modules": "^1.0.5",
     "@types/howler": "^2.2.12",
     "@types/jsmediatags": "^3.9.6",
     "@types/node": "^20",
