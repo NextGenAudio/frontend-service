@@ -175,7 +175,8 @@ export const LibraryPanel = () => {
     }
   };
 
-  const defaultImage = "/assets/file-icon.webp";
+  const defaultFolderImage = "/assets/file-icon.webp";
+  const defaultPlaylistImage = "/assets/music-icon.webp";
 
   return (
     <div className="h-full relative overflow-hidden">
@@ -265,7 +266,7 @@ export const LibraryPanel = () => {
                       key={`playlist-${playlist.playlistId}`}
                       name={playlist.name}
                       image={
-                        playlist.coverImage || playlist.image || defaultImage
+                        playlist.coverImage || playlist.image || defaultPlaylistImage
                       }
                       count={playlist.songCount}
                       type="playlist"
@@ -276,7 +277,7 @@ export const LibraryPanel = () => {
                   <MediaCard
                     key={`folder-${folder.id}`}
                     name={folder.name}
-                    image={folder.folderArt ? folder.folderArt : defaultImage}
+                    image={folder.folderArt ? folder.folderArt : defaultFolderImage}
                     count={folder.musicCount}
                     type="folder"
                     onClick={() => handleFolderClick(folder)}
@@ -294,7 +295,7 @@ export const LibraryPanel = () => {
                       key={`playlist-${playlist.playlistId}`}
                       name={playlist.name}
                       image={
-                        playlist.coverImage || playlist.image || defaultImage
+                        playlist.coverImage || playlist.image || defaultPlaylistImage
                       }
                       count={playlist.songCount}
                       type="playlist"
@@ -314,7 +315,7 @@ export const LibraryPanel = () => {
                     image={
                       folder.folderArt
                         ? `http://localhost:8080/${folder.folderArt}`
-                        : defaultImage
+                        : defaultFolderImage
                     }
                     count={folder.musicCount}
                     onClick={() => handleFolderClick(folder)}
