@@ -23,6 +23,7 @@ import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
 import AlertBar from "./alert-bar";
 import Image from "next/image";
+import { useFileHandling } from "../utils/entity-handling-context";
 
 // Backend service URLs
 const PLAYLIST_SERVICE_URL = "http://localhost:8082/playlist-service/playlists";
@@ -68,6 +69,7 @@ export function PlaylistCreatePage() {
   const [message, setMessage] = useState<string | null>(null);
   const { player } = useSidebar();
   const artworkInputRef = useRef<HTMLInputElement>(null);
+  const {playlistCreateRefresh, setPlaylistCreateRefresh} = useFileHandling();
   useEffect(() => {
     fetchAvailableSongs();
   }, []);
@@ -165,12 +167,12 @@ export function PlaylistCreatePage() {
             },
           }
         );
+
+
       }
 
       setMessage("✅ Playlist created successfully!");
-      setTimeout(() => {
-        router.push("/player/home");
-      }, 2000);
+      setPlaylistCreateRefresh((old) => old + 1); // trigger refresh in playlist list
     } catch (error) {
       console.error("Failed to create playlist:", error);
       let errorMessage = "❌ Failed to create playlist. Please try again.";

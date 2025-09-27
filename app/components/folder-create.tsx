@@ -7,7 +7,7 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import axios from "axios";
-import { useFileHandling } from "../utils/file-handling-context";
+import { useFileHandling } from "../utils/entity-handling-context";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import clsx from "clsx";
@@ -99,7 +99,13 @@ export function FolderCreate() {
         />
       </div> */}
 
-      <div className={clsx(`h-screen overflow-y-auto relative max-w-4xl mx-auto min-h-full ${player ? "mb-64" : "mb-8"}`)}>
+      <div
+        className={clsx(
+          `h-screen overflow-y-auto relative max-w-4xl mx-auto min-h-full ${
+            player ? "mb-64" : "mb-8"
+          }`
+        )}
+      >
         {/* Header */}
         <div className="text-center mb-8">
           <h1
@@ -111,11 +117,8 @@ export function FolderCreate() {
 
         <form
           onSubmit={handleSubmit}
-          className={clsx(
-            `grid md:grid-cols-2  gap-8`
-          )}
+          className={clsx(`grid md:grid-cols-2  gap-8`)}
         >
-          
           {/* Artwork Upload */}
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
             <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">

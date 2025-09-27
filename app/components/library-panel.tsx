@@ -27,7 +27,7 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import MediaCard from "./ui/media-card";
 import { set } from "react-hook-form";
-import { useFileHandling } from "../utils/file-handling-context";
+import { useFileHandling } from "../utils/entity-handling-context";
 import { useRouter } from "next/navigation";
 import { useEntityContext } from "../utils/entity-context";
 import { ScrollArea } from "./ui/scroll-area";
@@ -80,7 +80,7 @@ export const LibraryPanel = () => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const { setSongList } = useMusicContext();
-  const { folderCreateRefresh, songUploadRefresh } = useFileHandling();
+  const { folderCreateRefresh, songUploadRefresh, playlistCreateRefresh, songAddToPlaylistRefresh } = useFileHandling();
   const router = useRouter();
 
   // Fetch folders
@@ -142,7 +142,7 @@ export const LibraryPanel = () => {
       }
     };
     fetchPlaylists();
-  }, [folderCreateRefresh, songUploadRefresh]);
+  }, [ playlistCreateRefresh, songAddToPlaylistRefresh]);
 
   // Handle folder click
   const handleFolderClick = async (folder: Folder) => {
@@ -151,9 +151,7 @@ export const LibraryPanel = () => {
       setEntityType("folder");
       setEntityName(folder.name);
       setEntityArt(
-        folder.folderArt
-          ? `${folder.folderArt}`
-          : "/assets/file-icon.webp"
+        folder.folderArt ? `${folder.folderArt}` : "/assets/file-icon.webp"
       );
       setEntityDescription(folder.description || "");
       router.push(`/player/folder/${folder.id}`);

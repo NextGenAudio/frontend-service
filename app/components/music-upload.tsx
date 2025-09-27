@@ -27,7 +27,7 @@ import {
 import axios from "axios";
 import { useMusicContext } from "../utils/music-context";
 import { useRouter } from "next/navigation";
-import { useFileHandling } from "../utils/file-handling-context";
+import { useFileHandling } from "../utils/entity-handling-context";
 import { useEntityContext } from "../utils/entity-context";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
@@ -474,9 +474,7 @@ export function MusicUpload() {
         </form>
 
         {/* Custom Alert Bar */}
-        {message && (
-          <AlertBar message={message} setMessage={setMessage} />
-        )}
+        {message && <AlertBar message={message} setMessage={setMessage} />}
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ import SongCover from "./song-cover";
 import * as RadixSlider from "@radix-ui/react-slider";
 import { usePlayerSettings } from "@/app/hooks/use-player-settings";
 import MusicContext, { useMusicContext } from "../utils/music-context";
-import { useFileHandling } from "../utils/file-handling-context";
+import { useFileHandling } from "../utils/entity-handling-context";
 import { useTheme } from "../utils/theme-context";
 
 interface Song {

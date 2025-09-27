@@ -13,7 +13,7 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import { usePlayerSettings } from "../hooks/use-player-settings";
 import { SongDetailsPanel } from "../components/song-details-panel";
-import { FileHandlingProvider } from "../utils/file-handling-context";
+import { EntityHandlingProvider } from "../utils/entity-handling-context";
 import { Howl } from "howler";
 import AudioVisualizer from "../components/audio-visualizer";
 import { ProfileDropdown } from "../components/profile-dropdown";
@@ -110,34 +110,36 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       soundRef.current.unload();
     }
 
-      const sound = new Howl({
-        src: [playingSong.source],
-        html5: true,
-        volume: isMuted ? 0 : volume / 100,
-        preload: true,
-        loop: repeatMode === 1,
-        onload: () => {
-          // Auto-play when the song is loaded and isPlaying is true
-          setPlayingSongDuration(parseFloat(playingSong.metadata?.track_length) || 0);
-        },
-        onplay: () => {
-          setIsPlaying(true);
-        },
-        onpause: () => setIsPlaying(false),
-        onend: () => {
-          setIsPlaying(false);
-          handleNextClick(); // Automatically move to next song
-        },
-      });
-      (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
+    const sound = new Howl({
+      src: [playingSong.source],
+      html5: true,
+      volume: isMuted ? 0 : volume / 100,
+      preload: true,
+      loop: repeatMode === 1,
+      onload: () => {
+        // Auto-play when the song is loaded and isPlaying is true
+        setPlayingSongDuration(
+          parseFloat(playingSong.metadata?.track_length) || 0
+        );
+      },
+      onplay: () => {
+        setIsPlaying(true);
+      },
+      onpause: () => setIsPlaying(false),
+      onend: () => {
+        setIsPlaying(false);
+        handleNextClick(); // Automatically move to next song
+      },
+    });
+    (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
 
-      soundRef.current = sound;
+    soundRef.current = sound;
 
-      return () => {
-        // only cleanup if unmounting, not when replaying same song
-        sound.unload();
-      };
-    }, [playingSong?.source]);
+    return () => {
+      // only cleanup if unmounting, not when replaying same song
+      sound.unload();
+    };
+  }, [playingSong?.source]);
 
   // Handle play/pause state changes
   useEffect(() => {
@@ -156,10 +158,12 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
   return (
     <div className="relative h-screen overflow-hidden ">
-      <div className={`absolute top-0 left-0 h-screen rounded-[32px] w-screen bg-gradient-to-t ${theme.preview} z-0`}></div>
+      <div
+        className={`absolute top-0 left-0 h-screen rounded-[32px] w-screen bg-gradient-to-t ${theme.preview} z-0`}
+      ></div>
       {/* Sidebar with higher z-index */}
 
-      <FileHandlingProvider>
+      <EntityHandlingProvider>
         <div className="absolute top-0 left-0 z-10">
           <Sidebar />
         </div>
@@ -204,7 +208,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
           {player && <FloatingPlayerControls song={playingSong} />}
         </div>
-      </FileHandlingProvider>
+      </EntityHandlingProvider>
     </div>
   );
 };
