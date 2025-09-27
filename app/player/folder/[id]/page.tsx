@@ -119,7 +119,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         );
         const data = await res.json();
         console.log("Songs in folder:", data);
-        setCache(prev => new Map(prev).set(folderId, data));
+        setCache((prev) => new Map(prev).set(folderId, data));
         setSongList(data);
       } catch (err) {
         console.error("Error fetching songs:", err);
@@ -287,11 +287,12 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         {/* Glass Visualizer Area */}
 
         <div className="px-4 pt-4">
-          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
-            <div className="col-span-6 ml-14">Title</div>
+          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl  transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+            <div className="col-span-1">#</div>
+            <div className="col-span-5 ">Title</div>
 
             <div className="col-span-3">Album</div>
-            <div className="col-span-1">Duration</div>
+            <div className="col-span-1 mr-4">Duration</div>
           </div>
         </div>
 
@@ -438,7 +439,9 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
             {/* Add More Music Button */}
             <div className="flex justify-center pt-6 pb-4">
               <Button
-                onClick={() => router.push("/player/upload")}
+                onClick={() =>
+                  router.push(`/player/upload?folderId=${params.id}`)
+                }
                 variant="outline"
                 className={`${themeColors.border} ${themeColors.text} ${themeColors.hoverBg} px-8 py-3 rounded-full `}
               >

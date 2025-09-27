@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Upload,
   Music,
@@ -26,7 +26,7 @@ import {
 } from "@/app/components/ui/select";
 import axios from "axios";
 import { useMusicContext } from "../utils/music-context";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useFileHandling } from "../utils/entity-handling-context";
 import { useEntityContext } from "../utils/entity-context";
 import { useTheme } from "../utils/theme-context";
@@ -65,8 +65,31 @@ export function MusicUpload() {
   const { folderList, playlistList } = useEntityContext();
   const { setSongUploadRefresh } = useFileHandling();
   const { player } = useSidebar();
+  const searchParams = useSearchParams();
 
   const router = useRouter();
+
+  // Pre-select folder if folderId is provided in URL
+  useEffect(() => {
+    const folderId = searchParams.get("folderId");
+    console.log("URL folderId:", folderId);
+    console.log("Available folders:", folderList);
+
+    if (folderId && folderList.length > 0 && !formData.selectedFolder) {
+      const targetFolder = folderList.find(
+        (folder) => folder.id === parseInt(folderId)
+      );
+      console.log("Found target folder:", targetFolder);
+
+      if (targetFolder) {
+        setFormData((prev) => ({
+          ...prev,
+          selectedFolder: targetFolder.name,
+        }));
+        console.log("Pre-selected folder:", targetFolder.name);
+      }
+    }
+  }, [searchParams, folderList, formData.selectedFolder]);
 
   const handleMusicDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -413,7 +436,13 @@ export function MusicUpload() {
                     <SelectTrigger
                       className={`bg-white/10 border-white/20 text-white focus:${themeColors.border} focus:ring-white/20`}
                     >
-                      <SelectValue placeholder="Choose an existing folder" />
+                      <SelectValue
+                        placeholder={
+                          formData.selectedFolder
+                            ? formData.selectedFolder
+                            : "Choose an existing folder"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800/95 backdrop-blur-xl border-white/20">
                       {folderList.map((folder) => (

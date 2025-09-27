@@ -133,26 +133,29 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
       return () => scrollElement.removeEventListener("scroll", handleScroll);
     }
   }, []);
-  const deleteSong = async (songId: string) => {
+  const removeSongFromPlaylist = async (songId: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/files/${songId}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8082/playlists/${params.id}/${songId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
-        console.log("Song deleted successfully");
-        // Optional: update state to remove song from UI
+        console.log("Song removed from playlist successfully");
+        // Update state to remove song from UI
         setSongList(songList.filter((song) => song.id !== songId));
       } else {
         const errorText = await response.text();
-        console.error("Failed to delete song:", errorText);
+        console.error("Failed to remove song from playlist:", errorText);
       }
     } catch (err) {
-      console.error("Error deleting song:", err);
+      console.error("Error removing song from playlist:", err);
     }
   };
   return (
@@ -274,8 +277,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
         {/* Glass Visualizer Area */}
 
         <div className="px-4 pt-4">
-          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
-            <div className="col-span-6 ml-14">Title</div>
+          <div className="grid grid-cols-11 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+            <div className="col-span-1">#</div>
+            <div className="col-span-6">Title</div>
 
             <div className="col-span-3">Album</div>
             <div className="col-span-1">Duration</div>
@@ -423,7 +427,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                       <SongOptionsDropdown
                         songId={song.id}
                         onDelete={() => {
-                          deleteSong(song.id);
+                          removeSongFromPlaylist(song.id);
                           setOpenDropdownSongId(null);
                         }}
                         onClose={() => setOpenDropdownSongId(null)}
