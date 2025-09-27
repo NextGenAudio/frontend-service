@@ -31,6 +31,7 @@ import { useFileHandling } from "../utils/file-handling-context";
 import { useRouter } from "next/navigation";
 import { useEntityContext } from "../utils/entity-context";
 import { ScrollArea } from "./ui/scroll-area";
+import clsx from "clsx";
 
 type Folder = {
   id: number;
@@ -66,7 +67,7 @@ interface Playlist {
 }
 
 export const LibraryPanel = () => {
-  const { setUpload, setHome, setCreateFolder, setPlaylist } = useSidebar();
+  const { player } = useSidebar();
   const {
     folderList,
     setFolderList,
@@ -151,7 +152,7 @@ export const LibraryPanel = () => {
       setEntityName(folder.name);
       setEntityArt(
         folder.folderArt
-          ? `http://localhost:8080/${folder.folderArt}`
+          ? `${folder.folderArt}`
           : "/assets/file-icon.webp"
       );
       setEntityDescription(folder.description || "");
@@ -255,7 +256,10 @@ export const LibraryPanel = () => {
 
           {/* All = playlists + folders */}
           <ScrollArea className="flex-1">
-            <TabsContent value="all" className="px-3">
+            <TabsContent
+              value="all"
+              className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
+            >
               <div className="space-y-2">
                 {Array.isArray(playlists) &&
                   playlists.map((playlist) => (
@@ -274,11 +278,7 @@ export const LibraryPanel = () => {
                   <MediaCard
                     key={`folder-${folder.id}`}
                     name={folder.name}
-                    image={
-                      folder.folderArt
-                        ? `http://localhost:8080/${folder.folderArt}`
-                        : defaultImage
-                    }
+                    image={folder.folderArt ? folder.folderArt : defaultImage}
                     count={folder.musicCount}
                     type="folder"
                     onClick={() => handleFolderClick(folder)}

@@ -1,8 +1,16 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
-import { ArrowLeft, Search, Music, Clock, Plus } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  ArrowLeft,
+  Search,
+  Music,
+  Clock,
+  Plus,
+  ImageIcon,
+  X,
+} from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
@@ -14,6 +22,7 @@ import { getGeneralThemeColors } from "../lib/theme-colors";
 import clsx from "clsx";
 import { useSidebar } from "../utils/sidebar-context";
 import AlertBar from "./alert-bar";
+import Image from "next/image";
 
 // Backend service URLs
 const PLAYLIST_SERVICE_URL = "http://localhost:8082/playlist-service/playlists";
@@ -34,13 +43,23 @@ interface Song {
 
 interface PlaylistFormData {
   name: string;
+  description: string;
+}
+
+interface UploadedFile {
+  file: File;
+  preview?: string;
 }
 
 export function PlaylistCreatePage() {
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
-  const [formData, setFormData] = useState<PlaylistFormData>({ name: "" });
+  const [formData, setFormData] = useState<PlaylistFormData>({
+    name: "",
+    description: "",
+  });
+  const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [selectedSongs, setSelectedSongs] = useState<Song[]>([]);
   const [availableSongs, setAvailableSongs] = useState<Song[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,6 +67,7 @@ export function PlaylistCreatePage() {
   // Remove step state since we're showing everything on one page
   const [message, setMessage] = useState<string | null>(null);
   const { player } = useSidebar();
+  const artworkInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     fetchAvailableSongs();
   }, []);
@@ -62,6 +82,28 @@ export function PlaylistCreatePage() {
       console.error("Failed to fetch songs:", error);
       setMessage("❌ Failed to load songs");
     }
+  };
+
+  // Handle drag-drop for artwork
+  const handleArtworkDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    const imageFile = files.find((file) => file.type.startsWith("image/"));
+    if (imageFile) {
+      handleArtworkUpload(imageFile);
+    }
+  };
+
+  // Preview artwork before sending
+  const handleArtworkUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setArtworkFile({
+        file,
+        preview: e.target?.result as string,
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   const toggleSongSelection = (song: Song) => {
@@ -80,14 +122,23 @@ export function PlaylistCreatePage() {
     setMessage(null);
 
     try {
-      // Step 1: Create the playlist
+      // Step 1: Create the playlist with artwork
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      if (formData.description) {
+        formDataToSend.append("description", formData.description);
+      }
+      if (artworkFile) {
+        formDataToSend.append("artwork", artworkFile.file);
+      }
+
       const playlistResponse = await axios.post(
         PLAYLIST_SERVICE_URL,
-        { name: formData.name },
+        formDataToSend,
         {
           withCredentials: true,
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -135,10 +186,11 @@ export function PlaylistCreatePage() {
   };
 
   const resetForm = () => {
-    setFormData({ name: "" });
+    setFormData({ name: "", description: "" });
     setSelectedSongs([]);
     setSearchQuery("");
     setMessage(null);
+    setArtworkFile(null);
   };
 
   const filteredSongs = availableSongs.filter((song) => {
@@ -162,10 +214,14 @@ export function PlaylistCreatePage() {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-slate-800/80 to-gray-900/90"></div>
 
-      <div className={clsx(`relative h-full flex flex-col ${player ? "pb-80" : "pb-44"}`)}>
+      <div
+        className={clsx(
+          `relative h-full flex flex-col ${player ? "pb-80" : "pb-44"}`
+        )}
+      >
         {/* Header */}
 
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <h1
             className={`text-4xl font-bold bg-gradient-to-r ${themeColors.gradient} bg-clip-text text-transparent pb-2`}
           >
@@ -174,40 +230,66 @@ export function PlaylistCreatePage() {
         </div>
 
         {/* Content */}
-        <div className=" flex-1 overflow-hidden p-6">
-          <div className="h-full flex gap-8">
-            {/* Left Side - Inputs and Song Selection */}
-            <div className="flex-1 flex flex-col space-y-6 overflow-hidden">
-              {/* Playlist Name Input */}
-              <div className="bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Playlist Details
+
+        <div className="overflow-y-auto h-screen flex-1 overflow-hidden p-6">
+          <div className="flex gap-6">
+            {/* Left Side - Song Selection */}
+            <div className="flex-1 w-7/12">
+              <div className="flex-1 bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm mb-5">
+                <h2 className="text-lg font-semibold text-white mb-3">
+                  Details
                 </h2>
-                <div className="space-y-4">
-                  <Label
-                    htmlFor="name"
-                    className="text-white text-lg font-medium"
-                  >
-                    Playlist Name *
-                  </Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ name: e.target.value })}
-                    className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-12 text-lg`}
-                    placeholder="My Awesome Playlist"
-                    required
-                  />
+                <div className="space-y-3">
+                  <div>
+                    <Label
+                      htmlFor="name"
+                      className="text-white text-sm font-medium mb-1 block"
+                    >
+                      Name *
+                    </Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-10 text-sm`}
+                      placeholder="My Playlist"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="description"
+                      className="text-white text-sm font-medium mb-1 block"
+                    >
+                      Description
+                    </Label>
+                    <textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} w-full rounded-md p-2 text-sm resize-none`}
+                      placeholder="Optional description..."
+                      rows={2}
+                    />
+                  </div>
                 </div>
               </div>
-
-              {/* Song Selection Section */}
-              <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
+              <div className="h-auto bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
                 <h2 className="text-xl font-semibold text-white mb-4">
                   Add Songs
                 </h2>
 
-                <div className="space-y-4 h-full flex flex-col">
+                <div className="space-y-4 flex flex-col">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input
@@ -286,10 +368,65 @@ export function PlaylistCreatePage() {
               </div>
             </div>
 
-            {/* Right Side - Selected Songs Output */}
-            <div className="w-[450px] flex flex-col space-y-6">
-              {/* Selected Songs Preview */}
-              <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
+            {/* Right Side */}
+            <div className="w-[400px] flex flex-col space-y-6">
+              {/* Top Row - Playlist Details and Artwork */}
+              <div className="flex gap-4 ">
+                {/* Playlist Details */}
+
+                {/* Artwork Upload */}
+                <div className="w-full bg-white/5 rounded-2xl p-8 border border-white/10 backdrop-blur-sm">
+                  <h2 className="text-sm font-semibold text-white mb-2 text-center">
+                    Art
+                  </h2>
+                  {!artworkFile ? (
+                    <div
+                      onDrop={handleArtworkDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                      onClick={() => artworkInputRef.current?.click()}
+                      className={`aspect-square border-2 border-dashed ${themeColors.border} rounded-xl p-8 text-center cursor-pointer ${themeColors.hoverBg} hover:border-white/50 transition-all duration-300 group flex flex-col items-center justify-center`}
+                    >
+                      <ImageIcon
+                        className={`w-12 h-12 ${themeColors.text} group-hover:scale-110 transition-transform`}
+                      />
+                      <input
+                        ref={artworkInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          e.target.files?.[0] &&
+                          handleArtworkUpload(e.target.files[0])
+                        }
+                        className="hidden"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative aspect-square rounded-lg overflow-hidden group">
+                      <Image
+                        src={artworkFile.preview || "/placeholder.svg"}
+                        alt="Playlist artwork"
+                        className="w-full h-full object-cover"
+                        width={64}
+                        height={64}
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setArtworkFile(null)}
+                          className="text-white hover:text-red-400 hover:bg-red-400/10 p-1"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Selected Songs */}
+              <div className="h-auto bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold text-white">
                     Selected Songs
