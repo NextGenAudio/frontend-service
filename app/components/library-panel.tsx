@@ -56,7 +56,7 @@ interface Song {
 }
 
 interface Playlist {
-  playlistId: number;
+  id: number;
   name: string;
   description?: string;
   coverImage?: string;
@@ -70,6 +70,8 @@ export const LibraryPanel = () => {
   const { player } = useSidebar();
   const {
     folderList,
+    playlistList,
+    setPlaylistList,
     setFolderList,
     setEntityName,
     setEntityArt,
@@ -78,7 +80,6 @@ export const LibraryPanel = () => {
   } = useEntityContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const { setSongList } = useMusicContext();
   const { folderCreateRefresh, songUploadRefresh, playlistCreateRefresh, songAddToPlaylistRefresh } = useFileHandling();
   const router = useRouter();
@@ -132,10 +133,10 @@ export const LibraryPanel = () => {
         console.log("Length:", Array.isArray(data) ? data.length : "not array");
 
         if (Array.isArray(data)) {
-          setPlaylists(data);
+          setPlaylistList(data);
         } else {
           console.warn("Expected array but got:", typeof data, data);
-          setPlaylists([]);
+          setPlaylistList([]);
         }
       } catch (err) {
         console.error("Error fetching playlists:", err);
@@ -169,7 +170,7 @@ export const LibraryPanel = () => {
         playlist.coverImage || playlist.image || "/assets/music-icon.webp"
       );
       setEntityDescription(playlist.description || "");
-      router.push(`/player/playlist/${playlist.playlistId}`);
+      router.push(`/player/playlist/${playlist.id}`);
     } catch (err) {
       console.error("Error navigating to playlist:", err);
     }
@@ -260,10 +261,10 @@ export const LibraryPanel = () => {
               className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
             >
               <div className="space-y-2">
-                {Array.isArray(playlists) &&
-                  playlists.map((playlist) => (
+                {Array.isArray(playlistList) &&
+                  playlistList.map((playlist) => (
                     <MediaCard
-                      key={`playlist-${playlist.playlistId}`}
+                      key={`playlist-${playlist.id}`}
                       name={playlist.name}
                       image={
                         playlist.coverImage || playlist.image || defaultPlaylistImage
@@ -289,10 +290,10 @@ export const LibraryPanel = () => {
             {/* Playlists only */}
             <TabsContent value="playlists" className="px-3">
               <div className="space-y-2">
-                {Array.isArray(playlists) &&
-                  playlists.map((playlist) => (
+                {Array.isArray(playlistList) &&
+                  playlistList.map((playlist) => (
                     <MediaCard
-                      key={`playlist-${playlist.playlistId}`}
+                      key={`playlist-${playlist.id}`}
                       name={playlist.name}
                       image={
                         playlist.coverImage || playlist.image || defaultPlaylistImage

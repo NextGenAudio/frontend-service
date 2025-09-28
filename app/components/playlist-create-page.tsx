@@ -53,6 +53,7 @@ interface UploadedFile {
 }
 
 export function PlaylistCreatePage() {
+  const [step, setStep] = useState(1);
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
@@ -69,7 +70,7 @@ export function PlaylistCreatePage() {
   const [message, setMessage] = useState<string | null>(null);
   const { player } = useSidebar();
   const artworkInputRef = useRef<HTMLInputElement>(null);
-  const {playlistCreateRefresh, setPlaylistCreateRefresh} = useFileHandling();
+  const { playlistCreateRefresh, setPlaylistCreateRefresh } = useFileHandling();
   useEffect(() => {
     fetchAvailableSongs();
   }, []);
@@ -167,8 +168,6 @@ export function PlaylistCreatePage() {
             },
           }
         );
-
-
       }
 
       setMessage("✅ Playlist created successfully!");
@@ -218,7 +217,7 @@ export function PlaylistCreatePage() {
 
       <div
         className={clsx(
-          `relative h-full flex flex-col ${player ? "pb-80" : "pb-44"}`
+          `relative h-full flex flex-col ${player ? "pb-[400px]" : "pb-60"}`
         )}
       >
         {/* Header */}
@@ -233,293 +232,336 @@ export function PlaylistCreatePage() {
 
         {/* Content */}
 
-        <div className="overflow-y-auto h-screen flex-1 overflow-hidden p-6">
-          <div className="flex gap-6">
-            {/* Left Side - Song Selection */}
-            <div className="flex-1 w-7/12">
-              <div className="flex-1 bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm mb-5">
-                <h2 className="text-lg font-semibold text-white mb-3">
-                  Details
-                </h2>
-                <div className="space-y-3">
-                  <div>
-                    <Label
-                      htmlFor="name"
-                      className="text-white text-sm font-medium mb-1 block"
-                    >
-                      Name *
-                    </Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                        }))
-                      }
-                      className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-10 text-sm`}
-                      placeholder="My Playlist"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="description"
-                      className="text-white text-sm font-medium mb-1 block"
-                    >
-                      Description
-                    </Label>
-                    <textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          description: e.target.value,
-                        }))
-                      }
-                      className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} w-full rounded-md p-2 text-sm resize-none`}
-                      placeholder="Optional description..."
-                      rows={2}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="h-auto bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                  Add Songs
-                </h2>
-
-                <div className="space-y-4 flex flex-col">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input
-                      placeholder="Search songs in your library..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className={`pl-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-12`}
-                    />
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                    {filteredSongs.map((song) => {
-                      const isSelected = selectedSongs.some(
-                        (s) => s.id === song.id
-                      );
-                      return (
-                        <div
-                          key={song.id}
-                          onClick={() => toggleSongSelection(song)}
-                          className={`flex items-center justify-between p-5 rounded-xl cursor-pointer transition-all duration-200 ${
-                            isSelected
-                              ? `${themeColors.hoverBg} border ${themeColors.border} shadow-lg`
-                              : "bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10"
-                          }`}
-                        >
-                          <div className="flex items-center space-x-4 flex-1 min-w-0">
-                            <div
-                              className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                                isSelected
-                                  ? `bg-gradient-to-r ${themeColors.gradient} scale-110`
-                                  : "bg-white/10"
-                              }`}
-                            >
-                              <Music
-                                className={`w-7 h-7 ${
-                                  isSelected ? "text-white" : "text-gray-400"
-                                }`}
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-white font-medium text-lg truncate">
-                                {song.title || song.filename}
-                              </p>
-                              <p className="text-gray-400 text-base truncate">
-                                {song.artist || "Unknown Artist"}
-                              </p>
-                              {song.album && (
-                                <p className="text-gray-500 text-sm truncate">
-                                  {song.album}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-4 flex-shrink-0">
-                            <span className="text-gray-400 text-base flex items-center">
-                              <Clock className="w-4 h-4 mr-2" />
-                              {formatDuration(song.metadata?.track_length || 0)}
-                            </span>
-                            <div
-                              className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                                isSelected
-                                  ? `${themeColors.border} bg-gradient-to-r ${themeColors.gradient}`
-                                  : `border-gray-400 ${themeColors.hover}`
-                              }`}
-                            >
-                              {isSelected && (
-                                <div className="w-3 h-3 bg-white rounded-full"></div>
-                              )}
-                            </div>
-                          </div>
+        <div className="overflow-y-auto h-screen flex-1 p-6">
+          <div className="flex gap-6 h-full pb-60">
+            {/* Step 1: Details and Artwork */}
+            {step === 1 && (
+              <div className="flex-1 flex flex-col">
+                <div className="max-w-4xl mx-auto w-full">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* Playlist Details */}
+                    <div className="bg-white/5 rounded-2xl p-8 border border-white/10 backdrop-blur-sm">
+                      <h2 className="text-2xl font-semibold text-white mb-6">
+                        Playlist Details
+                      </h2>
+                      <div className="space-y-6">
+                        <div>
+                          <Label
+                            htmlFor="name"
+                            className="text-white text-lg font-medium mb-2 block"
+                          >
+                            Name *
+                          </Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                name: e.target.value,
+                              }))
+                            }
+                            className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-12 text-lg`}
+                            placeholder="My Awesome Playlist"
+                            required
+                          />
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side */}
-            <div className="w-[400px] flex flex-col space-y-6">
-              {/* Top Row - Playlist Details and Artwork */}
-              <div className="flex gap-4 ">
-                {/* Playlist Details */}
-
-                {/* Artwork Upload */}
-                <div className="w-full bg-white/5 rounded-2xl p-8 border border-white/10 backdrop-blur-sm">
-                  <h2 className="text-sm font-semibold text-white mb-2 text-center">
-                    Art
-                  </h2>
-                  {!artworkFile ? (
-                    <div
-                      onDrop={handleArtworkDrop}
-                      onDragOver={(e) => e.preventDefault()}
-                      onClick={() => artworkInputRef.current?.click()}
-                      className={`aspect-square border-2 border-dashed ${themeColors.border} rounded-xl p-8 text-center cursor-pointer ${themeColors.hoverBg} hover:border-white/50 transition-all duration-300 group flex flex-col items-center justify-center`}
-                    >
-                      <ImageIcon
-                        className={`w-12 h-12 ${themeColors.text} group-hover:scale-110 transition-transform`}
-                      />
-                      <input
-                        ref={artworkInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                          e.target.files?.[0] &&
-                          handleArtworkUpload(e.target.files[0])
-                        }
-                        className="hidden"
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative aspect-square rounded-lg overflow-hidden group">
-                      <Image
-                        src={artworkFile.preview || "/placeholder.svg"}
-                        alt="Playlist artwork"
-                        className="w-full h-full object-cover"
-                        width={64}
-                        height={64}
-                      />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setArtworkFile(null)}
-                          className="text-white hover:text-red-400 hover:bg-red-400/10 p-1"
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
+                        <div>
+                          <Label
+                            htmlFor="description"
+                            className="text-white text-lg font-medium mb-2 block"
+                          >
+                            Description
+                          </Label>
+                          <textarea
+                            id="description"
+                            value={formData.description}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                description: e.target.value,
+                              }))
+                            }
+                            className={`bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} w-full rounded-md p-3 text-lg resize-none`}
+                            placeholder="Optional description..."
+                            rows={4}
+                          />
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              </div>
 
-              {/* Selected Songs */}
-              <div className="h-auto bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-white">
-                    Selected Songs
-                  </h2>
-                  <Badge
-                    variant="secondary"
-                    className={`${themeColors.hoverBg} ${themeColors.text} px-3 py-1 text-base`}
-                  >
-                    {selectedSongs.length} songs
-                  </Badge>
-                </div>
-
-                {selectedSongs.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center py-8">
-                    <Music className="w-16 h-16 text-gray-400 mb-4" />
-                    <p className="text-gray-400 text-lg">No songs selected</p>
-                    <p className="text-gray-500 text-sm mt-2">
-                      Select songs from the left to add them here
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex-1 h-full overflow-y-auto space-y-3 pr-2">
-                    {selectedSongs.map((song, index) => (
-                      <div
-                        key={song.id}
-                        className={`flex items-center space-x-3 p-4 ${themeColors.hoverBg} rounded-xl border ${themeColors.border}`}
-                      >
+                    {/* Artwork Upload */}
+                    <div className="bg-white/5 rounded-2xl p-8 border border-white/10 backdrop-blur-sm">
+                      <h2 className="text-2xl font-semibold text-white mb-6">
+                        Playlist Artwork
+                      </h2>
+                      {!artworkFile ? (
                         <div
-                          className={`${themeColors.text} text-base font-medium w-8`}
+                          onDrop={handleArtworkDrop}
+                          onDragOver={(e) => e.preventDefault()}
+                          onClick={() => artworkInputRef.current?.click()}
+                          className={`aspect-square border-2 border-dashed ${themeColors.border} rounded-xl p-8 text-center cursor-pointer ${themeColors.hoverBg} hover:border-white/50 transition-all duration-300 group flex flex-col items-center justify-center`}
                         >
-                          {index + 1}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white text-base font-medium truncate">
-                            {song.title || song.filename}
+                          <ImageIcon
+                            className={`w-16 h-16 ${themeColors.text} mb-4 group-hover:scale-110 transition-transform`}
+                          />
+                          <p className="text-white mb-2 text-lg">
+                            Drop artwork here
                           </p>
-                          <p className="text-gray-400 text-sm truncate">
-                            {song.artist || "Unknown Artist"}
+                          <p className="text-gray-400">
+                            JPG, PNG (min 500x500)
                           </p>
+                          <input
+                            ref={artworkInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                              e.target.files?.[0] &&
+                              handleArtworkUpload(e.target.files[0])
+                            }
+                            className="hidden"
+                          />
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSongSelection(song);
-                          }}
-                          className="text-gray-400 hover:text-red-400 transition-colors duration-200"
-                        >
-                          <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center hover:bg-red-500/30">
-                            <div className="w-3 h-0.5 bg-current"></div>
+                      ) : (
+                        <div className="relative aspect-square rounded-xl overflow-hidden group">
+                          <Image
+                            src={artworkFile.preview || "/placeholder.svg"}
+                            alt="Playlist artwork"
+                            className="w-full h-full object-cover"
+                            width={400}
+                            height={400}
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setArtworkFile(null)}
+                              className="text-white hover:text-red-400 hover:bg-red-400/10"
+                            >
+                              <X className="w-6 h-6" />
+                            </Button>
                           </div>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Total Duration */}
-                {selectedSongs.length > 0 && (
-                  <div className="pt-4 border-t border-white/10 mt-4">
-                    <p className="text-gray-400 text-sm">
-                      Total duration:{" "}
-                      {formatDuration(
-                        selectedSongs.reduce(
-                          (total, song) =>
-                            total + (song.metadata?.track_length || 0),
-                          0
-                        )
+                        </div>
                       )}
-                    </p>
+                    </div>
                   </div>
-                )}
-              </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                <Button
-                  onClick={handleSubmit}
-                  disabled={loading || !formData.name}
-                  className={`w-full bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 h-12 text-base font-medium`}
-                >
-                  {loading ? "Creating..." : "Create Playlist"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => router.back()}
-                  className="w-full border-white/20 text-white hover:bg-white/10 h-12 text-base"
-                >
-                  Cancel
-                </Button>
+                  {/* Step 1 Navigation */}
+                  <div className="flex justify-end mt-8">
+                    <Button
+                      onClick={() => setStep(2)}
+                      disabled={!formData.name}
+                      className={`bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 px-8 py-3 text-lg font-medium`}
+                    >
+                      Next: Add Songs
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Step 2: Add Songs and Selected Songs */}
+            {step === 2 && (
+              <div className="flex-1 flex flex-col w-full">
+                <div className="flex gap-6 flex-1">
+                  {/* Left Side - Song Selection */}
+                  <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
+                    <h2 className="text-xl font-semibold text-white mb-4">
+                      Add Songs
+                    </h2>
+
+                    <div className="space-y-4 h-screen flex flex-col">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Input
+                          placeholder="Search songs in your library..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className={`pl-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:${themeColors.border} h-12`}
+                        />
+                      </div>
+
+                      <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+                        {filteredSongs.map((song) => {
+                          const isSelected = selectedSongs.some(
+                            (s) => s.id === song.id
+                          );
+                          return (
+                            <div
+                              key={song.id}
+                              onClick={() => toggleSongSelection(song)}
+                              className={`flex items-center justify-between p-5 rounded-xl cursor-pointer transition-all duration-200 ${
+                                isSelected
+                                  ? `${themeColors.hoverBg} border ${themeColors.border} shadow-lg`
+                                  : "bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10"
+                              }`}
+                            >
+                              <div className="flex items-center space-x-4 flex-1 min-w-0">
+                                <div
+                                  className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                                    isSelected
+                                      ? `bg-gradient-to-r ${themeColors.gradient} scale-110`
+                                      : "bg-white/10"
+                                  }`}
+                                >
+                                  <Music
+                                    className={`w-7 h-7 ${
+                                      isSelected
+                                        ? "text-white"
+                                        : "text-gray-400"
+                                    }`}
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-white font-medium text-lg truncate">
+                                    {song.title || song.filename}
+                                  </p>
+                                  <p className="text-gray-400 text-base truncate">
+                                    {song.artist || "Unknown Artist"}
+                                  </p>
+                                  {song.album && (
+                                    <p className="text-gray-500 text-sm truncate">
+                                      {song.album}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-4 flex-shrink-0">
+                                <span className="text-gray-400 text-base flex items-center">
+                                  <Clock className="w-4 h-4 mr-2" />
+                                  {formatDuration(
+                                    song.metadata?.track_length || 0
+                                  )}
+                                </span>
+                                <div
+                                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                                    isSelected
+                                      ? `${themeColors.border} bg-gradient-to-r ${themeColors.gradient}`
+                                      : `border-gray-400 ${themeColors.hover}`
+                                  }`}
+                                >
+                                  {isSelected && (
+                                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Side - Selected Songs */}
+                  <div className="w-[400px] flex flex-col space-y-6">
+                    <div className="flex-1 bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm overflow-hidden">
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-semibold text-white">
+                          Selected Songs
+                        </h2>
+                        <Badge
+                          variant="secondary"
+                          className={`${themeColors.hoverBg} ${themeColors.text} px-3 py-1 text-base`}
+                        >
+                          {selectedSongs.length} songs
+                        </Badge>
+                      </div>
+
+                      {selectedSongs.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full text-center py-8">
+                          <Music className="w-16 h-16 text-gray-400 mb-4" />
+                          <p className="text-gray-400 text-lg">
+                            No songs selected
+                          </p>
+                          <p className="text-gray-500 text-sm mt-2">
+                            Select songs from the left to add them here
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex-1 h-full overflow-y-auto space-y-3 pr-2">
+                          {selectedSongs.map((song, index) => (
+                            <div
+                              key={song.id}
+                              className={`flex items-center space-x-3 p-4 ${themeColors.hoverBg} rounded-xl border ${themeColors.border}`}
+                            >
+                              <div
+                                className={`${themeColors.text} text-base font-medium w-8`}
+                              >
+                                {index + 1}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white text-base font-medium truncate">
+                                  {song.title || song.filename}
+                                </p>
+                                <p className="text-gray-400 text-sm truncate">
+                                  {song.artist || "Unknown Artist"}
+                                </p>
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleSongSelection(song);
+                                }}
+                                className="text-gray-400 hover:text-red-400 transition-colors duration-200"
+                              >
+                                <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center hover:bg-red-500/30">
+                                  <div className="w-3 h-0.5 bg-current"></div>
+                                </div>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Total Duration */}
+                      {selectedSongs.length > 0 && (
+                        <div className="pt-4 border-t border-white/10 mt-4">
+                          <p className="text-gray-400 text-sm">
+                            Total duration:{" "}
+                            {formatDuration(
+                              selectedSongs.reduce(
+                                (total, song) =>
+                                  total + (song.metadata?.track_length || 0),
+                                0
+                              )
+                            )}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2 Navigation */}
+                <div className="flex justify-between mt-8">
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep(1)}
+                    className="border-white/20 text-white hover:bg-white/10 px-6 py-3 text-base"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back: Edit Details
+                  </Button>
+                  <div className="space-x-3">
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={loading || !formData.name}
+                      className={`bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 px-8 py-3 text-base font-medium`}
+                    >
+                      {loading ? "Creating..." : "Create Playlist"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => router.back()}
+                      className="border-white/20 text-white hover:bg-white/10 px-6 py-3 text-base"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {message && <AlertBar message={message} setMessage={setMessage} />}

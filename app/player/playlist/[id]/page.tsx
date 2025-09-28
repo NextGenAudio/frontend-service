@@ -13,6 +13,8 @@ import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 interface Song {
   id: string;
   title: string | undefined;
@@ -63,6 +65,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const { songList, setSongList } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
     useSidebar();
+  const router = useRouter();
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
@@ -136,7 +139,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const removeSongFromPlaylist = async (songId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8082/playlists/${params.id}/${songId}`,
+        `http://localhost:8082/playlist-service/playlists/${params.id}/tracks?musicIds=${songId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -156,6 +159,28 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
       }
     } catch (err) {
       console.error("Error removing song from playlist:", err);
+    }
+  };
+  const deleteSong = async (songId: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        console.log("Song deleted successfully");
+        // Optional: update state to remove song from UI
+        setSongList(songList.filter((song) => song.id !== songId));
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to delete song:", errorText);
+      }
+    } catch (err) {
+      console.error("Error deleting song:", err);
     }
   };
   return (
@@ -426,8 +451,13 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                     {openDropdownSongId === song.id && (
                       <SongOptionsDropdown
                         songId={song.id}
-                        onDelete={() => {
+                        isInPlaylist={true}
+                        onRemoveFromPlaylist={() => {
                           removeSongFromPlaylist(song.id);
+                          setOpenDropdownSongId(null);
+                        }}
+                        onDelete={() => {
+                          deleteSong(song.id);
                           setOpenDropdownSongId(null);
                         }}
                         onClose={() => setOpenDropdownSongId(null)}
@@ -437,6 +467,18 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                 </div>
               ))
             )}
+            {/* Add More Music Button */}
+            <div className="flex justify-center pt-6 pb-4">
+              <Button
+                onClick={() =>
+                  router.push(`/player/playlist/update?playlistId=${params.id}`)
+                }
+                variant="outline"
+                className={`${themeColors.border} ${themeColors.text} ${themeColors.hoverBg} px-8 py-3 rounded-full `}
+              >
+                <Music className="w-5 h-5 mr-2" />+ More Musics
+              </Button>
+            </div>
           </div>
         </ScrollArea>
       </div>

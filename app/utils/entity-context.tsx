@@ -11,6 +11,20 @@ type Folder = {
   musicCount?: number;
 };
 
+interface Playlist {
+  id: number;
+  playlistId?: number; // for compatibility
+  name: string;
+  description?: string;
+  coverImage?: string;
+  image?: string; // for compatibility with existing code
+  songCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  musics?: any[]; // Add musics property
+  tracks?: any[]; // Add tracks property
+}
+
 type EntityContextType = {
   entityName: string | null;
   entityArt: string | null;
@@ -21,9 +35,9 @@ type EntityContextType = {
   setEntityType: (value: "folder" | "playlist" | null) => void;
 
   folderList: Folder[];
-  playlistList: any[];
+  playlistList: Playlist[];
   setFolderList: (value: Folder[]) => void;
-  setPlaylistList: (value: any[]) => void;
+  setPlaylistList: (value: Playlist[]) => void;
   entityDescription: string;
   setEntityDescription: (value: string) => void;
 };
