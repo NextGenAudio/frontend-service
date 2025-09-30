@@ -32,6 +32,8 @@ import { useRouter } from "next/navigation";
 import { useEntityContext } from "../utils/entity-context";
 import { ScrollArea } from "./ui/scroll-area";
 import clsx from "clsx";
+import { Playlist } from "../utils/entity-context";
+
 
 type Folder = {
   id: number;
@@ -55,16 +57,6 @@ interface Song {
   // liked: boolean;
 }
 
-interface Playlist {
-  id: number;
-  name: string;
-  description?: string;
-  coverImage?: string;
-  image?: string; // for compatibility with existing code
-  songCount?: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
 
 export const LibraryPanel = () => {
   const { player } = useSidebar();
@@ -269,7 +261,7 @@ export const LibraryPanel = () => {
                       image={
                         playlist.coverImage || playlist.image || defaultPlaylistImage
                       }
-                      count={playlist.songCount}
+                      count={playlist.musicCount}
                       type="playlist"
                       onClick={() => handlePlaylistClick(playlist)}
                     />
@@ -298,7 +290,7 @@ export const LibraryPanel = () => {
                       image={
                         playlist.coverImage || playlist.image || defaultPlaylistImage
                       }
-                      count={playlist.songCount}
+                      count={playlist.musicCount}
                       type="playlist"
                       onClick={() => handlePlaylistClick(playlist)}
                     />

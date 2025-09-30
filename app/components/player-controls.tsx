@@ -34,6 +34,7 @@ import { usePlayerSettings } from "@/app/hooks/use-player-settings";
 import MusicContext, { useMusicContext } from "../utils/music-context";
 import { useFileHandling } from "../utils/entity-handling-context";
 import { useTheme } from "../utils/theme-context";
+import { PlaylistSelectionDropdown } from "./playlist-selection-dropdown";
 
 interface Song {
   id: string;
@@ -63,6 +64,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [progress, setProgress] = useState(0); // in percentage 0-100
   const [isDragging, setIsDragging] = useState(false);
   const [liked, setliked] = useState(false);
+  const [showPlaylistDropdown, setShowPlaylistDropdown] = useState(false);
   const toggleShuffle = () => setIsShuffle(!isShuffle);
   const toggleRepeat = () => setRepeatMode((repeatMode + 1) % 3);
   const toggleMute = () => setIsMuted(!isMuted);
@@ -242,6 +244,43 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     const previousSong = songList[previousIndex];
     handleSongDoubleClick(previousSong);
   };
+
+  const handleAddToPlaylist = async (
+    playlistId: number,
+    playlistName: string
+  ) => {
+    if (!song) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8082/playlist-service/playlists/${playlistId}/tracks`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            musicIds: [parseInt(song.id)],
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log(`Song added to playlist: ${playlistName}`);
+        // Optional: Show success notification
+      } else {
+        console.error("Failed to add song to playlist");
+      }
+    } catch (error) {
+      console.error("Error adding song to playlist:", error);
+    }
+  };
+
+  const handleCreateNewPlaylist = () => {
+    // Navigate to create playlist page or open modal
+    console.log("Create new playlist functionality");
+  };
   return (
     <TooltipProvider>
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[85%] max-w-[1800px]">
@@ -298,13 +337,26 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className={`h-7 w-7 rounded-full backdrop-blur-sm border border-white/20 text-orange-200/80 ${themeColors.hover} transition-all duration-300`}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
+                      <div className="relative">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className={`h-7 w-7 rounded-full backdrop-blur-sm border border-white/20 text-orange-200/80 ${themeColors.hover} transition-all duration-300 hover:scale-110`}
+                          onClick={() =>
+                            setShowPlaylistDropdown(!showPlaylistDropdown)
+                          }
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                        {showPlaylistDropdown && song && (
+                          <PlaylistSelectionDropdown
+                            songId={song.id}
+                            onAddToPlaylist={handleAddToPlaylist}
+                            onCreateNewPlaylist={handleCreateNewPlaylist}
+                            onClose={() => setShowPlaylistDropdown(false)}
+                          />
+                        )}
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Add to playlist</p>

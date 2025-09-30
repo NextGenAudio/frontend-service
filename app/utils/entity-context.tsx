@@ -11,14 +11,14 @@ type Folder = {
   musicCount?: number;
 };
 
-interface Playlist {
+export interface Playlist {
   id: number;
   playlistId?: number; // for compatibility
   name: string;
   description?: string;
   coverImage?: string;
   image?: string; // for compatibility with existing code
-  songCount?: number;
+  musicCount?: number;
   createdAt?: string;
   updatedAt?: string;
   musics?: any[]; // Add musics property
