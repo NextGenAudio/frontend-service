@@ -102,7 +102,7 @@ const PlaylistUpdatePage = () => {
 
       const playlistData = idStr
         ? playlistList.find(
-            (p) => (p.id || p.playlistId) === parseInt(idStr)
+            (p) => (p.id) === parseInt(idStr)
           ) || null
         : null;
       setPlaylist(playlistData);

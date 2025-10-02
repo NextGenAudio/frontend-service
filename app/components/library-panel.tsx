@@ -147,7 +147,7 @@ export const LibraryPanel = () => {
       setEntityType("playlist");
       setEntityName(playlist.name);
       setEntityArt(
-        playlist.coverImage || playlist.image || "/assets/music-icon.webp"
+        playlist.coverImage || playlist.playlistArt || "/assets/music-icon.webp"
       );
       setEntityDescription(playlist.description || "");
       router.push(`/player/playlist/${playlist.id}`);
@@ -247,7 +247,7 @@ export const LibraryPanel = () => {
                       key={`playlist-${playlist.id}`}
                       name={playlist.name}
                       image={
-                        playlist.coverImage || playlist.image || defaultPlaylistImage
+                        playlist.coverImage || playlist.playlistArt || defaultPlaylistImage
                       }
                       count={playlist.musicCount}
                       type="playlist"
@@ -276,7 +276,7 @@ export const LibraryPanel = () => {
                       key={`playlist-${playlist.id}`}
                       name={playlist.name}
                       image={
-                        playlist.coverImage || playlist.image || defaultPlaylistImage
+                        playlist.coverImage || playlist.playlistArt || defaultPlaylistImage
                       }
                       count={playlist.musicCount}
                       type="playlist"

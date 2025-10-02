@@ -18,19 +18,7 @@ import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { set } from "react-hook-form";
-
-interface Song {
-  id: string;
-  title: string | undefined;
-  filename: string;
-  artist: string | undefined;
-  album: string | undefined;
-  path: string;
-  uploadedAt: Date;
-  source: string;
-  metadata: any;
-  liked: boolean;
-}
+import { Song } from "@/app/utils/music-context";
 
 export default function FavoritePage() {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =

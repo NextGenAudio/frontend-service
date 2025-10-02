@@ -124,9 +124,9 @@ export function PlaylistSelectionDropdown({
                     onClick={() => handlePlaylistSelect(playlist)}
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {playlist.image ? (
+                      {playlist.playlistArt ? (
                         <img
-                          src={playlist.image}
+                          src={playlist.playlistArt}
                           alt={playlist.name}
                           className="w-full h-full object-cover"
                         />

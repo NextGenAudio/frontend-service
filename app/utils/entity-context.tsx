@@ -13,11 +13,10 @@ type Folder = {
 
 export interface Playlist {
   id: number;
-  playlistId?: number; // for compatibility
   name: string;
   description?: string;
   coverImage?: string;
-  image?: string; // for compatibility with existing code
+  playlistArt?: string; // for compatibility with existing code
   musicCount?: number;
   createdAt?: string;
   updatedAt?: string;
