@@ -292,7 +292,7 @@ export function MusicPlayerHome() {
             {moodPlaylists.map((playlist) => (
               <div
                 key={playlist.id}
-                className={`bg-gradient-to-br ${playlist.color} backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer group`}
+                className={`bg-gradient-to-br ${playlist.color} backdrop-blur-xl border border-white/20 rounded-2xl p-6  transition-all duration-300 cursor-pointer group`}
                 style={{ opacity: 0.8 }}
               >
                 <div className="flex items-center justify-between mb-4">

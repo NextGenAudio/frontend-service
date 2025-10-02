@@ -325,7 +325,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
               songList.map((song, id) => (
                 <div
                   key={song.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer  group backdrop-blur-sm border hover:shadow-lg ${
                     playingSongId === song.id
                       ? `bg-gradient-to-r ${theme.preview} border-white/40 shadow-lg ${themeColors.shadow}`
                       : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30"

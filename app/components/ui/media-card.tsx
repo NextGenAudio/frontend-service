@@ -15,7 +15,7 @@ function MediaCard({ name, image, count, onClick, type }: MediaCardProps) {
   return (
     <div
       onClick={onClick}
-      className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 cursor-pointer transition-all duration-300 shadow-lg"
+      className="flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 cursor-pointer  shadow-lg"
     >
       <Image
         src={image || "/assets/file-icon.webp"}

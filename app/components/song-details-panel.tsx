@@ -153,7 +153,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
                 <div className="p-3 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-xl border border-green-400/30 text-center">
                   <div className="text-xs text-white/60 mb-1">Genre</div>
                   <div className="text-sm font-medium text-white/90">
-                    {song?.genre || "Unknown"}
+                    {song?.genre?.genre || "Unknown"}
                   </div>
                 </div>
               </div>

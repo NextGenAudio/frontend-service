@@ -66,7 +66,7 @@ export function SongOptionsDropdown({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="absolute right-0 top-full mt-2 z-[9999] min-w-[200px] bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+      <div className="absolute right-0 top-full mt-2 z-[999999] min-w-[200px] bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
         {/* Glass background overlay */}
         <div
           className={`absolute inset-0 bg-gradient-to-br opacity-10 backdrop-blur-xl`}

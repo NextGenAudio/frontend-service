@@ -33,7 +33,7 @@ import { useEntityContext } from "../utils/entity-context";
 import { ScrollArea } from "./ui/scroll-area";
 import clsx from "clsx";
 import { Playlist } from "../utils/entity-context";
-
+import { Song } from "../utils/music-context";
 
 type Folder = {
   id: number;
@@ -43,19 +43,7 @@ type Folder = {
   musicCount?: number;
 };
 
-interface Song {
-  id: string;
-  title: string | undefined;
-  filename: string;
-  artist: string | undefined;
-  album: string | undefined;
-  path: string;
-  uploadedAt: Date;
-  // duration: string;
-  source: string;
-  metadata: any;
-  // liked: boolean;
-}
+
 
 
 export const LibraryPanel = () => {

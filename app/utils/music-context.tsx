@@ -26,7 +26,7 @@ export interface Song {
   source: string;
   metadata: any;
   liked: boolean;
-  genre?: string;
+  genre: Genre;
   mood: Mood;
 }
 

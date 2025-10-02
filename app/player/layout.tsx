@@ -177,7 +177,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                 </div>
               </ResizablePanel>
               <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
-              <ResizablePanel defaultSize={30} minSize={20} maxSize={70}>
+              <ResizablePanel defaultSize={30} minSize={20}>
                 {/* Music player positioned to not overlap sidebar */}
 
                 <ResizablePanelGroup direction="vertical">
