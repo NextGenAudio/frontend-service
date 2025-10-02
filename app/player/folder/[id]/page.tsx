@@ -61,6 +61,11 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     handleSongSingleClick(song);
     setPlayingSongId(song.id);
     setPlayingSong(song);
+    const newScore = (song?.x_score ?? 0) + 1;
+    fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+      method: "POST",
+      credentials: "include",
+    }).catch((err) => console.error("Failed to update song score", err));
   };
 
   const handlePlayAll = () => {
@@ -163,7 +168,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
     >
       {/* Glass background with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/20 to-gray-800/20 backdrop-blur-xl " />
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/10 to-gray-800/20 backdrop-blur-xl " />
       {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
 
       {searchBar && <SearchBar />}

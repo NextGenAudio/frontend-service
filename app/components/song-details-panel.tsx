@@ -35,8 +35,10 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
   }, [song]);
   const { entityName, entityType } = useEntityContext();
   const handleLikeClick = async () => {
+    const newLikeStatus = !liked; // Calculate the new status first
+    setliked(newLikeStatus);
+    song!.liked = newLikeStatus;
     try {
-      const newLikeStatus = !liked; // Calculate the new status first
       const response = await fetch(
         `http://localhost:8080/files/${song!.id}/like?like=${newLikeStatus}`,
 
@@ -46,13 +48,37 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         }
       );
       console.log(response);
-      if (response.status === 200) {
-        setliked(newLikeStatus);
-        song!.liked = newLikeStatus; // Update local song object
+      if (!response.ok) {
+        // ❌ Backend failed → rollback
+        setliked(!newLikeStatus);
+        song!.liked = !newLikeStatus;
+        console.error("Failed to update like status on server");
+      } else {
         console.log("Like status updated successfully");
       }
     } catch (err) {
       console.error("Failed to update like:", err);
+    }
+
+    // Update music score based on like status
+    const newScore = (song?.x_score ?? 0) + 2;
+    try {
+      const response = await fetch(
+        `http://localhost:8080/files/${song!.id}/score?score=${newScore}`,
+
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      console.log(response);
+      if (!response.ok) {
+        console.error("Failed to update music score on server");
+      } else {
+        console.log("Music score updated successfully");
+      }
+    } catch (err) {
+      console.error("Failed to update music score:", err);
     }
   };
 
@@ -68,8 +94,8 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
           <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
             <h2 className="text-lg font-semibold text-white/90">
               Music Details
-              {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
-             <span className="text-sm text-white/60 font-normal ml-2"></span> */}
+              <span className="text-2xl text-white/60 font-normal ml-2">|</span>
+              <span className="text-sm text-white/60 font-normal ml-2">{}</span>
             </h2>
             <Button
               size="icon"

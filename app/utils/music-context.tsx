@@ -22,12 +22,16 @@ export interface Song {
   album: string | undefined;
   path: string;
   uploadedAt: Date;
+  lastListenedAt: Date | null;
+  musicArt?: string; 
   // duration: string;
   source: string;
   metadata: any;
   liked: boolean;
   genre: Genre;
   mood: Mood;
+  x_score?: number;
+  y_score?: number;
 }
 
 type MusicContextType = {

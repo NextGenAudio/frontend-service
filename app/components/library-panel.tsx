@@ -43,9 +43,6 @@ type Folder = {
   musicCount?: number;
 };
 
-
-
-
 export const LibraryPanel = () => {
   const { player } = useSidebar();
   const {
@@ -61,7 +58,12 @@ export const LibraryPanel = () => {
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const { setSongList } = useMusicContext();
-  const { folderCreateRefresh, songUploadRefresh, playlistCreateRefresh, songAddToPlaylistRefresh } = useFileHandling();
+  const {
+    folderCreateRefresh,
+    songUploadRefresh,
+    playlistCreateRefresh,
+    songAddToPlaylistRefresh,
+  } = useFileHandling();
   const router = useRouter();
 
   // Fetch folders
@@ -123,7 +125,7 @@ export const LibraryPanel = () => {
       }
     };
     fetchPlaylists();
-  }, [ playlistCreateRefresh, songAddToPlaylistRefresh]);
+  }, [playlistCreateRefresh, songAddToPlaylistRefresh]);
 
   // Handle folder click
   const handleFolderClick = async (folder: Folder) => {
@@ -247,7 +249,9 @@ export const LibraryPanel = () => {
                       key={`playlist-${playlist.id}`}
                       name={playlist.name}
                       image={
-                        playlist.coverImage || playlist.playlistArt || defaultPlaylistImage
+                        playlist.coverImage ||
+                        playlist.playlistArt ||
+                        defaultPlaylistImage
                       }
                       count={playlist.musicCount}
                       type="playlist"
@@ -258,7 +262,9 @@ export const LibraryPanel = () => {
                   <MediaCard
                     key={`folder-${folder.id}`}
                     name={folder.name}
-                    image={folder.folderArt ? folder.folderArt : defaultFolderImage}
+                    image={
+                      folder.folderArt ? folder.folderArt : defaultFolderImage
+                    }
                     count={folder.musicCount}
                     type="folder"
                     onClick={() => handleFolderClick(folder)}
@@ -268,7 +274,7 @@ export const LibraryPanel = () => {
             </TabsContent>
 
             {/* Playlists only */}
-            <TabsContent value="playlists" className="px-3">
+            <TabsContent value="playlists" className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}>
               <div className="space-y-2">
                 {Array.isArray(playlistList) &&
                   playlistList.map((playlist) => (
@@ -276,7 +282,9 @@ export const LibraryPanel = () => {
                       key={`playlist-${playlist.id}`}
                       name={playlist.name}
                       image={
-                        playlist.coverImage || playlist.playlistArt || defaultPlaylistImage
+                        playlist.coverImage ||
+                        playlist.playlistArt ||
+                        defaultPlaylistImage
                       }
                       count={playlist.musicCount}
                       type="playlist"
@@ -287,16 +295,14 @@ export const LibraryPanel = () => {
             </TabsContent>
 
             {/* Folders only */}
-            <TabsContent value="folders" className="px-3">
+            <TabsContent value="folders" className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}>
               <div className="space-y-2">
                 {folderList.map((folder) => (
                   <MediaCard
                     key={`folder-${folder.id}`}
                     name={folder.name}
                     image={
-                      folder.folderArt
-                        ? `http://localhost:8080/${folder.folderArt}`
-                        : defaultFolderImage
+                      folder.folderArt ? folder.folderArt : defaultFolderImage
                     }
                     count={folder.musicCount}
                     onClick={() => handleFolderClick(folder)}

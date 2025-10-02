@@ -85,13 +85,34 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     setSelectSongId(song.id);
     setSelectSong(song);
     setPlayingSong(song);
+    // if (!auto) {
+    //   // Update music score
+    //   const newScore = (song?.x_score ?? 0) + 1;
+    //   fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+    //     method: "POST",
+    //     credentials: "include",
+    //   }).catch((err) => console.error("Failed to update song score", err));
+    // }
   }
   const handleNextClick = () => {
+    const listenedSong = playingSong;
+    if (!songList.length || !playingSong) return;
     const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
     const nextIndex = (currentIndex + 1) % songList.length;
     const nextSong = songList[nextIndex];
     handleSongDoubleClick(nextSong);
     setIsPlaying(true);
+
+    // Update last listened timestamp
+    if (listenedSong) {
+      fetch(`http://localhost:8080/files/${listenedSong.id}/listen`, {
+        method: "POST",
+        credentials: "include",
+      }).catch((err) =>
+        console.error("Failed to update listen timestamp", err)
+      );
+      listenedSong.lastListenedAt = new Date(); // Update local object
+    }
   };
   useEffect(() => {
     if (!playingSong?.source) return;
