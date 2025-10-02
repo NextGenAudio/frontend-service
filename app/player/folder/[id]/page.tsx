@@ -14,19 +14,7 @@ import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-interface Song {
-  id: string;
-  title: string | undefined;
-  filename: string;
-  artist: string | undefined;
-  album: string | undefined;
-  path: string;
-  uploadedAt: Date;
-  // duration: string;
-  source: string;
-  metadata: any;
-  liked: boolean;
-}
+import { Song } from "@/app/utils/music-context";
 
 export default function FolderPanel({ params }: { params: { id: number } }) {
   const {

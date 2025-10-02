@@ -17,18 +17,7 @@ import { useMusicContext } from "../utils/music-context";
 import axios from "axios";
 import { set } from "react-hook-form";
 import { useEntityContext } from "../utils/entity-context";
-interface Song {
-  id: string;
-  title: string | undefined;
-  filename: string;
-  artist: string | undefined;
-  album: string | undefined;
-  uploadedAt: Date;
-  // duration: string;
-  source: string;
-  metadata: any;
-  liked: boolean;
-}
+import { Song } from "../utils/music-context";
 
 interface GlassSongDetailsPanelProps {
   song: Song | null;
@@ -37,13 +26,14 @@ interface GlassSongDetailsPanelProps {
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
   const [liked, setliked] = useState(false);
   const { player, setDetailPanel } = useSidebar();
+
   useEffect(() => {
     console.log(song?.metadata);
     if (song) {
       setliked(song.liked);
     }
   }, [song]);
-  const{entityName, entityType}= useEntityContext();
+  const { entityName, entityType } = useEntityContext();
   const handleLikeClick = async () => {
     try {
       const newLikeStatus = !liked; // Calculate the new status first
@@ -77,8 +67,8 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
           <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
             <h2 className="text-lg font-semibold text-white/90">
-             Music Details
-             {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
+              Music Details
+              {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
              <span className="text-sm text-white/60 font-normal ml-2"></span> */}
             </h2>
             <Button
@@ -151,6 +141,23 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
               <h4 className="font-medium text-white/80 mb-4 text-center">
                 Metadata
               </h4>
+
+              {/* Mood and Genre Section */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="p-3 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl border border-purple-400/30 text-center">
+                  <div className="text-xs text-white/60 mb-1">Mood</div>
+                  <div className="text-sm font-medium text-white/90">
+                    {song?.mood?.mood || "Unknown"}
+                  </div>
+                </div>
+                <div className="p-3 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-xl border border-green-400/30 text-center">
+                  <div className="text-xs text-white/60 mb-1">Genre</div>
+                  <div className="text-sm font-medium text-white/90">
+                    {song?.genre || "Unknown"}
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Year</span>

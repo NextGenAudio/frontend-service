@@ -2,7 +2,19 @@
 import React, { useRef } from "react";
 
 import { createContext, useState, useContext } from "react";
-interface Song {
+
+export interface Mood{
+  id: number;
+  mood: string;
+  description: string;
+}
+
+export interface Genre{
+  id: number;
+  genre: string;
+  description: string;
+}
+export interface Song {
   id: string;
   title: string | undefined;
   filename: string;
@@ -14,6 +26,8 @@ interface Song {
   source: string;
   metadata: any;
   liked: boolean;
+  genre?: string;
+  mood: Mood;
 }
 
 type MusicContextType = {

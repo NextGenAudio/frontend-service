@@ -33,7 +33,7 @@ export function PlaylistSelectionDropdown({
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) 
+        !dropdownRef.current.contains(event.target as Node)
       ) {
         onClose?.();
       }
@@ -48,8 +48,6 @@ export function PlaylistSelectionDropdown({
     setPlaylists(playlistList);
     setLoading(false);
   }, [playlistList]);
-
-
 
   const handlePlaylistSelect = (playlist: Playlist) => {
     setSelectedPlaylist(playlist.id);
@@ -84,7 +82,7 @@ export function PlaylistSelectionDropdown({
           <div className="p-2">
             <button
               className={`w-full px-3 py-2.5 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group rounded-lg border border-white/10 hover:border-white/20`}
-              onClick={() => router.push('/player/playlist/create')}
+              onClick={() => router.push("/player/playlist/create")}
             >
               <div
                 className={`w-8 h-8 rounded-lg bg-gradient-to-br ${themeColors.gradient} flex items-center justify-center flex-shrink-0`}
