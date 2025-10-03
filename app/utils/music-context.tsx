@@ -3,13 +3,13 @@ import React, { useRef } from "react";
 
 import { createContext, useState, useContext } from "react";
 
-export interface Mood{
+export interface Mood {
   id: number;
   mood: string;
   description: string;
 }
 
-export interface Genre{
+export interface Genre {
   id: number;
   genre: string;
   description: string;
@@ -23,15 +23,15 @@ export interface Song {
   path: string;
   uploadedAt: Date;
   lastListenedAt: Date | null;
-  musicArt?: string; 
+  musicArt?: string;
   // duration: string;
   source: string;
   metadata: any;
   liked: boolean;
   genre: Genre;
   mood: Mood;
-  x_score?: number;
-  y_score?: number;
+  xscore?: number;
+  yscore?: number;
 }
 
 type MusicContextType = {

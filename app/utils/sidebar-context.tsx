@@ -26,7 +26,7 @@ type SidebarContextType = {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  const [home, setHome] = useState(true);
+  const [home, setHome] = useState(false);
   const [player, setPlayer] = useState(false);
   const [searchBar, setSearchBar] = useState(false);
   const [detailPanel, setDetailPanel] = useState(false);

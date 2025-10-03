@@ -19,7 +19,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileAvatar from "../components/profile-avatar";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
 
 export function Landing() {
@@ -51,7 +51,7 @@ export function Landing() {
               password: null,
               image: session.user.image,
               created_at: new Date().toISOString(),
-              created_by: "provider"
+              created_by: "provider",
             }),
           });
           const createData = await createResult.json();
@@ -130,9 +130,11 @@ export function Landing() {
               )}
               {status === "authenticated" && (
                 <div className="flex items-center space-x-12">
-                  <span className=" text-sm font-medium text-orange-400 tracking-wider uppercase bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-400/30">
-                    {session?.user?.name || first_name + " " + last_name}
-                  </span>
+                  {session?.user?.name && (
+                    <span className=" text-sm font-medium text-orange-400 tracking-wider uppercase bg-orange-500/10 backdrop-blur-md px-4 py-2 rounded-full border border-orange-400/30">
+                      {session?.user?.name || first_name + " " + last_name}
+                    </span>
+                  )}
                   <ProfileAvatar w={12} h={12} />
                   <Button
                     onClick={() => signOut()}

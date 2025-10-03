@@ -16,7 +16,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Song } from "@/app/utils/music-context";
 
-
 export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const {
     selectSong,
@@ -64,6 +63,12 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     handleSongSingleClick(song);
     setPlayingSongId(song.id);
     setPlayingSong(song);
+    const newScore = (song?.xscore ?? 0) + 1;
+    fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+      method: "POST",
+      credentials: "include",
+    }).catch((err) => console.error("Failed to update song score", err));
+    song.xscore = newScore; // Optimistically update score in UI
   };
 
   const handlePlayAll = () => {

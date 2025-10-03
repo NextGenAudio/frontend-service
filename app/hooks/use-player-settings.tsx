@@ -1,26 +1,33 @@
 import { useState, useEffect } from "react";
+import { useSidebar } from "../utils/sidebar-context";
 
 export const usePlayerSettings = () => {
-  const [volume, setVolume] = useState(50);     // default
-  const [isMuted, setIsMuted] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(false);
-  const [progress, setProgress] = useState(0);
-  // Load saved settings once on client
-  useEffect(() => {
-    if (typeof window === "undefined") return; // ✅ guard
+  const { player } = useSidebar();
 
-    const savedVolume = localStorage.getItem("volume");
-    const savedMuted = localStorage.getItem("isMuted");
-    const savedRepeat = localStorage.getItem("isRepeat");
-    const savedProgress = localStorage.getItem("progress");
+  // Initialize with localStorage values or defaults
+  const [volume, setVolume] = useState(() => {
+    if (typeof window === "undefined") return 50;
+    const saved = localStorage.getItem("volume");
+    return saved !== null ? Number(saved) : 50;
+  });
 
+  const [isMuted, setIsMuted] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = localStorage.getItem("isMuted");
+    return saved !== null ? saved === "true" : false;
+  });
 
-    if (savedVolume !== null) setVolume(Number(savedVolume));
-    if (savedMuted !== null) setIsMuted(savedMuted === "true");
-    if (savedRepeat !== null) setIsRepeat(savedRepeat === "true");
-    if (savedProgress !== null) setProgress(Number(savedProgress));
+  const [isRepeat, setIsRepeat] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = localStorage.getItem("isRepeat");
+    return saved !== null ? saved === "true" : false;
+  });
 
-  }, []);
+  const [progress, setProgress] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    const saved = localStorage.getItem("progress");
+    return saved !== null ? Number(saved) : 0;
+  });
 
   // Save whenever values change
   useEffect(() => {

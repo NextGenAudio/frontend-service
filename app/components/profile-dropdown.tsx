@@ -14,16 +14,15 @@ import { useSession, signOut } from "next-auth/react";
 import { Sign } from "crypto";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
+import { getGeneralThemeColors } from "../lib/theme-colors";
 
-
-
-export function ProfileDropdown(
-) {
+export function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const {theme , setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
   const { status, data: session } = useSession();
-      const router = useRouter();
+  const router = useRouter();
+  const themeColors = getGeneralThemeColors(theme.primary);
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -45,17 +44,17 @@ export function ProfileDropdown(
   ];
 
   function handleProfileClick() {
-
     router.push("/player/profile");
   }
-  
 
   return (
     <div className="relative" ref={dropdownRef}>
       {isOpen && (
-        <div className="fixed bottom-8 left-28  w-72 bg-slate-800/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+        <div className="fixed bottom-8 left-28  w-72 bg-slate-800/60 backdrop-blur-xl border border-white/10 border-  rounded-2xl shadow-2xl overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
           {/* User Info Header */}
-          <div className={`p-4 border-b border-white/10 bg-${theme.primary}/10`}>
+          <div
+            className={`p-4 border-b border-white/10 bg-${theme.primary}/10`}
+          >
             <div className="flex items-center gap-3">
               {/* <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-orange-400 to-orange-600 p-0.5">
                 <img
@@ -84,9 +83,11 @@ export function ProfileDropdown(
                   }
                   // Handle navigation here
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/5 transition-all duration-200 group"
+                className={`w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 group`}
               >
-                <item.icon className="w-4 h-4 text-white/60 group-hover:text-orange-400 transition-colors" />
+                <item.icon
+                  className={`w-4 h-4 text-white/60 transition-colors`}
+                />
                 <span className="text-sm font-medium">{item.label}</span>
               </button>
             ))}

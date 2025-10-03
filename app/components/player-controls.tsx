@@ -232,10 +232,26 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     setPlayingSong(song);
   }
   const handleNextClick = () => {
+    const skippedSong = playingSong; // For updating listen timestamp later
+    const skippedTime = currentTime;
     const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
     const nextIndex = (currentIndex + 1) % songList.length;
     const nextSong = songList[nextIndex];
     handleSongDoubleClick(nextSong);
+    if (
+      skippedSong &&
+      skippedSong.metadata &&
+      skippedTime < skippedSong.metadata.track_length / 2
+    ) {
+      skippedSong.xscore = (skippedSong.xscore ?? 0) - 1;
+      fetch(
+        `http://localhost:8080/files/${skippedSong.id}/score?score=${skippedSong.xscore}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      ).catch((err) => console.error("Failed to update song score", err));
+    }
   };
   const handlePreviousClick = () => {
     const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);

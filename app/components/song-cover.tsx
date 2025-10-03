@@ -16,12 +16,12 @@ export default function SongCover({ song }: { song: any }) {
   }
 
   // Convert binary data to base64 string
-  const base64String = btoa(
-    new Uint8Array(picture.data).reduce(
-      (data, byte) => data + String.fromCharCode(byte),
-      ""
-    )
-  );
+  // const base64String = btoa(
+  //   new Uint8Array(picture.data).reduce(
+  //     (data, byte) => data + String.fromCharCode(byte),
+  //     ""
+  //   )
+  // );
 
   // const imageSrc = `data:${picture.format};base64,${base64String}`;
 

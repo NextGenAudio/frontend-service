@@ -26,6 +26,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     setSelectSongId,
     playingSongId,
     setPlayingSongId,
+    isPlaying,
+    setIsPlaying,
   } = useMusicContext();
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -33,7 +35,6 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   const [isHeaderCompact, setIsHeaderCompact] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
-  const { isPlaying, setIsPlaying } = useMusicContext();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
@@ -49,7 +50,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     useSidebar();
   // Add caching to prevent duplicate requests
   const [cache, setCache] = useState<Map<number, Song[]>>(new Map());
-  const [loadingStates, setLoadingStates] = useState<Set<number>>(new Set());
+  const [loadingStates] = useState<Set<number>>(new Set());
 
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
@@ -61,11 +62,12 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     handleSongSingleClick(song);
     setPlayingSongId(song.id);
     setPlayingSong(song);
-    const newScore = (song?.x_score ?? 0) + 1;
+    const newScore = (song?.xscore ?? 0) + 1;
     fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
       method: "POST",
       credentials: "include",
     }).catch((err) => console.error("Failed to update song score", err));
+    song.xscore = newScore; // Optimistically update score in UI
   };
 
   const handlePlayAll = () => {

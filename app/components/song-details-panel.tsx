@@ -61,7 +61,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
     }
 
     // Update music score based on like status
-    const newScore = (song?.x_score ?? 0) + 2;
+    const newScore = (song?.xscore ?? 0) + 2;
     try {
       const response = await fetch(
         `http://localhost:8080/files/${song!.id}/score?score=${newScore}`,

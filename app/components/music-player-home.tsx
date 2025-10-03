@@ -14,12 +14,39 @@ import {
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import Image from "next/image";
+import axios from "axios";
+import { Song } from "../utils/music-context";
+import { useSidebar } from "../utils/sidebar-context";
+import { useMusicContext } from "../utils/music-context";
+const MUSIC_SERVICE_URL = "http://localhost:8080";
 
 export function MusicPlayerHome() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
+  const [recentMusics, setRecentMusics] = useState<Song[]>([]);
+  const { setDetailPanel } = useSidebar();
+  const {
+    setSelectSong,
+    setPlayingSong,
+    setSelectSongId,
+    setPlayingSongId,
+    setIsPlaying,
+  } = useMusicContext();
+
+  const { setPlayer } = useSidebar();
+  useEffect(() => {
+    const fetchRecentMusics = async () => {
+      const response = await axios.get(`${MUSIC_SERVICE_URL}/files/recent`, {
+        withCredentials: true,
+      });
+      // You may want to use setRecentMusics(response.data) here if needed
+      setRecentMusics(response.data);
+      console.log("Recent Musics:", response.data);
+    };
+    fetchRecentMusics();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -30,47 +57,26 @@ export function MusicPlayerHome() {
     const hour = currentTime.getHours();
     if (hour < 12) return "Good Morning";
     if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
+    if (hour < 21) return "Good Evening";
+    return "Good Night";
   };
 
-  const recentlyPlayed = [
-    {
-      id: 1,
-      title: "Blinding Lights",
-      artist: "The Weeknd",
-      image: "/blinding-lights-album-cover.png",
-      duration: "3:20",
-    },
-    {
-      id: 2,
-      title: "Watermelon Sugar",
-      artist: "Harry Styles",
-      image: "/watermelon-sugar-album-cover.png",
-      duration: "2:54",
-    },
-    {
-      id: 3,
-      title: "Levitating",
-      artist: "Dua Lipa",
-      image: "/levitating-album-cover.png",
-      duration: "3:23",
-    },
-    {
-      id: 4,
-      title: "Good 4 U",
-      artist: "Olivia Rodrigo",
-      image: "/good-4-u-album-cover.png",
-      duration: "2:58",
-    },
-    {
-      id: 5,
-      title: "Stay",
-      artist: "The Kid LAROI",
-      image: "/stay-album-cover.png",
-      duration: "2:21",
-    },
-  ];
+  const handleSongSingleClick = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    setDetailPanel(true);
+  };
+  const handleSongDoubleClick = (song: Song) => {
+    // handleSongSingleClick(song);
+    setPlayingSongId(song.id);
+    setPlayingSong(song);
 
+    const newScore = (song?.xscore ?? 0) + 1;
+    fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+      method: "POST",
+      credentials: "include",
+    }).catch((err) => console.error("Failed to update song score", err));
+  };
   const moodPlaylists = [
     {
       id: 1,
@@ -245,34 +251,51 @@ export function MusicPlayerHome() {
             </button>
           </div>
           <div className="grid grid-cols-5 gap-4">
-            {recentlyPlayed.map((track) => (
+            {recentMusics.map((track) => (
               <div
                 key={track.id}
                 className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
-                onMouseEnter={() => setActiveCard(track.id)}
+                onMouseEnter={() => setActiveCard(Number(track.id))}
                 onMouseLeave={() => setActiveCard(null)}
+                onClick={() => handleSongSingleClick(track)}
               >
                 <div className="relative mb-4">
                   <Image
-                    src={track.image || "/placeholder.svg"}
-                    alt={track.title}
+                    src={
+                      track.musicArt ||
+                      track.metadata?.cover_art ||
+                      "/placeholder.svg"
+                    }
+                    alt={track.filename}
                     className="w-full aspect-square rounded-xl object-cover"
                     width={256}
                     height={256}
                   />
                   <div
                     className={`absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center transition-opacity duration-300 ${
-                      activeCard === track.id ? "opacity-100" : "opacity-0"
+                      activeCard === Number(track.id)
+                        ? "opacity-100"
+                        : "opacity-0"
                     }`}
                   >
-                    <Play className="w-8 h-8 text-white" />
+                    <Play
+                      className="w-8 h-8 text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSongDoubleClick(track);
+                        setPlayer(true);
+                        setIsPlaying(true);
+                      }}
+                    />
                   </div>
                 </div>
                 <h3 className="font-semibold text-white truncate">
                   {track.title}
                 </h3>
                 <p className="text-white/70 text-sm truncate">{track.artist}</p>
-                <p className="text-white/50 text-xs mt-1">{track.duration}</p>
+                <p className="text-white/50 text-xs mt-1">
+                  {track.metadata?.track_length}
+                </p>
               </div>
             ))}
           </div>
