@@ -32,6 +32,7 @@ export interface Song {
   mood: Mood;
   xscore?: number;
   yscore?: number;
+  listenCount?: number;
 }
 
 type MusicContextType = {

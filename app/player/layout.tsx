@@ -20,6 +20,7 @@ import { ProfileDropdown } from "../components/profile-dropdown";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
+import axios from "axios";
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const { theme, setTheme } = useTheme();
@@ -105,13 +106,20 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
     // Update last listened timestamp
     if (listenedSong) {
-      fetch(`http://localhost:8080/files/${listenedSong.id}/listen`, {
-        method: "POST",
-        credentials: "include",
+      axios.post(`http://localhost:8080/files/${listenedSong.id}/listen`, {
+        withCredentials: true,
       }).catch((err) =>
         console.error("Failed to update listen timestamp", err)
       );
       listenedSong.lastListenedAt = new Date(); // Update local object
+
+
+      listenedSong.listenCount = (listenedSong.listenCount || 0) + 1;
+      axios.post(`http://localhost:8080/files/${listenedSong.id}/listen_count?count=${listenedSong.listenCount}`, { withCredentials: true } ).then(response => {
+        console.log("Listen timestamp updated:", response.data);
+      }).catch(err => {
+        console.error("Failed to update listen timestamp", err);
+      });
     }
   };
   useEffect(() => {
