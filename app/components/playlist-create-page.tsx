@@ -128,11 +128,23 @@ export function PlaylistCreatePage() {
       // Step 1: Create the playlist with artwork
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
-      if (formData.description) {
-        formDataToSend.append("description", formData.description);
-      }
+      // Always include description, even if empty (required = false means it can be empty)
+      formDataToSend.append("description", formData.description);
+      // Only include artwork if we have a file (required = false means optional)
       if (artworkFile) {
         formDataToSend.append("artwork", artworkFile.file);
+      }
+
+      console.log("Sending playlist data:", {
+        name: formData.name,
+        description: formData.description,
+        hasArtwork: !!artworkFile,
+      });
+
+      // Debug FormData contents
+      console.log("FormData entries:");
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
       }
 
       const playlistResponse = await axios.post(
@@ -174,13 +186,26 @@ export function PlaylistCreatePage() {
       setPlaylistCreateRefresh((old) => old + 1); // trigger refresh in playlist list
     } catch (error) {
       console.error("Failed to create playlist:", error);
+
+      if (axios.isAxiosError(error)) {
+        console.error("Error details:", {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          headers: error.response?.headers,
+        });
+      }
+
       let errorMessage = "❌ Failed to create playlist. Please try again.";
       if (axios.isAxiosError(error) && error.response) {
-        errorMessage = `❌ Error: ${
-          error.response.data.message || "An unknown error occurred."
+        const serverError = error.response.data;
+        console.log("Server error response:", serverError);
+        errorMessage = `❌ Error (${error.response.status}): ${
+          serverError?.message || serverError || "An unknown error occurred."
         }`;
       }
       setMessage(errorMessage);
+      setPlaylistCreateRefresh((old) => old + 1); // trigger refresh in playlist list
     } finally {
       setLoading(false);
     }

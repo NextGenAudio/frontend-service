@@ -15,6 +15,7 @@ import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
+import { useFileHandling } from "@/app/utils/entity-handling-context";
 
 export default function FolderPanel({ params }: { params: { id: number } }) {
   const {
@@ -51,7 +52,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   // Add caching to prevent duplicate requests
   const [cache, setCache] = useState<Map<number, Song[]>>(new Map());
   const [loadingStates] = useState<Set<number>>(new Set());
-
+  const { setSongUploadRefresh } = useFileHandling();
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
@@ -143,6 +144,14 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   }, []);
   const deleteSong = async (songId: string) => {
     try {
+      // Optimistically update UI first
+      const updatedSongList = songList.filter((song) => song.id !== songId);
+      setSongList(updatedSongList);
+
+      // Update cache as well
+      const folderId = params.id;
+      setCache((prev) => new Map(prev).set(folderId, updatedSongList));
+
       const response = await fetch(`http://localhost:8080/files/${songId}`, {
         method: "DELETE",
         credentials: "include",
@@ -153,14 +162,23 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
       if (response.ok) {
         console.log("Song deleted successfully");
-        // Optional: update state to remove song from UI
-        setSongList(songList.filter((song) => song.id !== songId));
+        // Trigger refresh for other components that might need to update
+        setSongUploadRefresh((prev) => prev + 1);
       } else {
         const errorText = await response.text();
         console.error("Failed to delete song:", errorText);
+
+        // Rollback the optimistic update if the API call failed
+        setSongList(songList);
+        setCache((prev) => new Map(prev).set(folderId, songList));
       }
     } catch (err) {
       console.error("Error deleting song:", err);
+
+      // Rollback the optimistic update if there was an error
+      setSongList(songList);
+      const folderId = params.id;
+      setCache((prev) => new Map(prev).set(folderId, songList));
     }
   };
   return (
