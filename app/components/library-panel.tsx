@@ -34,6 +34,9 @@ import { ScrollArea } from "./ui/scroll-area";
 import clsx from "clsx";
 import { Playlist } from "../utils/entity-context";
 import { Song } from "../utils/music-context";
+import axios from "axios";
+import { on } from "events";
+import AlertBar from "./alert-bar";
 
 type Folder = {
   id: number;
@@ -45,6 +48,7 @@ type Folder = {
 
 export const LibraryPanel = () => {
   const { player } = useSidebar();
+  const [message, setMessage] = useState<string | null>(null);
   const {
     folderList,
     playlistList,
@@ -158,6 +162,76 @@ export const LibraryPanel = () => {
     }
   };
 
+  const handlePlaylistDelete = async (id: number) => {
+    try {
+      // Optimistically remove from UI first
+      setPlaylistList(playlistList.filter((playlist) => playlist.id !== id));
+      router.back();
+
+      // Make the API call
+      const response = await axios.delete(
+        `http://localhost:8082/playlist-service/playlists/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log("Playlist deleted:", response.data);
+
+      // Show success message
+      setMessage("✅ Playlist deleted successfully");
+
+      // Auto-clear message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error("Failed to delete playlist", err);
+
+      // Restore the playlist to the list if deletion failed
+      // You might want to refetch the playlists here instead
+
+      // Show error message
+      setMessage("❌ Failed to delete playlist. Please try again.");
+
+      // Auto-clear message after 5 seconds
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
+  const handleFolderDelete = async (id: number) => {
+    try {
+      // Optimistically remove from UI first
+      setFolderList(folderList.filter((folder) => folder.id !== id));
+      router.back();
+
+      // Make the API call
+      const response = await axios.delete(
+        `http://localhost:8080/folders/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log("Folder deleted:", response.data);
+
+      // Show success message
+      setMessage("✅ Folder deleted successfully");
+
+      // Auto-clear message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error("Failed to delete folder", err);
+
+      // Restore the folder to the list if deletion failed
+      // You might want to refetch the folders here instead
+
+      // Show error message
+      setMessage("❌ Failed to delete folder. Please try again.");
+
+      // Auto-clear message after 5 seconds
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
   const defaultFolderImage = "/assets/file-icon.webp";
   const defaultPlaylistImage = "/assets/music-icon.webp";
 
@@ -247,6 +321,7 @@ export const LibraryPanel = () => {
                   playlistList.map((playlist) => (
                     <MediaCard
                       key={`playlist-${playlist.id}`}
+                      id={playlist.id}
                       name={playlist.name}
                       image={
                         playlist.coverImage ||
@@ -256,11 +331,14 @@ export const LibraryPanel = () => {
                       count={playlist.musicCount}
                       type="playlist"
                       onClick={() => handlePlaylistClick(playlist)}
+                      onPlaylistDelete={() => handlePlaylistDelete(playlist.id)}
                     />
                   ))}
                 {folderList.map((folder) => (
                   <MediaCard
                     key={`folder-${folder.id}`}
+                    id={folder.id}
+                    onFolderDelete={() => handleFolderDelete(folder.id)}
                     name={folder.name}
                     image={
                       folder.folderArt ? folder.folderArt : defaultFolderImage
@@ -274,13 +352,18 @@ export const LibraryPanel = () => {
             </TabsContent>
 
             {/* Playlists only */}
-            <TabsContent value="playlists" className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}>
+            <TabsContent
+              value="playlists"
+              className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
+            >
               <div className="space-y-2">
                 {Array.isArray(playlistList) &&
                   playlistList.map((playlist) => (
                     <MediaCard
                       key={`playlist-${playlist.id}`}
+                      id={playlist.id}
                       name={playlist.name}
+                      onPlaylistDelete={() => handlePlaylistDelete(playlist.id)}
                       image={
                         playlist.coverImage ||
                         playlist.playlistArt ||
@@ -295,12 +378,17 @@ export const LibraryPanel = () => {
             </TabsContent>
 
             {/* Folders only */}
-            <TabsContent value="folders" className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}>
+            <TabsContent
+              value="folders"
+              className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
+            >
               <div className="space-y-2">
                 {folderList.map((folder) => (
                   <MediaCard
                     key={`folder-${folder.id}`}
+                    id={folder.id}
                     name={folder.name}
+                    onFolderDelete={() => handleFolderDelete(folder.id)}
                     image={
                       folder.folderArt ? folder.folderArt : defaultFolderImage
                     }
@@ -313,6 +401,9 @@ export const LibraryPanel = () => {
             </TabsContent>
           </ScrollArea>
         </Tabs>
+
+        {/* Alert Bar for delete feedback */}
+        {message && <AlertBar message={message} setMessage={setMessage} />}
       </div>
     </div>
   );
