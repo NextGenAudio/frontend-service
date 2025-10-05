@@ -10,7 +10,7 @@ import { LibraryPanel } from "../components/library-panel";
 import { useState, useEffect } from "react";
 import { FloatingPlayerControls } from "../components/player-controls";
 import { useSidebar } from "../utils/sidebar-context";
-import { useMusicContext } from "../utils/music-context";
+import { Song, useMusicContext } from "../utils/music-context";
 import { usePlayerSettings } from "../hooks/use-player-settings";
 import { SongDetailsPanel } from "../components/song-details-panel";
 import { EntityHandlingProvider } from "../utils/entity-handling-context";
@@ -96,32 +96,34 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     // }
   }
   const handleNextClick = () => {
-    const listenedSong = playingSong;
     if (!songList.length || !playingSong) return;
     const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
     const nextIndex = (currentIndex + 1) % songList.length;
     const nextSong = songList[nextIndex];
     handleSongDoubleClick(nextSong);
     setIsPlaying(true);
+  };
 
-    // Update last listened timestamp
-    if (listenedSong) {
-      axios.post(`http://localhost:8080/files/${listenedSong.id}/listen`, {
-        withCredentials: true,
-      }).catch((err) =>
-        console.error("Failed to update listen timestamp", err)
-      );
-      listenedSong.lastListenedAt = new Date(); // Update local object
+  // Update listen count and last listened timestamp
+  const updateListenedSong = (listenedSong: Song) => {
+    listenedSong.lastListenedAt = new Date(); // Update local object
 
-
-      listenedSong.listenCount = (listenedSong.listenCount || 0) + 1;
-      axios.post(`http://localhost:8080/files/${listenedSong.id}/listen_count?count=${listenedSong.listenCount}`, { withCredentials: true } ).then(response => {
+    listenedSong.listenCount = (listenedSong.listenCount || 0) + 1;
+    axios
+      .post(
+        `http://localhost:8080/files/${listenedSong.id}/listen_count?count=${listenedSong.listenCount}`,
+        { withCredentials: true }
+      )
+      .then((response) => {
         console.log("Listen timestamp updated:", response.data);
-      }).catch(err => {
+      })
+      .catch((err) => {
         console.error("Failed to update listen timestamp", err);
       });
-    }
+
+    console.log("Updated listen count:", listenedSong.listenCount);
   };
+
   useEffect(() => {
     if (!playingSong?.source) return;
 
@@ -150,14 +152,20 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         setPlayingSongDuration(
           parseFloat(playingSong.metadata?.track_length) || 0
         );
+        // If isPlaying was set to true before the song loaded, start playing now
+        if (isPlaying && soundRef.current && !soundRef.current.playing()) {
+          soundRef.current.play();
+        }
       },
       onplay: () => {
         setIsPlaying(true);
       },
       onpause: () => setIsPlaying(false),
       onend: () => {
+        const listenedSong = playingSong;
         setIsPlaying(false);
         handleNextClick(); // Automatically move to next song
+        updateListenedSong(listenedSong);
       },
     });
     (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
@@ -206,7 +214,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                 </div>
               </ResizablePanel>
               <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
-              <ResizablePanel defaultSize={30} minSize={20}>
+              <ResizablePanel defaultSize={55} minSize={20}>
                 {/* Music player positioned to not overlap sidebar */}
 
                 <ResizablePanelGroup direction="vertical">

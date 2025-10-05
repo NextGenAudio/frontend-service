@@ -161,7 +161,7 @@ export function MusicUpload() {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("file", musicFile.file); // backend expects "file"
-      formDataToSend.append("user", formData.title);
+      // Remove the incorrect user field - let backend handle user from session
       // If you also want to send artwork and metadata:
       if (artworkFile) {
         formDataToSend.append("artwork", artworkFile.file);

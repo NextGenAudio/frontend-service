@@ -147,7 +147,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       // Optimistically update UI first
       const updatedSongList = songList.filter((song) => song.id !== songId);
       setSongList(updatedSongList);
-
+      
       // Update cache as well
       const folderId = params.id;
       setCache((prev) => new Map(prev).set(folderId, updatedSongList));
@@ -167,14 +167,14 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       } else {
         const errorText = await response.text();
         console.error("Failed to delete song:", errorText);
-
+        
         // Rollback the optimistic update if the API call failed
         setSongList(songList);
         setCache((prev) => new Map(prev).set(folderId, songList));
       }
     } catch (err) {
       console.error("Error deleting song:", err);
-
+      
       // Rollback the optimistic update if there was an error
       setSongList(songList);
       const folderId = params.id;

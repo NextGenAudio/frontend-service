@@ -35,18 +35,7 @@ import MusicContext, { useMusicContext } from "../utils/music-context";
 import { useFileHandling } from "../utils/entity-handling-context";
 import { useTheme } from "../utils/theme-context";
 import { PlaylistSelectionDropdown } from "./playlist-selection-dropdown";
-
-interface Song {
-  id: string;
-  title: string | undefined;
-  filename: string;
-  artist: string | undefined;
-  album: string | undefined;
-  // duration: string;
-  source: string;
-  metadata: any;
-  liked: boolean;
-}
+import { Song } from "../utils/music-context";
 
 export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isShuffle, setIsShuffle] = useState(false);
@@ -205,27 +194,69 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   }, [isPlaying]);
 
   const handleLikeClick = async () => {
+    const newLikeStatus = !liked; // Calculate the new status first
+    setliked(newLikeStatus);
+    song!.liked = newLikeStatus;
+
     try {
-      const newLikeStatus = !liked; // Calculate the new status first
       const response = await fetch(
         `http://localhost:8080/files/${song!.id}/like?like=${newLikeStatus}`,
-
         {
           method: "POST",
           credentials: "include",
         }
       );
+
       console.log(response);
-      if (response.status === 200) {
-        setliked(newLikeStatus);
-        song!.liked = newLikeStatus; // Update local song object
+      if (!response.ok) {
+        // ❌ Backend failed → rollback
+        setliked(!newLikeStatus);
+        song!.liked = !newLikeStatus;
+        console.error("Failed to update like status on server");
+        return; // Don't update score if like failed
+      } else {
         console.log("Like status updated successfully");
       }
     } catch (err) {
       console.error("Failed to update like:", err);
+      // Rollback on error
+      setliked(!newLikeStatus);
+      song!.liked = !newLikeStatus;
+      return; // Don't update score if like failed
+    }
+
+    // Update music score based on like status (only if like was successful)
+    let newScore = 0;
+    if (newLikeStatus) {
+      newScore = (song?.xscore ?? 0) + 2;
+    } else {
+      newScore = (song?.xscore ?? 0) - 2;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/files/${song!.id}/score?score=${newScore}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      console.log(response);
+      if (!response.ok) {
+        console.error("Failed to update music score on server");
+      } else {
+        console.log("Music score updated successfully");
+        // Update local score only if API call was successful
+        if (song) {
+          song.xscore = newScore;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to update music score:", err);
     }
   };
-  function handleSongDoubleClick(song: any) {
+  function handleSongDoubleClick(song: Song) {
     setPlayingSongId(song.id);
     setSelectSongId(song.id);
     setSelectSong(song);
