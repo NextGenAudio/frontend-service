@@ -14,20 +14,9 @@ import AppLoadingScreen from "./app-loading";
 import { useEntityContext } from "../utils/entity-context";
 import { SongOptionsDropdown } from "./song-options-dropdown";
 import Image from "next/image";
+import { Song } from "../utils/music-context";
 
-interface Song {
-  id: string;
-  title: string | undefined;
-  filename: string;
-  artist: string | undefined;
-  album: string | undefined;
-  path: string;
-  uploadedAt: Date;
-  // duration: string;
-  source: string;
-  metadata: any;
-  liked: boolean;
-}
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
 
 export const PlaylistPanel = () => {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
@@ -89,7 +78,7 @@ export const PlaylistPanel = () => {
   };
   const deleteSong = async (songId: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+      const response = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // if you use JWT

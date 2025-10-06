@@ -20,6 +20,8 @@ import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { set } from "react-hook-form";
 import { Song } from "@/app/utils/music-context";
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+
 export default function FavoritePage() {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
     useMusicContext();
@@ -73,7 +75,7 @@ export default function FavoritePage() {
     const fetchFavorites = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:8080/files/favorite", {
+        const res = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/favorite`, {
           method: "GET",
           credentials: "include",
         });

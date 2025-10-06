@@ -22,7 +22,9 @@ import { Song } from "../utils/music-context";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import clsx from "clsx";
-const MUSIC_SERVICE_URL = "http://localhost:8080";
+
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+
 
 export function MusicPlayerHome() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -46,7 +48,7 @@ export function MusicPlayerHome() {
   useEffect(() => {
     const fetchRecentMusics = async () => {
       try {
-        const response = await axios.get(`${MUSIC_SERVICE_URL}/files/recent`, {
+        const response = await axios.get(`${MUSIC_LIBRARY_SERVICE_URL}/files/recent`, {
           withCredentials: true,
         });
         setRecentMusics(response.data);
@@ -59,7 +61,7 @@ export function MusicPlayerHome() {
     const fetchTrendingMusics = async () => {
       try {
         const response = await axios.get(
-          `${MUSIC_SERVICE_URL}/files/trending`,
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/trending`,
           {
             withCredentials: true,
           }
@@ -71,7 +73,7 @@ export function MusicPlayerHome() {
         // Fallback to recent if trending endpoint doesn't exist
         try {
           const fallbackResponse = await axios.get(
-            `${MUSIC_SERVICE_URL}/files/recent`,
+            `${MUSIC_LIBRARY_SERVICE_URL}/files/recent`,
             {
               withCredentials: true,
             }
@@ -86,7 +88,7 @@ export function MusicPlayerHome() {
     const fetchMostPlayedMusics = async () => {
       try {
         const response = await axios.get(
-          `${MUSIC_SERVICE_URL}/files/most-played`,
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/most-played`,
           {
             withCredentials: true,
           }
@@ -98,7 +100,7 @@ export function MusicPlayerHome() {
         // Fallback to recent if most-played endpoint doesn't exist
         try {
           const fallbackResponse = await axios.get(
-            `${MUSIC_SERVICE_URL}/files/recent`,
+            `${MUSIC_LIBRARY_SERVICE_URL}/files/recent`,
             {
               withCredentials: true,
             }
@@ -150,7 +152,7 @@ export function MusicPlayerHome() {
     setSongList(currentList);
 
     const newScore = (song?.xscore ?? 0) + 1;
-    fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+    fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
       method: "POST",
       credentials: "include",
     }).catch((err) => console.error("Failed to update song score", err));

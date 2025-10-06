@@ -42,6 +42,8 @@ interface UploadedFile {
   preview?: string;
 }
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+
 export function MusicUpload() {
   const [musicFile, setMusicFile] = useState<UploadedFile | null>(null);
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
@@ -181,7 +183,7 @@ export function MusicUpload() {
       }
 
       const response = await axios.post(
-        "http://localhost:8080/files/upload",
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/upload`,
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },

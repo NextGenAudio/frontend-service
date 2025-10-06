@@ -19,6 +19,8 @@ import { set } from "react-hook-form";
 import { useEntityContext } from "../utils/entity-context";
 import { Song } from "../utils/music-context";
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+
 interface GlassSongDetailsPanelProps {
   song: Song | null;
 }
@@ -41,7 +43,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/files/${song!.id}/like?like=${newLikeStatus}`,
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${song!.id}/like?like=${newLikeStatus}`,
         {
           method: "POST",
           credentials: "include",
@@ -76,7 +78,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/files/${song!.id}/score?score=${newScore}`,
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${song!.id}/score?score=${newScore}`,
         {
           method: "POST",
           credentials: "include",

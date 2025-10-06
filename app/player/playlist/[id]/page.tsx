@@ -16,6 +16,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Song } from "@/app/utils/music-context";
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const PLAYLIST_SERVICE_URL = process.env.PLAYLIST_SERVICE_URL;
 export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const {
     selectSong,
@@ -64,7 +66,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     setPlayingSongId(song.id);
     setPlayingSong(song);
     const newScore = (song?.xscore ?? 0) + 1;
-    fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+    fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
       method: "POST",
       credentials: "include",
     }).catch((err) => console.error("Failed to update song score", err));
@@ -95,7 +97,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:8082/playlist-service/playlists/list?playlistId=${params.id}`,
+          `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/list?playlistId=${params.id}`,
           {
             method: "GET",
             credentials: "include",
@@ -132,7 +134,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const removeSongFromPlaylist = async (songId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8082/playlist-service/playlists/${params.id}/tracks?musicIds=${songId}`,
+        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${params.id}/tracks?musicIds=${songId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -156,7 +158,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   };
   const deleteSong = async (songId: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+      const response = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {

@@ -37,6 +37,10 @@ import { useTheme } from "../utils/theme-context";
 import { PlaylistSelectionDropdown } from "./playlist-selection-dropdown";
 import { Song } from "../utils/music-context";
 
+
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const PLAYLIST_SERVICE_URL = process.env.PLAYLIST_SERVICE_URL;
+
 export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
   const [isShuffle, setIsShuffle] = useState(false);
 
@@ -200,7 +204,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/files/${song!.id}/like?like=${newLikeStatus}`,
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${song!.id}/like?like=${newLikeStatus}`,
         {
           method: "POST",
           credentials: "include",
@@ -235,7 +239,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/files/${song!.id}/score?score=${newScore}`,
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${song!.id}/score?score=${newScore}`,
         {
           method: "POST",
           credentials: "include",
@@ -276,7 +280,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     ) {
       skippedSong.xscore = (skippedSong.xscore ?? 0) - 1;
       fetch(
-        `http://localhost:8080/files/${skippedSong.id}/score?score=${skippedSong.xscore}`,
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${skippedSong.id}/score?score=${skippedSong.xscore}`,
         {
           method: "POST",
           credentials: "include",
@@ -300,7 +304,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8082/playlist-service/playlists/${playlistId}/tracks`,
+        `${PLAYLIST_SERVICE_URL}/${playlistId}/tracks`,
         {
           method: "POST",
           credentials: "include",

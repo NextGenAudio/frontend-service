@@ -20,6 +20,8 @@ interface UploadedFile {
   preview?: string;
 }
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+
 export function FolderCreate() {
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [formData, setFormData] = useState({
@@ -70,7 +72,7 @@ export function FolderCreate() {
         formDataToSend.append("artwork", artworkFile.file);
       }
 
-      await axios.post("http://localhost:8080/folders", formDataToSend, {
+      await axios.post(`${MUSIC_LIBRARY_SERVICE_URL}/folders`, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });

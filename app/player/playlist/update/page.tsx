@@ -27,8 +27,8 @@ import { useFileHandling } from "../../../utils/entity-handling-context";
 import { useEntityContext } from "@/app/utils/entity-context";
 
 // Backend service URLs
-const PLAYLIST_SERVICE_URL = "http://localhost:8082/playlist-service/playlists";
-const MUSIC_SERVICE_URL = "http://localhost:8080/files/list";
+const PLAYLIST_SERVICE_URL = process.env.PLAYLIST_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
 
 interface Song {
   id: string;
@@ -118,7 +118,7 @@ const PlaylistUpdatePage = () => {
   const fetchAvailableSongs = async () => {
     try {
       console.log("Fetching available songs..."); // Debug log
-      const response = await axios.get(MUSIC_SERVICE_URL, {
+      const response = await axios.get(MUSIC_LIBRARY_SERVICE_URL!, {
         withCredentials: true,
       });
       console.log("Available songs response:", response.data?.length, "songs"); // Debug log

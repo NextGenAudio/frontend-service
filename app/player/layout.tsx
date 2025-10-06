@@ -22,6 +22,8 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import axios from "axios";
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const { theme, setTheme } = useTheme();
   const {
@@ -64,7 +66,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   useEffect(() => {
     if (!selectSong) return;
 
-    const url = `http://localhost:8080/files/download/${selectSong.filename}`;
+    const url = `${MUSIC_LIBRARY_SERVICE_URL}/files/download/${selectSong.filename}`;
     console.log("Song URL:", url);
 
     // Update state with direct backend URL
@@ -89,7 +91,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     // if (!auto) {
     //   // Update music score
     //   const newScore = (song?.x_score ?? 0) + 1;
-    //   fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+    //   fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
     //     method: "POST",
     //     credentials: "include",
     //   }).catch((err) => console.error("Failed to update song score", err));
@@ -111,7 +113,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     listenedSong.listenCount = (listenedSong.listenCount || 0) + 1;
     axios
       .post(
-        `http://localhost:8080/files/${listenedSong.id}/listen_count?count=${listenedSong.listenCount}`,
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${listenedSong.id}/listen_count?count=${listenedSong.listenCount}`,
         { withCredentials: true }
       )
       .then((response) => {

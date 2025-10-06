@@ -26,8 +26,8 @@ import Image from "next/image";
 import { useFileHandling } from "../utils/entity-handling-context";
 
 // Backend service URLs
-const PLAYLIST_SERVICE_URL = "http://localhost:8082/playlist-service/playlists";
-const MUSIC_SERVICE_URL = "http://localhost:8080/files/list";
+const PLAYLIST_SERVICE_URL = `${process.env.PLAYLIST_SERVICE_URL}/playlist-service/playlists`;
+const MUSIC_LIBRARY_SERVICE_URL = `${process.env.MUSIC_LIBRARY_SERVICE_URL}/files/list`;
 
 interface Song {
   id: string;
@@ -77,7 +77,7 @@ export function PlaylistCreatePage() {
 
   const fetchAvailableSongs = async () => {
     try {
-      const response = await axios.get(MUSIC_SERVICE_URL, {
+      const response = await axios.get(MUSIC_LIBRARY_SERVICE_URL, {
         withCredentials: true,
       });
       setAvailableSongs(response.data);

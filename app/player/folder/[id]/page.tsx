@@ -17,6 +17,8 @@ import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
 import { useFileHandling } from "@/app/utils/entity-handling-context";
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+
 export default function FolderPanel({ params }: { params: { id: number } }) {
   const {
     selectSong,
@@ -64,7 +66,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     setPlayingSongId(song.id);
     setPlayingSong(song);
     const newScore = (song?.xscore ?? 0) + 1;
-    fetch(`http://localhost:8080/files/${song.id}/score?score=${newScore}`, {
+    fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
       method: "POST",
       credentials: "include",
     }).catch((err) => console.error("Failed to update song score", err));
@@ -107,7 +109,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://localhost:8080/files/list?folderId=${folderId}`,
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/list?folderId=${folderId}`,
           {
             method: "GET",
             credentials: "include",
@@ -152,7 +154,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       const folderId = params.id;
       setCache((prev) => new Map(prev).set(folderId, updatedSongList));
 
-      const response = await fetch(`http://localhost:8080/files/${songId}`, {
+      const response = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {

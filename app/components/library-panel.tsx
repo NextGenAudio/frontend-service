@@ -46,6 +46,9 @@ type Folder = {
   musicCount?: number;
 };
 
+const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const PLAYLIST_SERVICE_URL = process.env.PLAYLIST_SERVICE_URL;
+
 export const LibraryPanel = () => {
   const { player } = useSidebar();
   const [message, setMessage] = useState<string | null>(null);
@@ -74,7 +77,7 @@ export const LibraryPanel = () => {
   useEffect(() => {
     const fetchFolders = async () => {
       try {
-        const res = await fetch("http://localhost:8080/folders", {
+        const res = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/folders`, {
           method: "GET",
           credentials: "include",
         });
@@ -93,7 +96,7 @@ export const LibraryPanel = () => {
     const fetchPlaylists = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8082/playlist-service/playlists",
+          `${PLAYLIST_SERVICE_URL}/playlist-service/playlists`,
           {
             method: "GET",
             credentials: "include",
@@ -170,7 +173,7 @@ export const LibraryPanel = () => {
 
       // Make the API call
       const response = await axios.delete(
-        `http://localhost:8082/playlist-service/playlists/${id}`,
+        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${id}`,
         {
           withCredentials: true,
         }
@@ -205,7 +208,7 @@ export const LibraryPanel = () => {
 
       // Make the API call
       const response = await axios.delete(
-        `http://localhost:8080/folders/${id}`,
+        `${MUSIC_LIBRARY_SERVICE_URL}/folders/${id}`,
         {
           withCredentials: true,
         }
