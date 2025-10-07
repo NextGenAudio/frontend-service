@@ -17,7 +17,8 @@ import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
 import { useFileHandling } from "@/app/utils/entity-handling-context";
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 export default function FolderPanel({ params }: { params: { id: number } }) {
   const {
@@ -66,10 +67,13 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     setPlayingSongId(song.id);
     setPlayingSong(song);
     const newScore = (song?.xscore ?? 0) + 1;
-    fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
-      method: "POST",
-      credentials: "include",
-    }).catch((err) => console.error("Failed to update song score", err));
+    fetch(
+      `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    ).catch((err) => console.error("Failed to update song score", err));
     song.xscore = newScore; // Optimistically update score in UI
   };
 
@@ -149,18 +153,21 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       // Optimistically update UI first
       const updatedSongList = songList.filter((song) => song.id !== songId);
       setSongList(updatedSongList);
-      
+
       // Update cache as well
       const folderId = params.id;
       setCache((prev) => new Map(prev).set(folderId, updatedSongList));
 
-      const response = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         console.log("Song deleted successfully");
@@ -169,14 +176,14 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       } else {
         const errorText = await response.text();
         console.error("Failed to delete song:", errorText);
-        
+
         // Rollback the optimistic update if the API call failed
         setSongList(songList);
         setCache((prev) => new Map(prev).set(folderId, songList));
       }
     } catch (err) {
       console.error("Error deleting song:", err);
-      
+
       // Rollback the optimistic update if there was an error
       setSongList(songList);
       const folderId = params.id;

@@ -23,8 +23,8 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import clsx from "clsx";
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
-
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 export function MusicPlayerHome() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -48,9 +48,12 @@ export function MusicPlayerHome() {
   useEffect(() => {
     const fetchRecentMusics = async () => {
       try {
-        const response = await axios.get(`${MUSIC_LIBRARY_SERVICE_URL}/files/recent`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/recent`,
+          {
+            withCredentials: true,
+          }
+        );
         setRecentMusics(response.data);
         console.log("Recent Musics:", response.data);
       } catch (error) {
@@ -152,10 +155,13 @@ export function MusicPlayerHome() {
     setSongList(currentList);
 
     const newScore = (song?.xscore ?? 0) + 1;
-    fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
-      method: "POST",
-      credentials: "include",
-    }).catch((err) => console.error("Failed to update song score", err));
+    fetch(
+      `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    ).catch((err) => console.error("Failed to update song score", err));
   };
 
   // Helper function to determine which song list the current song belongs to

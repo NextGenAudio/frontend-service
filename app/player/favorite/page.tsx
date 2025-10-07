@@ -20,7 +20,8 @@ import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { set } from "react-hook-form";
 import { Song } from "@/app/utils/music-context";
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 export default function FavoritePage() {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
@@ -75,10 +76,13 @@ export default function FavoritePage() {
     const fetchFavorites = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/favorite`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/favorite`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
         const data = await res.json();
 
         setFavoritesSongs(data);
@@ -166,7 +170,9 @@ export default function FavoritePage() {
               <div className="flex flex-col">
                 <h1
                   className={`text-4xl font-extrabold text-transparent bg-clip-text text-white drop-shadow-lg pb-2`}
-                >Loved Musics</h1>
+                >
+                  Loved Musics
+                </h1>
                 <p className="text-white/80text-lg flex items-center gap-2">
                   <Heart className="w-4 h-4 text-red-400" fill="currentColor" />
                   {favoritesSongs.length} favorites

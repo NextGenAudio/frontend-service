@@ -46,8 +46,8 @@ type Folder = {
   musicCount?: number;
 };
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
-const PLAYLIST_SERVICE_URL = process.env.PLAYLIST_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL = process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
+const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
 export const LibraryPanel = () => {
   const { player } = useSidebar();

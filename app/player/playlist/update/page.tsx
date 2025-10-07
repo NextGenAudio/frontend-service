@@ -27,8 +27,9 @@ import { useFileHandling } from "../../../utils/entity-handling-context";
 import { useEntityContext } from "@/app/utils/entity-context";
 
 // Backend service URLs
-const PLAYLIST_SERVICE_URL = process.env.PLAYLIST_SERVICE_URL;
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 interface Song {
   id: string;
@@ -101,9 +102,7 @@ const PlaylistUpdatePage = () => {
       const idStr = Array.isArray(playlistId) ? playlistId[0] : playlistId;
 
       const playlistData = idStr
-        ? playlistList.find(
-            (p) => (p.id) === parseInt(idStr)
-          ) || null
+        ? playlistList.find((p) => p.id === parseInt(idStr)) || null
         : null;
       setPlaylist(playlistData);
       setSelectedSongs(playlistData?.musics || playlistData?.tracks || []);

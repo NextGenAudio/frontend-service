@@ -20,7 +20,8 @@ interface UploadedFile {
   preview?: string;
 }
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 export function FolderCreate() {
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);

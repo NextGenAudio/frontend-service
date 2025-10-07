@@ -22,7 +22,8 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import axios from "axios";
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const { theme, setTheme } = useTheme();
@@ -91,7 +92,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     // if (!auto) {
     //   // Update music score
     //   const newScore = (song?.x_score ?? 0) + 1;
-    //   fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
+    //   fetch(`${NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
     //     method: "POST",
     //     credentials: "include",
     //   }).catch((err) => console.error("Failed to update song score", err));

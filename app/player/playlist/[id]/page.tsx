@@ -16,8 +16,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Song } from "@/app/utils/music-context";
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.MUSIC_LIBRARY_SERVICE_URL;
-const PLAYLIST_SERVICE_URL = process.env.PLAYLIST_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
+const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const {
     selectSong,
@@ -66,10 +67,13 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     setPlayingSongId(song.id);
     setPlayingSong(song);
     const newScore = (song?.xscore ?? 0) + 1;
-    fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
-      method: "POST",
-      credentials: "include",
-    }).catch((err) => console.error("Failed to update song score", err));
+    fetch(
+      `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    ).catch((err) => console.error("Failed to update song score", err));
     song.xscore = newScore; // Optimistically update score in UI
   };
 
@@ -158,13 +162,16 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   };
   const deleteSong = async (songId: string) => {
     try {
-      const response = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         console.log("Song deleted successfully");

@@ -26,8 +26,8 @@ import Image from "next/image";
 import { useFileHandling } from "../utils/entity-handling-context";
 
 // Backend service URLs
-const PLAYLIST_SERVICE_URL = `${process.env.PLAYLIST_SERVICE_URL}/playlist-service/playlists`;
-const MUSIC_LIBRARY_SERVICE_URL = `${process.env.MUSIC_LIBRARY_SERVICE_URL}/files/list`;
+const PLAYLIST_SERVICE_URL = `${process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL}/playlist-service/playlists`;
+const MUSIC_LIBRARY_SERVICE_URL = `${process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL}/files/list`;
 
 interface Song {
   id: string;
