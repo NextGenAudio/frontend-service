@@ -7,7 +7,6 @@ import { useState } from "react";
 import { FolderOptionsDropdown } from "../folder-options-dropdown";
 import { PlaylistOptionsDropdown } from "../playlist-options-dropdown";
 
-
 interface MediaCardProps {
   id: number;
   name: string;
@@ -15,6 +14,7 @@ interface MediaCardProps {
   count?: number;
   onClick?: () => void;
   type?: "folder" | "playlist";
+  isActive?: boolean; // Add this prop to track active state
   // Folder-specific props
   onFolderOpen?: () => void;
   onFolderRename?: () => void;
@@ -45,12 +45,13 @@ interface MediaCardProps {
 }
 
 function MediaCard({
-  id , 
+  id,
   name,
   image,
   count,
   onClick,
   type,
+  isActive = false, // Add default value
   // Folder props
   onFolderOpen,
   onFolderRename,
@@ -81,13 +82,14 @@ function MediaCard({
 }: MediaCardProps) {
   const [showDropdown, setShowDropdown] = useState(false);
 
-
   return (
     <div
       onClick={onClick}
-      className={`flex items-center gap-3 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 cursor-pointer shadow-lg group relative ${
-        showDropdown ? "z-[10000]" : "z-10"
-      }`}
+      className={`flex items-center gap-3 p-3 rounded-xl backdrop-blur-sm border cursor-pointer shadow-lg group relative transition-all duration-300 ${
+        isActive
+          ? "bg-white/25 border-white/40 shadow-xl" // Active state styling
+          : "bg-white/10 border-white/20 hover:bg-white/20" // Default state styling
+      } ${showDropdown ? "z-[10000]" : "z-10"}`}
     >
       <Image
         src={image || "/assets/file-icon.webp"}

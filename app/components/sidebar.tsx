@@ -9,6 +9,7 @@ import {
   BarChart3,
   Settings,
   LucideIcon,
+  ListMusic,
 } from "lucide-react";
 
 import SidebarButton from "./sidebar-button";
@@ -28,24 +29,26 @@ export const Sidebar = () => {
   const [favorites, setFavorites] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [settings, setSettings] = useState(false);
-  const {theme, setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
   const {
-    home, 
+    home,
     player,
     searchBar,
     detailPanel,
     upload,
     visualizer,
+    queue,
+    setQueue,
     setHome,
     setPlayer,
     setSearchBar,
     setDetailPanel,
     setUpload,
     setCreateFolder,
-    setVisualizer
-    } = useSidebar();
+    setVisualizer,
+  } = useSidebar();
 
-    const router =  useRouter();
+  const router = useRouter();
   const { status, data: session } = useSession();
   if (status === "loading") {
     return null;
@@ -64,7 +67,7 @@ export const Sidebar = () => {
       setSearchBar(!searchBar);
     }
     if (label === "Notifications") {
-      setNotifications(true); 
+      setNotifications(true);
     }
     if (label === "Favorites") {
       router.push("/player/favorite");
@@ -72,7 +75,7 @@ export const Sidebar = () => {
     if (label === "Settings") {
       router.push("/player/settings");
     }
-    if(label === "Visualizer"){
+    if (label === "Visualizer") {
       setVisualizer(!visualizer);
     }
   };
@@ -127,13 +130,18 @@ export const Sidebar = () => {
           isActive={visualizer}
         />
         <SidebarButton
+          label={"Queue"}
+          Icon={ListMusic}
+          handleItemClick={handleToggleButton}
+          isActive={queue}
+        />
+        <SidebarButton
           label={"Settings"}
           Icon={Settings}
           handleItemClick={handleToggleButton}
           isActive={settings}
         />
       </div>
-
       <div className="mt-auto mb-4">
         <ProfileAvatar w={14} h={14} />
       </div>

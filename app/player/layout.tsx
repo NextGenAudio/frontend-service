@@ -27,16 +27,8 @@ const MUSIC_LIBRARY_SERVICE_URL =
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const { theme, setTheme } = useTheme();
-  const {
-    player,
-    home,
-    upload,
-    profile,
-    createFolder,
-    playlist,
-    detailPanel,
-    visualizer,
-  } = useSidebar();
+  const { player, home, upload, profile, detailPanel, visualizer } =
+    useSidebar();
   const {
     setIsPlaying,
     selectSong,
@@ -53,17 +45,61 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     setSelectSong,
     setSelectSongId,
     setPlayingSongId,
-    playingSongId,
+    songQueue,
+    setSongQueue,
   } = useMusicContext();
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
   const { status } = useSession();
   const router = useRouter();
+
+  // Add state to track if we're using recommendations
+  const [usingRecommendations, setUsingRecommendations] = useState(false);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
+
+  // Remove this from the selectSong useEffect and create a separate one
+  useEffect(() => {
+    if (!playingSong || !songList.length) return;
+
+    const currentIndex = songList.findIndex((s) => s.id === playingSong.id);
+    console.log(
+      "Queue reset useEffect triggered. Using recommendations:",
+      usingRecommendations,
+      "Queue length:",
+      songQueue.length
+    );
+
+    // Don't reset queue if we're using recommendations
+    if (usingRecommendations) {
+      console.log("Skipping queue reset - using recommendations");
+      return;
+    }
+
+    if (currentIndex !== -1 && songQueue.length <= 1) {
+      // Get all songs from current index to end of list
+      const queueFromCurrent = songList.slice(currentIndex);
+      setSongQueue(queueFromCurrent);
+      setUsingRecommendations(false);
+      console.log(
+        `Set queue from songList: ${queueFromCurrent.length} songs from index ${currentIndex}`
+      );
+    } else if (currentIndex === -1 && songQueue.length === 0) {
+      // If current song not found in list AND queue is empty, set queue to just the current song
+      setSongQueue([playingSong]);
+      setUsingRecommendations(false);
+      console.log(
+        "Current song not in songList and queue empty, queue set to current song only"
+      );
+    } else {
+      console.log("Keeping existing queue intact");
+    }
+  }, [playingSong?.id, songList]); // Dependencies: when song or list changes
+
   useEffect(() => {
     if (!selectSong) return;
 
@@ -84,11 +120,13 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       }
     };
   }, [playingSong?.filename]);
+
   function handleSongDoubleClick(song: any) {
     setPlayingSongId(song.id);
     setSelectSongId(song.id);
     setSelectSong(song);
     setPlayingSong(song);
+    console.log("Song Queue", songQueue);
     // if (!auto) {
     //   // Update music score
     //   const newScore = (song?.x_score ?? 0) + 1;
@@ -98,11 +136,63 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     //   }).catch((err) => console.error("Failed to update song score", err));
     // }
   }
+
   const handleNextClick = () => {
-    if (!songList.length || !playingSong) return;
-    const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
-    const nextIndex = (currentIndex + 1) % songList.length;
-    const nextSong = songList[nextIndex];
+    const newQueue = [...songQueue]; // ✅ Declare as const inside the function
+    newQueue.shift();
+    setSongQueue(newQueue);
+
+    console.log("Song Queue after shift (newQueue)", newQueue);
+    if (!newQueue.length || !playingSong) return;
+    const currentIndex = newQueue.findIndex((s) => s.id === playingSong?.id);
+
+    if (newQueue.length < 2) {
+      axios
+        .get(
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/recommendations?genre=${playingSong?.genre?.genre},mood=${playingSong?.mood?.mood},artist=${playingSong?.artist}`,
+          { withCredentials: true }
+        )
+        .then((response) => {
+          const recommended = response.data as Song[];
+          console.log("Fetched Recommended Songs:", recommended);
+
+          // Remove duplicates - check against the newQueue that was captured in closure
+          const uniqueRecommended = recommended.filter(
+            (rec) => !newQueue.some((queued) => queued.id === rec.id)
+          );
+
+          console.log(
+            "Unique Recommended Songs after filtering:",
+            uniqueRecommended
+          );
+
+          const updatedQueue = [...newQueue, ...uniqueRecommended];
+          setSongQueue(updatedQueue);
+          setUsingRecommendations(true); // ✅ Set flag to prevent queue reset
+
+          console.log("Final Updated Song Queue:", updatedQueue);
+
+          // If we need to play the next song immediately after getting recommendations
+          if (updatedQueue.length > 0) {
+            const nextSong = updatedQueue[0]; // Play first song from updated queue
+            console.log(
+              "Playing next song from updated queue:",
+              nextSong?.title
+            );
+            handleSongDoubleClick(nextSong);
+            setIsPlaying(true);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch recommendations:", error);
+        });
+      return; // ✅ Important: return here to avoid playing song twice
+    }
+
+    // Only execute this if we didn't fetch recommendations
+    const nextIndex = (currentIndex + 1) % newQueue.length;
+    const nextSong = newQueue[nextIndex];
+    console.log("Playing next song from existing queue:", nextSong?.title);
     handleSongDoubleClick(nextSong);
     setIsPlaying(true);
   };

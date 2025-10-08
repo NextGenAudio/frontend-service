@@ -38,7 +38,6 @@ export interface Song {
 type MusicContextType = {
   isPlaying: boolean;
   songList: Song[];
-
   setSongList: (value: Song[]) => void;
 
   setIsPlaying: (value: boolean) => void;
@@ -61,6 +60,10 @@ type MusicContextType = {
   playingSongId: string | null;
   setSelectSongId: (value: string | null) => void;
   setPlayingSongId: (value: string | null) => void;
+  songQueue : Song[];
+  setSongQueue: (value: Song[]) => void;
+
+
 };
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -69,7 +72,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [selectSong, setSelectSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [songList, setSongList] = useState<Song[]>([]);
-
+  const [songQueue, setSongQueue] = useState<Song[]>([]);
   const [duration, setDuration] = useState(0);
   const [playingSong, setPlayingSong] = useState<Song | null>(null);
 
@@ -105,6 +108,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     playingSongId,
     setSelectSongId,
     setPlayingSongId,
+    songQueue,
+    setSongQueue
   };
 
   return (
