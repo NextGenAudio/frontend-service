@@ -1,4 +1,5 @@
 "use client";
+import { Shuffle } from "lucide-react";
 import React, { useRef } from "react";
 
 import { createContext, useState, useContext } from "react";
@@ -62,6 +63,8 @@ type MusicContextType = {
   setPlayingSongId: (value: string | null) => void;
   songQueue : Song[];
   setSongQueue: (value: Song[]) => void;
+  shuffleQueue: boolean;
+  setShuffleQueue: (value: boolean) => void;
 
 
 };
@@ -84,6 +87,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [selectSongId, setSelectSongId] = useState<string | null>(null);
   const [playingSongId, setPlayingSongId] = useState<string | null>(null);
+  const [shuffleQueue, setShuffleQueue] = useState(false);
   const value = {
     selectSong,
     playingSong,
@@ -109,7 +113,9 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setSelectSongId,
     setPlayingSongId,
     songQueue,
-    setSongQueue
+    setSongQueue,
+    shuffleQueue,
+    setShuffleQueue,
   };
 
   return (

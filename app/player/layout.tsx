@@ -13,6 +13,7 @@ import { useSidebar } from "../utils/sidebar-context";
 import { Song, useMusicContext } from "../utils/music-context";
 import { usePlayerSettings } from "../hooks/use-player-settings";
 import { SongDetailsPanel } from "../components/song-details-panel";
+import { QueuePanel } from "../components/queue-panel";
 import { EntityHandlingProvider } from "../utils/entity-handling-context";
 import { Howl } from "howler";
 import AudioVisualizer from "../components/audio-visualizer";
@@ -27,8 +28,9 @@ const MUSIC_LIBRARY_SERVICE_URL =
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const { theme, setTheme } = useTheme();
-  const { player, home, upload, profile, detailPanel, visualizer } =
+  const { player, home, upload, profile, detailPanel, visualizer, queue } =
     useSidebar();
+
   const {
     setIsPlaying,
     selectSong,
@@ -47,6 +49,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     setPlayingSongId,
     songQueue,
     setSongQueue,
+    shuffleQueue,
   } = useMusicContext();
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
@@ -137,9 +140,10 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     // }
   }
 
-  const handleNextClick = () => {
+  const handleNextClick = (playedSong : Song) => {
     const newQueue = [...songQueue]; // ✅ Declare as const inside the function
-    newQueue.shift();
+    const playedSongIndex = newQueue.findIndex((s) => s.id === playedSong?.id);
+    newQueue.splice(playedSongIndex , 1);
     setSongQueue(newQueue);
 
     console.log("Song Queue after shift (newQueue)", newQueue);
@@ -190,12 +194,20 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     }
 
     // Only execute this if we didn't fetch recommendations
-    const nextIndex = (currentIndex + 1) % newQueue.length;
+    let nextIndex = 0;
+    if (!shuffleQueue) {
+      nextIndex = (currentIndex + 1) % newQueue.length;
+    }
+    else {
+      nextIndex = Math.floor(Math.random() * newQueue.length);
+    }
     const nextSong = newQueue[nextIndex];
     console.log("Playing next song from existing queue:", nextSong?.title);
     handleSongDoubleClick(nextSong);
     setIsPlaying(true);
   };
+
+
 
   // Update listen count and last listened timestamp
   const updateListenedSong = (listenedSong: Song) => {
@@ -257,7 +269,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       onend: () => {
         const listenedSong = playingSong;
         setIsPlaying(false);
-        handleNextClick(); // Automatically move to next song
+        handleNextClick(listenedSong); // Automatically move to next song
         updateListenedSong(listenedSong);
       },
     });
@@ -328,15 +340,19 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                 </ResizablePanelGroup>
               </ResizablePanel>
               <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
-              {detailPanel && (
+              {(detailPanel || queue) && (
                 <ResizablePanel defaultSize={22} minSize={20} maxSize={25}>
-                  {detailPanel && <SongDetailsPanel song={selectSong} />}
+                  {queue ? (
+                    <QueuePanel />
+                  ) : (
+                    detailPanel && <SongDetailsPanel song={selectSong} />
+                  )}
                 </ResizablePanel>
               )}
             </ResizablePanelGroup>
           </div>
 
-          {player && <FloatingPlayerControls song={playingSong} />}
+          {player && <FloatingPlayerControls song={playingSong} handleNextClick={handleNextClick} />}
         </div>
       </EntityHandlingProvider>
     </div>

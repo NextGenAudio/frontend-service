@@ -41,7 +41,7 @@ const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
-export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
+export const FloatingPlayerControls = ({ song , handleNextClick}: { song: Song | null , handleNextClick: (playedSong : Song) => void }) => {
   const [isShuffle, setIsShuffle] = useState(false);
 
   // const [progress, setProgress] = useState(0);
@@ -76,6 +76,9 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     setRepeatMode,
     songList,
     playingSong,
+    songQueue,
+    setSongQueue,
+    setShuffleQueue,
   } = useMusicContext();
   const { setSelectSong, setPlayingSong, setSelectSongId, setPlayingSongId } =
     useMusicContext();
@@ -270,33 +273,12 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
     setSelectSong(song);
     setPlayingSong(song);
   }
-  const handleNextClick = () => {
-    const skippedSong = playingSong; // For updating listen timestamp later
-    const skippedTime = currentTime;
-    const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
-    const nextIndex = (currentIndex + 1) % songList.length;
-    const nextSong = songList[nextIndex];
-    handleSongDoubleClick(nextSong);
-    if (
-      skippedSong &&
-      skippedSong.metadata &&
-      skippedTime < skippedSong.metadata.track_length / 2
-    ) {
-      skippedSong.xscore = (skippedSong.xscore ?? 0) - 1;
-      fetch(
-        `${MUSIC_LIBRARY_SERVICE_URL}/files/${skippedSong.id}/score?score=${skippedSong.xscore}`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      ).catch((err) => console.error("Failed to update song score", err));
-    }
-  };
+
   const handlePreviousClick = () => {
-    const currentIndex = songList.findIndex((s) => s.id === playingSong?.id);
+    const currentIndex = songQueue.findIndex((s) => s.id === playingSong?.id);
     const previousIndex =
-      (currentIndex - 1 + songList.length) % songList.length;
-    const previousSong = songList[previousIndex];
+      (currentIndex - 1 + songQueue.length) % songQueue.length;
+    const previousSong = songQueue[previousIndex];
     handleSongDoubleClick(previousSong);
   };
 
@@ -436,7 +418,11 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                             ? `text-white ${themeColors.activeBg}`
                             : "text-orange-200/80 hover:text-white"
                         }`}
-                        onClick={toggleShuffle}
+                        onClick={() => {
+                          toggleShuffle();
+                          setShuffleQueue(!isShuffle);
+                          setIsShuffle(!isShuffle);
+                        }}
                       >
                         <Shuffle className="h-3.5 w-3.5" />
                       </Button>
@@ -487,7 +473,7 @@ export const FloatingPlayerControls = ({ song }: { song: Song | null }) => {
                         size="icon"
                         variant="ghost"
                         className={`h-8 w-8 rounded-full backdrop-blur-sm border border-white/20 text-orange-200/80 hover:text-white hover:scale-110 ${themeColors.hoverBg} transition-all duration-300`}
-                        onClick={handleNextClick}
+                        onClick={() => handleNextClick(playingSong!)}
                       >
                         <SkipForward className="h-4 w-4" />
                       </Button>

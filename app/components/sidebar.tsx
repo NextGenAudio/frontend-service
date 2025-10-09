@@ -78,6 +78,13 @@ export const Sidebar = () => {
     if (label === "Visualizer") {
       setVisualizer(!visualizer);
     }
+    if (label === "Queue") {
+      setQueue(!queue);
+      // Hide detail panel when queue is shown
+      if (!queue) {
+        setDetailPanel(false);
+      }
+    }
   };
 
   const handleProfileClick = () => {
