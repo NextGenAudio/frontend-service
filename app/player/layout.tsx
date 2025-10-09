@@ -140,10 +140,10 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     // }
   }
 
-  const handleNextClick = (playedSong : Song) => {
+  const handleNextClick = (playedSong: Song) => {
     const newQueue = [...songQueue]; // ✅ Declare as const inside the function
     const playedSongIndex = newQueue.findIndex((s) => s.id === playedSong?.id);
-    newQueue.splice(playedSongIndex , 1);
+    newQueue.splice(playedSongIndex, 1);
     setSongQueue(newQueue);
 
     console.log("Song Queue after shift (newQueue)", newQueue);
@@ -197,8 +197,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     let nextIndex = 0;
     if (!shuffleQueue) {
       nextIndex = (currentIndex + 1) % newQueue.length;
-    }
-    else {
+    } else {
       nextIndex = Math.floor(Math.random() * newQueue.length);
     }
     const nextSong = newQueue[nextIndex];
@@ -206,8 +205,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     handleSongDoubleClick(nextSong);
     setIsPlaying(true);
   };
-
-
 
   // Update listen count and last listened timestamp
   const updateListenedSong = (listenedSong: Song) => {
@@ -318,7 +315,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                   <LibraryPanel />
                 </div>
               </ResizablePanel>
-              <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
+              <ResizableHandle className="w-[2px] bg-white/20 hover:bg-white/40 transition-colors" />
               <ResizablePanel defaultSize={55} minSize={20}>
                 {/* Music player positioned to not overlap sidebar */}
 
@@ -339,20 +336,33 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                   </ResizablePanel>
                 </ResizablePanelGroup>
               </ResizablePanel>
-              <ResizableHandle className="w-1 bg-border hover:bg-primary/20 transition-colors" />
+              <ResizableHandle className="w-[2px] bg-white/20 hover:bg-white/40 transition-colors" />
               {(detailPanel || queue) && (
                 <ResizablePanel defaultSize={22} minSize={20} maxSize={25}>
-                  {queue ? (
-                    <QueuePanel />
-                  ) : (
-                    detailPanel && <SongDetailsPanel song={selectSong} />
-                  )}
+                  <ResizablePanelGroup direction="vertical">
+                    {queue && (
+                      <ResizablePanel defaultSize={50} minSize={0}>
+                        <QueuePanel />
+                      </ResizablePanel>
+                    )}
+                    <ResizableHandle className="w-1 bg-white/20 hover:bg-white/40 transition-colors" />
+                    {detailPanel && (
+                      <ResizablePanel defaultSize={50} minSize={0}>
+                        <SongDetailsPanel song={selectSong} />
+                      </ResizablePanel>
+                    )}
+                  </ResizablePanelGroup>
                 </ResizablePanel>
               )}
             </ResizablePanelGroup>
           </div>
 
-          {player && <FloatingPlayerControls song={playingSong} handleNextClick={handleNextClick} />}
+          {player && (
+            <FloatingPlayerControls
+              song={playingSong}
+              handleNextClick={handleNextClick}
+            />
+          )}
         </div>
       </EntityHandlingProvider>
     </div>

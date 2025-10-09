@@ -330,7 +330,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
               </div>
             ) : songList.length === 0 ? (
               /* Empty State */
-              <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="flex flex-col items-center justify-center pt-20 text-center">
                 <div className="relative mb-6">
                   <div
                     className={`w-32 h-32 rounded-full bg-gradient-to-br ${themeColors.gradient} opacity-20 backdrop-blur-sm ${themeColors.border} flex items-center justify-center`}
@@ -350,9 +350,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                   This folder is empty. Upload some music files to get started!
                 </p>
                 <div className="flex flex-col items-center gap-2 text-white/50">
-                  <p className="text-sm">
+                  {/* <p className="text-sm">
                     💡 Tip: Drag and drop music files to add them to this folder
-                  </p>
+                  </p> */}
                 </div>
               </div>
             ) : (
@@ -470,7 +470,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
               ))
             )}
             {/* Add More Music Button */}
-            <div className="flex justify-center pt-6 pb-4">
+            <div className="flex justify-center pb-4 pt-6">
               <Button
                 onClick={() =>
                   router.push(`/player/playlist/update?playlistId=${params.id}`)

@@ -37,6 +37,7 @@ import { Song } from "../utils/music-context";
 import axios from "axios";
 import { on } from "events";
 import AlertBar from "./alert-bar";
+import { usePathname } from "next/navigation";
 
 type Folder = {
   id: number;
@@ -46,12 +47,18 @@ type Folder = {
   musicCount?: number;
 };
 
-const MUSIC_LIBRARY_SERVICE_URL = process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
 export const LibraryPanel = () => {
   const { player } = useSidebar();
   const [message, setMessage] = useState<string | null>(null);
+  const [activeItem, setActiveItem] = useState<{
+    type: string;
+    id: number;
+  } | null>(null);
+  const pathname = usePathname();
   const {
     folderList,
     playlistList,
@@ -72,6 +79,22 @@ export const LibraryPanel = () => {
     songAddToPlaylistRefresh,
   } = useFileHandling();
   const router = useRouter();
+
+  // Detect active item from URL
+  useEffect(() => {
+    if (pathname) {
+      const folderMatch = pathname.match(/\/player\/folder\/(\d+)/);
+      const playlistMatch = pathname.match(/\/player\/playlist\/(\d+)/);
+
+      if (folderMatch) {
+        setActiveItem({ type: "folder", id: parseInt(folderMatch[1]) });
+      } else if (playlistMatch) {
+        setActiveItem({ type: "playlist", id: parseInt(playlistMatch[1]) });
+      } else {
+        setActiveItem(null);
+      }
+    }
+  }, [pathname]);
 
   // Fetch folders
   useEffect(() => {
@@ -137,6 +160,7 @@ export const LibraryPanel = () => {
   // Handle folder click
   const handleFolderClick = async (folder: Folder) => {
     setSelectedFolder(folder);
+    setActiveItem({ type: "folder", id: folder.id });
     try {
       setEntityType("folder");
       setEntityName(folder.name);
@@ -152,6 +176,7 @@ export const LibraryPanel = () => {
 
   // Handle playlist click
   const handlePlaylistClick = async (playlist: Playlist) => {
+    setActiveItem({ type: "playlist", id: playlist.id });
     try {
       setEntityType("playlist");
       setEntityName(playlist.name);
@@ -333,6 +358,10 @@ export const LibraryPanel = () => {
                       }
                       count={playlist.musicCount}
                       type="playlist"
+                      isActive={
+                        activeItem?.type === "playlist" &&
+                        activeItem?.id === playlist.id
+                      }
                       onClick={() => handlePlaylistClick(playlist)}
                       onPlaylistDelete={() => handlePlaylistDelete(playlist.id)}
                     />
@@ -348,6 +377,10 @@ export const LibraryPanel = () => {
                     }
                     count={folder.musicCount}
                     type="folder"
+                    isActive={
+                      activeItem?.type === "folder" &&
+                      activeItem?.id === folder.id
+                    }
                     onClick={() => handleFolderClick(folder)}
                   />
                 ))}
@@ -374,6 +407,10 @@ export const LibraryPanel = () => {
                       }
                       count={playlist.musicCount}
                       type="playlist"
+                      isActive={
+                        activeItem?.type === "playlist" &&
+                        activeItem?.id === playlist.id
+                      }
                       onClick={() => handlePlaylistClick(playlist)}
                     />
                   ))}
@@ -398,6 +435,10 @@ export const LibraryPanel = () => {
                     count={folder.musicCount}
                     onClick={() => handleFolderClick(folder)}
                     type="folder"
+                    isActive={
+                      activeItem?.type === "folder" &&
+                      activeItem?.id === folder.id
+                    }
                   />
                 ))}
               </div>

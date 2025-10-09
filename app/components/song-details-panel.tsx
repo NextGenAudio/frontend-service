@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { Heart, Share2, MoreHorizontal, ChevronDown, X } from "lucide-react";
+import {
+  Heart,
+  Share2,
+  MoreHorizontal,
+  ChevronDown,
+  X,
+  Music,
+} from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import Image from "next/image";
 import {
@@ -18,6 +25,8 @@ import axios from "axios";
 import { set } from "react-hook-form";
 import { useEntityContext } from "../utils/entity-context";
 import { Song } from "../utils/music-context";
+import { getGeneralThemeColors } from "../lib/theme-colors";
+import { useTheme } from "../utils/theme-context";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -29,7 +38,8 @@ interface GlassSongDetailsPanelProps {
 export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
   const [liked, setliked] = useState(false);
   const { player, setDetailPanel } = useSidebar();
-
+  const { theme } = useTheme();
+  const themeColors = getGeneralThemeColors(theme.primary);
   useEffect(() => {
     console.log(song?.metadata);
     if (song) {
@@ -115,10 +125,11 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
       <div className="relative h-full flex flex-col">
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
           <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
+            <Music className={`w-6 h-6 ${themeColors.text}`} />
             <h2 className="text-lg font-semibold text-white/90">
               Music Details
-              <span className="text-2xl text-white/60 font-normal ml-2">|</span>
-              <span className="text-sm text-white/60 font-normal ml-2">{}</span>
+                {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
+                <span className="text-sm text-white/60 font-normal ml-2">{}</span> */}
             </h2>
             <Button
               size="icon"
