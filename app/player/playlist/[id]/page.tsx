@@ -35,7 +35,6 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
-  const [isHeaderCompact, setIsHeaderCompact] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
   const { isPlaying, setIsPlaying } = useMusicContext();
@@ -119,22 +118,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     fetchSongs();
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (scrollRef.current) {
-        const scrollTop = scrollRef.current.scrollTop;
-        setScrollY(scrollTop);
 
-        setIsHeaderCompact(scrollTop > 120);
-      }
-    };
-
-    const scrollElement = scrollRef.current;
-    if (scrollElement) {
-      scrollElement.addEventListener("scroll", handleScroll, { passive: true });
-      return () => scrollElement.removeEventListener("scroll", handleScroll);
-    }
-  }, []);
   const removeSongFromPlaylist = async (songId: string) => {
     try {
       const response = await fetch(
@@ -188,7 +172,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   return (
     <div
       ref={scrollRef}
-      className="relative h-full flex flex-col  pt-5"
+      className="relative h-full flex flex-col"
       onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
     >
       {/* Glass background with gradient */}
@@ -197,9 +181,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
 
       {searchBar && <SearchBar />}
 
-      <div className="pt-5 relative z-10 h-full flex flex-col">
+      <div className="pt-3 relative z-10 h-full flex flex-col">
         <div
-          className="h-fit p-4 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
+          className="h-fit p-5 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
           style={{
             transform: `translateY(${Math.min(scrollY * 0.3, 30)}px)`,
           }}
@@ -221,13 +205,12 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
               <div
                 className="rounded-xl  overflow-hidden relative flex-shrink-0 transition-all duration-700 ease-out"
                 style={{
-                  width: isHeaderCompact ? "60px" : "208px",
-                  height: isHeaderCompact ? "60px" : "208px",
-                  opacity: isHeaderCompact
-                    ? 0
-                    : Math.max(0.3, 1 - scrollY / 200),
+                  width:  "208px",
+                  height: "208px",
+                  opacity: 
+                    Math.max(0.3, 1 - scrollY / 200),
                   transform: `scale(${
-                    isHeaderCompact ? 0.3 : Math.max(0.8, 1 - scrollY / 400)
+                     Math.max(0.8, 1 - scrollY / 400)
                   })`,
                 }}
               >
@@ -246,13 +229,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                 <h2
                   className="font-extrabold text-white drop-shadow-lg transition-all duration-700 ease-out"
                   style={{
-                    fontSize: isHeaderCompact
-                      ? "2rem"
-                      : `${Math.max(2, 6 - scrollY / 50)}rem`,
-                    lineHeight: isHeaderCompact ? "2.5rem" : "1",
-                    transform: `translateX(${
-                      isHeaderCompact ? "-60px" : "0px"
-                    })`,
+                    fontSize: "5rem",
                   }}
                 >
                   {entityName}
@@ -260,18 +237,18 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                 <p
                   className="text-white/80 transition-all duration-700 ease-out ml-2 mt-1"
                   style={{
-                    fontSize: isHeaderCompact ? "0.875rem" : "1rem",
+                    fontSize:  "1.1rem",
                     transform: `translateX(${
-                      isHeaderCompact ? "-60px" : "0px"
+                     "0px"
                     })`,
-                    opacity: isHeaderCompact ? 0.9 : 0.8,
+                    opacity: 0.8,
                   }}
                 >
                   {songList.length} songs
                 </p>
 
                 {/* Action Buttons */}
-                {!isHeaderCompact && songList.length > 0 && (
+                {songList.length > 0 && (
                   <div className="flex items-center gap-4 mt-4">
                     <Button
                       onClick={handlePlayAll}
@@ -318,12 +295,12 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
             {loading ? (
               /* Loading State */
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="relative">
+                <div className="relative w-16 h-16">
                   <Music
-                    className={`w-16 h-16 ${themeColors.text} animate-pulse`}
+                    className={`w-8 h-8 ${themeColors.text} animate-pulse absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
                   />
                   <div
-                    className={`absolute inset-0 w-16 h-16 border-4 ${themeColors.border} border-t-current rounded-full animate-spin`}
+                    className={`w-16 h-16 border-4 ${themeColors.border} border-t-current rounded-full animate-spin`}
                   />
                 </div>
                 <p className="text-white/70 mt-4 text-lg">Loading songs...</p>
@@ -360,7 +337,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
               songList.map((song, id) => (
                 <div
                   key={song.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer group backdrop-blur-sm border hover:shadow-lg ${
                     playingSongId === song.id
                       ? `bg-gradient-to-r ${themeColors.gradient} bg-opacity-30 ${themeColors.border} ${themeColors.shadow}`
                       : `bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30`

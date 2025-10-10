@@ -27,7 +27,8 @@ import { useFileHandling } from "../utils/entity-handling-context";
 
 // Backend service URLs
 const PLAYLIST_SERVICE_URL = `${process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL}/playlist-service/playlists`;
-const MUSIC_LIBRARY_SERVICE_URL = `${process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL}/files/list`;
+const MUSIC_LIBRARY_SERVICE_URL =
+  process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 interface Song {
   id: string;
@@ -71,21 +72,24 @@ export function PlaylistCreatePage() {
   const { player } = useSidebar();
   const artworkInputRef = useRef<HTMLInputElement>(null);
   const { playlistCreateRefresh, setPlaylistCreateRefresh } = useFileHandling();
+
   useEffect(() => {
+    const fetchAvailableSongs = async () => {
+      try {
+        const response = await axios.get(
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/list`,
+          {
+            withCredentials: true,
+          }
+        );
+        setAvailableSongs(response.data);
+      } catch (error) {
+        console.error("Failed to fetch songs:", error);
+        setMessage("❌ Failed to load songs");
+      }
+    };
     fetchAvailableSongs();
   }, []);
-
-  const fetchAvailableSongs = async () => {
-    try {
-      const response = await axios.get(MUSIC_LIBRARY_SERVICE_URL, {
-        withCredentials: true,
-      });
-      setAvailableSongs(response.data);
-    } catch (error) {
-      console.error("Failed to fetch songs:", error);
-      setMessage("❌ Failed to load songs");
-    }
-  };
 
   // Handle drag-drop for artwork
   const handleArtworkDrop = (e: React.DragEvent) => {

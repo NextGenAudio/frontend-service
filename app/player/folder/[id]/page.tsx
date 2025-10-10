@@ -193,7 +193,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
   return (
     <div
       ref={scrollRef}
-      className="relative h-full flex flex-col  pt-5"
+      className="relative h-full flex flex-col"
       onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
     >
       {/* Glass background with gradient */}
@@ -202,9 +202,9 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
       {searchBar && <SearchBar />}
 
-      <div className="pt-5 relative z-10 h-full flex flex-col">
+      <div className="pt-3 relative z-10 h-full flex flex-col">
         <div
-          className="h-fit p-4 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
+          className="h-fit p-5 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
           style={{
             transform: `translateY(${Math.min(scrollY * 0.3, 30)}px)`,
           }}
@@ -251,13 +251,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 <h2
                   className="font-extrabold text-white drop-shadow-lg transition-all duration-700 ease-out"
                   style={{
-                    fontSize: isHeaderCompact
-                      ? "2rem"
-                      : `${Math.max(2, 6 - scrollY / 50)}rem`,
-                    lineHeight: isHeaderCompact ? "2.5rem" : "1",
-                    transform: `translateX(${
-                      isHeaderCompact ? "-60px" : "0px"
-                    })`,
+                    fontSize: "5rem",
+                    lineHeight: "5rem",
                   }}
                 >
                   {entityName}
@@ -265,10 +260,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 <p
                   className="text-white/80 transition-all duration-700 ease-out ml-2 mt-1"
                   style={{
-                    fontSize: isHeaderCompact ? "0.875rem" : "1rem",
-                    transform: `translateX(${
-                      isHeaderCompact ? "-60px" : "0px"
-                    })`,
+                    fontSize: isHeaderCompact ? "0.875rem" : "1.1rem",
+
                     opacity: isHeaderCompact ? 0.9 : 0.8,
                   }}
                 >
@@ -323,11 +316,13 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
             {loading ? (
               /* Loading State */
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="relative">
+                <div className="relative w-16 h-16">
                   <Music
-                    className={`w-16 h-16 ${themeColors.text} animate-pulse`}
+                    className={`w-8 h-8 ${themeColors.text} animate-pulse absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
                   />
-                  <div className="absolute inset-0 w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                  <div
+                    className={`w-16 h-16 border-4 ${themeColors.border} border-t-current rounded-full animate-spin`}
+                  />
                 </div>
                 <p className="text-white/70 mt-4 text-lg">Loading songs...</p>
               </div>

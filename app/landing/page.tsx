@@ -35,7 +35,7 @@ export function Landing() {
         const data = await result.json();
         set_first_name(data.data?.first_name);
         set_last_name(data.data?.last_name);
-        set_email(data.data.email);
+        set_email(data.data?.email);
         console.log("User data:", data.data);
 
         if (!data.data) {

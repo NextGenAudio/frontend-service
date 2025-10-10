@@ -7,6 +7,9 @@ import { getGeneralThemeColors } from "../lib/theme-colors";
 import { useEntityContext } from "../utils/entity-context";
 import { Playlist } from "../utils/entity-context";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+
+const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
 interface PlaylistSelectionDropdownProps {
   songId: string;
@@ -49,8 +52,25 @@ export function PlaylistSelectionDropdown({
     setLoading(false);
   }, [playlistList]);
 
-  const handlePlaylistSelect = (playlist: Playlist) => {
-    setSelectedPlaylist(playlist.id);
+  const handlePlaylistSelect = async(playlist: Playlist) => {
+    const playlistId = playlist.id;
+    setSelectedPlaylist(playlistId);
+
+    // Step 2: Add selected songs to the new playlist
+
+    const songIds = [songId]; // Wrap single songId in an array
+
+    await axios.post(
+      `${PLAYLIST_SERVICE_URL}/${playlistId}/tracks`,
+      { fileIds: songIds },
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(`Added song ${songId} to playlist ${playlistId}`);
     onAddToPlaylist?.(playlist.id, playlist.name);
     onClose?.();
   };
