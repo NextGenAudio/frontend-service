@@ -17,7 +17,6 @@ import {
   List,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { Slider } from "@/app/components/ui/slider";
 import { getControlThemeColors } from "@/app/lib/theme-colors";
 import {
   Tooltip,
@@ -26,7 +25,6 @@ import {
   TooltipTrigger,
 } from "@/app/components/ui/tooltip";
 import Image from "next/image";
-import { Howl } from "howler";
 import { parseWebStream } from "music-metadata";
 import SongCover from "./song-cover";
 import * as RadixSlider from "@radix-ui/react-slider";
@@ -36,6 +34,7 @@ import { useFileHandling } from "../utils/entity-handling-context";
 import { useTheme } from "../utils/theme-context";
 import { PlaylistSelectionDropdown } from "./playlist-selection-dropdown";
 import { Song } from "../utils/music-context";
+import axios from "axios";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -267,6 +266,7 @@ export const FloatingPlayerControls = ({ song , handleNextClick}: { song: Song |
       console.error("Failed to update music score:", err);
     }
   };
+
   function handleSongDoubleClick(song: Song) {
     setPlayingSongId(song.id);
     setSelectSongId(song.id);
@@ -284,27 +284,22 @@ export const FloatingPlayerControls = ({ song , handleNextClick}: { song: Song |
 
   const handleAddToPlaylist = async (
     playlistId: number,
-    playlistName: string
   ) => {
     if (!song) return;
 
     try {
-      const response = await fetch(
-        `${PLAYLIST_SERVICE_URL}/${playlistId}/tracks`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            musicIds: [parseInt(song.id)],
-          }),
-        }
+      const response = await axios.post(`${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/tracks`, 
+          { fileIds: [song.id] },
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
       );
 
-      if (response.ok) {
-        console.log(`Song added to playlist: ${playlistName}`);
+      if (response.status === 200) {
+        console.log(`Song added to playlist: ${playlistId}`);
         // Optional: Show success notification
       } else {
         console.error("Failed to add song to playlist");

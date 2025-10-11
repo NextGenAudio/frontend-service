@@ -51,6 +51,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     setSongQueue,
     shuffleQueue,
   } = useMusicContext();
+
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
   const { status } = useSession();
@@ -130,14 +131,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     setSelectSong(song);
     setPlayingSong(song);
     console.log("Song Queue", songQueue);
-    // if (!auto) {
-    //   // Update music score
-    //   const newScore = (song?.x_score ?? 0) + 1;
-    //   fetch(`${NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`, {
-    //     method: "POST",
-    //     credentials: "include",
-    //   }).catch((err) => console.error("Failed to update song score", err));
-    // }
   }
 
   const handleNextClick = (playedSong: Song) => {

@@ -13,7 +13,7 @@ const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
 interface PlaylistSelectionDropdownProps {
   songId: string;
-  onAddToPlaylist?: (playlistId: number, playlistName: string) => void;
+  onAddToPlaylist?: (playlistId: number) => void;
   onCreateNewPlaylist?: () => void;
   onClose?: () => void;
 }
@@ -52,28 +52,28 @@ export function PlaylistSelectionDropdown({
     setLoading(false);
   }, [playlistList]);
 
-  const handlePlaylistSelect = async(playlist: Playlist) => {
-    const playlistId = playlist.id;
-    setSelectedPlaylist(playlistId);
+  // const handlePlaylistSelect = async(playlist: Playlist) => {
+  //   const playlistId = playlist.id;
+  //   setSelectedPlaylist(playlistId);
 
-    // Step 2: Add selected songs to the new playlist
+  //   // Step 2: Add selected songs to the new playlist
 
-    const songIds = [songId]; // Wrap single songId in an array
+  //   const songIds = [songId]; // Wrap single songId in an array
 
-    await axios.post(
-      `${PLAYLIST_SERVICE_URL}/${playlistId}/tracks`,
-      { fileIds: songIds },
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    console.log(`Added song ${songId} to playlist ${playlistId}`);
-    onAddToPlaylist?.(playlist.id, playlist.name);
-    onClose?.();
-  };
+  //   await axios.post(
+  //     `${PLAYLIST_SERVICE_URL}/${playlistId}/tracks`,
+  //     { fileIds: songIds },
+  //     {
+  //       withCredentials: true,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     }
+  //   );
+  //   console.log(`Added song ${songId} to playlist ${playlistId}`);
+  //   onAddToPlaylist?.(playlist.id);
+  //   onClose?.();
+  // };
 
   const handleCreateNew = () => {
     onCreateNewPlaylist?.();
@@ -141,7 +141,7 @@ export function PlaylistSelectionDropdown({
                   <button
                     key={playlist.id}
                     className={`w-full px-3 py-2.5 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group rounded-lg hover:bg-white/10`}
-                    onClick={() => handlePlaylistSelect(playlist)}
+                    onClick={() => onAddToPlaylist?.(playlist.id)}
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {playlist.playlistArt ? (
