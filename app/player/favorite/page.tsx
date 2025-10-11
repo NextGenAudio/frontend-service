@@ -27,6 +27,7 @@ export default function FavoritePage() {
   const { selectSong, setSelectSong, playingSong, setPlayingSong } =
     useMusicContext();
   const { theme } = useTheme();
+  const [hoveredSong, setHoveredSong] = useState<string | null>(null);
   const themeColors = getGeneralThemeColors(theme.primary);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [favoritesSongs, setFavoritesSongs] = useState<Song[]>([]);
@@ -76,13 +77,10 @@ export default function FavoritePage() {
     const fetchFavorites = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          `${MUSIC_LIBRARY_SERVICE_URL}/files/favorite`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const res = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/favorite`, {
+          method: "GET",
+          credentials: "include",
+        });
         const data = await res.json();
 
         setFavoritesSongs(data);
@@ -205,10 +203,11 @@ export default function FavoritePage() {
 
         {/* Table Header - Fixed */}
         <div className="px-4 pt-4 pb-2 backdrop-blur-xl bg-gray-800/40">
-          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+          <div className="grid grid-cols-11 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-1">#</div>
             <div className="col-span-5">Title</div>
             <div className="col-span-3">Album</div>
+            <div className="col-span-1">Plays</div>
             <div className="col-span-1">Duration</div>
           </div>
         </div>
@@ -227,10 +226,12 @@ export default function FavoritePage() {
             <div className="flex flex-col items-center justify-center py-20">
               <div className="relative">
                 <Heart
-                  className={`w-16 h-16 ${themeColors.text} animate-pulse`}
+                  className={`w-8 h-8 ${themeColors.text} animate-pulse absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
                   fill="currentColor"
                 />
-                <div className="absolute inset-0 w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                <div
+                  className={`w-16 h-16 border-4 ${themeColors.border} border-t-current rounded-full animate-spin`}
+                />
               </div>
               <p className="text-white/70 mt-4 text-lg">
                 Loading your favorites...
@@ -266,7 +267,9 @@ export default function FavoritePage() {
             favoritesSongs.map((song, id) => (
               <div
                 key={song.id}
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:scale-[1.01] hover:shadow-lg ${
+                onMouseEnter={() => setHoveredSong(song.id)}
+                onMouseLeave={() => setHoveredSong(null)}
+                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border hover:shadow-lg ${
                   playingSongId === song.id
                     ? `bg-gradient-to-r ${theme.preview} border-white/40 shadow-lg ${themeColors.shadow}`
                     : `bg-white/10 border-white/20 ${themeColors.hoverBg} hover:border-white/30`
@@ -280,34 +283,45 @@ export default function FavoritePage() {
                   setIsPlaying(true);
                 }}
               >
-                <div className="font-medium text-white drop-shadow-sm">
-                  {id + 1}
-                </div>
-                <div className="relative">
+                <div className="col-span-1  flex items-center justify-center mx-1">
                   <Button
                     size="icon"
                     variant="ghost"
-                    className={`h-8 w-8 rounded-xl bg-white/10 hover:bg-${theme.primary}/30 border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm`}
+                    className={`h-9 w-9 rounded-xl bg-white/10 ${themeColors.hoverBg} border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 `}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (playingSongId === song.id) {
-                        setIsPlaying(!isPlaying);
+                        setIsPlaying(!isPlaying); // toggle play/pause
                       } else {
-                        handleSongDoubleClick(song);
-                        setPlayer(true);
-                        setIsPlaying(true);
+                        setPlayingSongId(song.id);
+                        setSelectSongId(song.id);
+                        setSelectSong(song);
+                        setPlayingSong(song);
                       }
                     }}
                   >
-                    {isPlaying && playingSongId === song.id ? (
-                      <Pause className="h-4 w-4 text-white" />
+                    {playingSong?.id === song.id ? (
+                      <div
+                        className="w-4 h-4 text-white flex items-center justify-center"
+                        style={{ color: theme.primary }}
+                      >
+                        {isPlaying ? (
+                          <Pause fill="white" />
+                        ) : (
+                          <Play fill="white" />
+                        )}
+                      </div>
+                    ) : hoveredSong === song.id ? (
+                      <Play className="w-4 h-4" fill="white" />
                     ) : (
-                      <Play className="h-4 w-4 text-white" />
+                      <span className="font-medium text-white drop-shadow-sm">
+                        {id + 1}
+                      </span>
                     )}
                   </Button>
                 </div>
                 <div className="grid grid-cols-10 gap-3 w-full items-center">
-                  <span className="col-span-6 flex flex-col">
+                  <span className="col-span-5 flex flex-col">
                     <div className="font-medium truncate text-white drop-shadow-sm flex items-center gap-2">
                       {song.title || song.filename}
                       <Heart
@@ -319,8 +333,11 @@ export default function FavoritePage() {
                       {song.artist}
                     </span>
                   </span>
-                  <span className="col-span-3 text-sm text-white/70 truncate">
+                  <span className="col-span-2 text-sm text-white/70 truncate">
                     {song.album}
+                  </span>
+                  <span className="col-span-2 text-sm text-white/70 truncate">
+                    {song.listenCount}
                   </span>
                   <span className="col-span-1 text-center text-white/70 truncate">
                     {song?.metadata.track_length / 60

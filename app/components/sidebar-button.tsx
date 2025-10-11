@@ -63,7 +63,7 @@ const SidebarButton = ({
 
         <div
           className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-black/80 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none whitespace-nowrap z-50 group-hover:translate-x-1 backdrop-blur-sm border border-white/10 shadow-lg
-  [transition-delay:0ms] group-hover:[transition-delay:2000ms]"
+  [transition-delay:0ms] group-hover:[transition-delay:1000ms]"
         >
           {label}
           <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black/90" />

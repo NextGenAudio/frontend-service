@@ -46,7 +46,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
   // Get theme-specific colors
   const themeColors = getGeneralThemeColors(theme.primary);
-
+  const [hoveredSong, setHoveredSong] = useState<string | null>(null);
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
   );
@@ -308,7 +308,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
             <div className="col-span-1">#</div>
             <div className="col-span-5 ">Title</div>
 
-            <div className="col-span-3">Album</div>
+            <div className="col-span-2">Album</div>
+            <div className="col-span-1">Plays</div>
             <div className="col-span-1 mr-4">Duration</div>
           </div>
         </div>
@@ -356,6 +357,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
               songList.map((song, id) => (
                 <div key={song.id}>
                   <div
+                    onMouseEnter={() => setHoveredSong(song.id)}
+                    onMouseLeave={() => setHoveredSong(null)}
                     className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer  group backdrop-blur-sm border hover:shadow-lg ${
                       playingSongId === song.id
                         ? `bg-gradient-to-r ${theme.preview} border-white/40 shadow-lg ${themeColors.shadow}`
@@ -370,33 +373,44 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                       setIsPlaying(true); // start playing it
                     }}
                   >
-                    <div className="font-medium text-white drop-shadow-sm">
-                      {id + 1}
-                    </div>
-                    <div className="relative">
+                    <div className="col-span-1  flex items-center justify-center mx-1">
                       <Button
                         size="icon"
                         variant="ghost"
-                        className={`h-8 w-8 rounded-xl bg-white/10 ${themeColors.hoverBg} border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm`}
+                        className={`h-9 w-9 rounded-xl bg-white/10 ${themeColors.hoverBg} border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 `}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (playingSongId === song.id) {
                             setIsPlaying(!isPlaying); // toggle play/pause
                           } else {
-                            handleSongSingleClick(song); // load a new song
-                            setPlayer(true);
-                            setIsPlaying(true); // start playing it
+                            setPlayingSongId(song.id);
+                            setSelectSongId(song.id);
+                            setSelectSong(song);
+                            setPlayingSong(song);
                           }
                         }}
                       >
-                        {isPlaying && playingSongId === song.id ? (
-                          <Pause className="h-4 w-4 text-white" />
+                        {playingSong?.id === song.id ? (
+                          <div
+                            className="w-4 h-4 text-white flex items-center justify-center"
+                            style={{ color: theme.primary }}
+                          >
+                            {isPlaying ? (
+                              <Pause fill="white" />
+                            ) : (
+                              <Play fill="white" />
+                            )}
+                          </div>
+                        ) : hoveredSong === song.id ? (
+                          <Play className="w-4 h-4" fill="white" />
                         ) : (
-                          <Play className="h-4 w-4 text-white" />
+                          <span className="font-medium text-white drop-shadow-sm">
+                            {id + 1}
+                          </span>
                         )}
                       </Button>
                     </div>
-                    <div className="grid grid-cols-10 gap-3 w-full items-center">
+                    <div className="grid grid-cols-11 gap-3 w-full items-center">
                       <span className="col-span-6 flex flex-col">
                         <div className="font-medium truncate text-white drop-shadow-sm">
                           {song.title || song.filename}
@@ -405,14 +419,18 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                           {song.artist}
                         </span>
                       </span>
-                      <span className="col-span-3 text-m text-white/70 truncate">
+                      <span className="col-span-2 text-m text-white/70 truncate">
                         {song.album}
+                      </span>
+                       <span className="col-span-2 text-m text-white/70 truncate ">
+                        {song.listenCount || 0}
                       </span>
                       <span className="col-span-1 text-center text-white/70 truncate">
                         {song?.metadata.track_length / 60
                           ? `${Math.floor(song?.metadata.track_length / 60)}:${
                               Math.floor(song?.metadata.track_length % 60) < 10
-                                ? "0" + Math.floor(song?.metadata.track_length % 60)
+                                ? "0" +
+                                  Math.floor(song?.metadata.track_length % 60)
                                 : Math.floor(song?.metadata.track_length % 60)
                             }`
                           : "0:00"}
