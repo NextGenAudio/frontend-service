@@ -141,6 +141,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   }
 
   const handleNextClick = (playedSong: Song) => {
+    console.log("Current Song Queue:", songQueue);
     const newQueue = [...songQueue]; // ✅ Declare as const inside the function
     const playedSongIndex = newQueue.findIndex((s) => s.id === playedSong?.id);
     newQueue.splice(playedSongIndex, 1);

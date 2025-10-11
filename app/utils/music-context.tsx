@@ -61,12 +61,10 @@ type MusicContextType = {
   playingSongId: string | null;
   setSelectSongId: (value: string | null) => void;
   setPlayingSongId: (value: string | null) => void;
-  songQueue : Song[];
-  setSongQueue: (value: Song[]) => void;
+  songQueue: Song[];
+  setSongQueue: (value: Song[] | ((prev: Song[]) => Song[])) => void;
   shuffleQueue: boolean;
   setShuffleQueue: (value: boolean) => void;
-
-
 };
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);

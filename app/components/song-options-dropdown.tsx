@@ -10,6 +10,7 @@ import {
   Download,
   Trash2,
   Edit3,
+  ListStart,
 } from "lucide-react";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
@@ -21,6 +22,7 @@ interface SongOptionsDropdownProps {
   onAddToPlaylist?: () => void;
   onRemoveFromPlaylist?: () => void;
   onToggleLike?: () => void;
+  onAddToQueue?: () => void;
   onShare?: () => void;
   onDownload?: () => void;
   onDelete?: () => void;
@@ -34,6 +36,7 @@ export function SongOptionsDropdown({
   isInPlaylist = false,
   onAddToPlaylist,
   onRemoveFromPlaylist,
+  onAddToQueue,
   onToggleLike,
   onShare,
   onDownload,
@@ -109,7 +112,15 @@ export function SongOptionsDropdown({
             />
             {liked ? "Remove from liked songs" : "Add to liked songs"}
           </button>
-
+          <button
+            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
+            onClick={() => handleOptionClick(onAddToQueue)}
+          >
+            <ListStart
+              className={`h-4 w-4 group-hover:scale-110 transition-transform ${themeColors.text}`}
+            />
+            {"Add to queue"}
+          </button>
           {/* Divider */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
@@ -125,7 +136,7 @@ export function SongOptionsDropdown({
           </button>
 
           {/* Download */}
-          <button
+          {/* <button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onDownload)}
           >
@@ -133,7 +144,7 @@ export function SongOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Download
-          </button>
+          </button> */}
 
           {/* Edit */}
           <button

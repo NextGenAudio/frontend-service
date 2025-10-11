@@ -29,6 +29,8 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     setSelectSongId,
     playingSongId,
     setPlayingSongId,
+    setSongQueue,
+    songQueue,
   } = useMusicContext();
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
@@ -41,16 +43,8 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
   );
-  const {
-    entityName,
-    entityArt,
-    entityType,
-    entityDescription,
-    setEntityName,
-    setEntityArt,
-    setEntityType,
-    setEntityDescription,
-  } = useEntityContext();
+  const { entityName, entityArt, entityType, entityDescription } =
+    useEntityContext();
   const { songList, setSongList } = useMusicContext();
   const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
     useSidebar();
@@ -118,6 +112,10 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     fetchSongs();
   }, []);
 
+  // Monitor songQueue changes
+  useEffect(() => {
+    console.log("🎵 Song queue updated:", songQueue);
+  }, [songQueue]);
 
   const removeSongFromPlaylist = async (songId: string) => {
     try {
@@ -176,7 +174,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
       onScroll={() => setScrollY(scrollRef.current?.scrollTop || 0)}
     >
       {/* Glass background with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/20 to-gray-800/20 backdrop-blur-xl " />
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/10 to-gray-800/20 backdrop-blur-xl " />
       {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
 
       {searchBar && <SearchBar />}
@@ -205,13 +203,10 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
               <div
                 className="rounded-xl  overflow-hidden relative flex-shrink-0 transition-all duration-700 ease-out"
                 style={{
-                  width:  "208px",
+                  width: "208px",
                   height: "208px",
-                  opacity: 
-                    Math.max(0.3, 1 - scrollY / 200),
-                  transform: `scale(${
-                     Math.max(0.8, 1 - scrollY / 400)
-                  })`,
+                  opacity: Math.max(0.3, 1 - scrollY / 200),
+                  transform: `scale(${Math.max(0.8, 1 - scrollY / 400)})`,
                 }}
               >
                 <Image
@@ -237,10 +232,8 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                 <p
                   className="text-white/80 transition-all duration-700 ease-out ml-2 mt-1"
                   style={{
-                    fontSize:  "1.1rem",
-                    transform: `translateX(${
-                     "0px"
-                    })`,
+                    fontSize: "1.1rem",
+                    transform: `translateX(${"0px"})`,
                     opacity: 0.8,
                   }}
                 >
@@ -335,114 +328,137 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
             ) : (
               /* Songs List */
               songList.map((song, id) => (
-                <div
-                  key={song.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer group backdrop-blur-sm border hover:shadow-lg ${
-                    playingSongId === song.id
-                      ? `bg-gradient-to-r ${themeColors.gradient} bg-opacity-30 ${themeColors.border} ${themeColors.shadow}`
-                      : `bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30`
-                  } ${
-                    openDropdownSongId === song.id ? "relative z-[10000]" : ""
-                  }`}
-                  onClick={() => handleSongSingleClick(song)}
-                  onDoubleClick={() => {
-                    handleSongDoubleClick(song);
-                    setPlayer(true);
-                    setIsPlaying(true); // start playing it
-                  }}
-                >
-                  <div className="font-medium text-white drop-shadow-sm">
-                    {id + 1}
-                  </div>
-                  <div className="relative">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className={`h-8 w-8 rounded-xl bg-white/10 ${themeColors.hoverBg} border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (playingSongId === song.id) {
-                          setIsPlaying(!isPlaying); // toggle play/pause
-                        } else {
-                          handleSongSingleClick(song); // load a new song
-                          setPlayer(true);
-                          setIsPlaying(true); // start playing it
-                        }
-                      }}
-                    >
-                      {isPlaying && playingSongId === song.id ? (
-                        <Pause className="h-4 w-4 text-white" />
-                      ) : (
-                        <Play className="h-4 w-4 text-white" />
-                      )}
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-10 gap-3 w-full items-center">
-                    <span className="col-span-6 flex flex-col">
-                      <div className="font-medium truncate text-white drop-shadow-sm">
-                        {song.title || song.filename}
-                      </div>
-                      <span className="col-span-text-sm text-white/70 truncate">
-                        {song.artist}
+                <div>
+                  <div
+                    key={song.id}
+                    className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer group backdrop-blur-sm border hover:shadow-lg ${
+                      playingSongId === song.id
+                        ? `bg-gradient-to-r ${themeColors.gradient} bg-opacity-30 ${themeColors.border} ${themeColors.shadow}`
+                        : `bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/30`
+                    } ${
+                      openDropdownSongId === song.id ? "relative z-[10000]" : ""
+                    }`}
+                    onClick={() => handleSongSingleClick(song)}
+                    onDoubleClick={() => {
+                      handleSongDoubleClick(song);
+                      setPlayer(true);
+                      setIsPlaying(true); // start playing it
+                    }}
+                  >
+                    <div className="font-medium text-white drop-shadow-sm">
+                      {id + 1}
+                    </div>
+                    <div className="relative">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className={`h-8 w-8 rounded-xl bg-white/10 ${themeColors.hoverBg} border border-white/20 opacity-100 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (playingSongId === song.id) {
+                            setIsPlaying(!isPlaying); // toggle play/pause
+                          } else {
+                            handleSongSingleClick(song); // load a new song
+                            setPlayer(true);
+                            setIsPlaying(true); // start playing it
+                          }
+                        }}
+                      >
+                        {isPlaying && playingSongId === song.id ? (
+                          <Pause className="h-4 w-4 text-white" />
+                        ) : (
+                          <Play className="h-4 w-4 text-white" />
+                        )}
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-10 gap-3 w-full items-center">
+                      <span className="col-span-6 flex flex-col">
+                        <div className="font-medium truncate text-white drop-shadow-sm">
+                          {song.title || song.filename}
+                        </div>
+                        <span className="col-span-text-sm text-white/70 truncate">
+                          {song.artist}
+                        </span>
                       </span>
-                    </span>
-                    <span className="col-span-3 text-m text-white/70 truncate">
-                      {song.album}
-                    </span>
-                    <span className="col-span-1 text-center text-white/70 truncate">
-                      {song.metadata?.track_length / 60
-                        ? `${Math.floor(song.metadata.track_length / 60)}:${
-                            Math.floor(song.metadata.track_length % 60) < 10
-                              ? "0" +
-                                Math.floor(song.metadata.track_length % 60)
-                              : Math.floor(song.metadata.track_length % 60)
-                          }`
-                        : "0:00"}
-                    </span>
+                      <span className="col-span-3 text-m text-white/70 truncate">
+                        {song.album}
+                      </span>
+                      <span className="col-span-1 text-center text-white/70 truncate">
+                        {song.metadata?.track_length / 60
+                          ? `${Math.floor(song.metadata.track_length / 60)}:${
+                              Math.floor(song.metadata.track_length % 60) < 10
+                                ? "0" +
+                                  Math.floor(song.metadata.track_length % 60)
+                                : Math.floor(song.metadata.track_length % 60)
+                            }`
+                          : "0:00"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {playingSongId === song.id && isPlaying && (
+                        <div className="flex items-center gap-1">
+                          <div
+                            className={`w-1 h-3 bg-gradient-to-t ${themeColors.gradient} animate-pulse rounded-full shadow-sm`}
+                          ></div>
+                          <div
+                            className={`w-1 h-2 bg-gradient-to-t ${themeColors.gradient} animate-pulse delay-100 rounded-full shadow-sm`}
+                          ></div>
+                          <div
+                            className={`w-1 h-4 bg-gradient-to-t ${themeColors.gradient} animate-pulse delay-200 rounded-full shadow-sm`}
+                          ></div>
+                        </div>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDropdownSongId(
+                            openDropdownSongId === song.id ? null : song.id
+                          );
+                        }}
+                      >
+                        <MoreHorizontal className="h-3 w-3 text-white/70" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {playingSongId === song.id && isPlaying && (
-                      <div className="flex items-center gap-1">
-                        <div
-                          className={`w-1 h-3 bg-gradient-to-t ${themeColors.gradient} animate-pulse rounded-full shadow-sm`}
-                        ></div>
-                        <div
-                          className={`w-1 h-2 bg-gradient-to-t ${themeColors.gradient} animate-pulse delay-100 rounded-full shadow-sm`}
-                        ></div>
-                        <div
-                          className={`w-1 h-4 bg-gradient-to-t ${themeColors.gradient} animate-pulse delay-200 rounded-full shadow-sm`}
-                        ></div>
-                      </div>
-                    )}
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpenDropdownSongId(
-                          openDropdownSongId === song.id ? null : song.id
-                        );
+                  {openDropdownSongId === song.id && (
+                    <SongOptionsDropdown
+                      songId={song.id}
+                      isInPlaylist={true}
+                      onAddToQueue={() => {
+                        console.log("Adding to queue from playlist page");
+
+                        // Use functional update to get the latest queue state
+                        setSongQueue((currentQueue: Song[]) => {
+                          // Check if song is already in the current queue
+                          const isInQueue = currentQueue.find(
+                            (s: Song) => s.id === song.id
+                          );
+
+                          if (isInQueue) {
+                            // Remove from queue if already present
+                            return currentQueue.filter(
+                              (s: Song) => s.id !== song.id
+                            );
+                          } else {
+                            // Add to front of queue if not present
+                            return [song, ...currentQueue];
+                          }
+                        });
                       }}
-                    >
-                      <MoreHorizontal className="h-3 w-3 text-white/70" />
-                    </Button>
-                    {openDropdownSongId === song.id && (
-                      <SongOptionsDropdown
-                        songId={song.id}
-                        isInPlaylist={true}
-                        onRemoveFromPlaylist={() => {
-                          removeSongFromPlaylist(song.id);
-                          setOpenDropdownSongId(null);
-                        }}
-                        onDelete={() => {
-                          deleteSong(song.id);
-                          setOpenDropdownSongId(null);
-                        }}
-                        onClose={() => setOpenDropdownSongId(null)}
-                      />
-                    )}
-                  </div>
+                      onRemoveFromPlaylist={() => {
+                        removeSongFromPlaylist(song.id);
+                        setOpenDropdownSongId(null);
+                      }}
+                      onDelete={() => {
+                        deleteSong(song.id);
+                        setOpenDropdownSongId(null);
+                      }}
+                      onClose={() => setOpenDropdownSongId(null)}
+                    />
+                  )}
                 </div>
               ))
             )}

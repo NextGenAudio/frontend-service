@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 
 import { createContext, useState, useContext } from "react";
 
@@ -44,11 +44,15 @@ type EntityContextType = {
 const EntityContext = createContext<EntityContextType | undefined>(undefined);
 
 export function EntityProvider({ children }: { children: React.ReactNode }) {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Initialize with default values first (for SSR)
   const [entityName, setEntityName] = useState<string | null>(null);
   const [entityArt, setEntityArt] = useState<string | null>(null);
   const [entityType, setEntityType] = useState<"folder" | "playlist" | null>(
     null
   );
+  const [entityDescription, setEntityDescription] = useState("");
 
   const [folderList, setFolderList] = useState<any[]>([]);
   const [playlistList, setPlaylistList] = useState<any[]>([]);
@@ -59,7 +63,72 @@ export function EntityProvider({ children }: { children: React.ReactNode }) {
   const [repeatMode, setRepeatMode] = useState(0);
   const [liked, setliked] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [entityDescription, setEntityDescription] = useState("");
+
+  // Load from localStorage after hydration
+  useEffect(() => {
+    setIsHydrated(true);
+
+    // Helper function to safely load from localStorage
+    const loadFromStorage = (key: string, defaultValue: any) => {
+      try {
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : defaultValue;
+      } catch (error) {
+        console.error(`Error loading ${key} from localStorage:`, error);
+        return defaultValue;
+      }
+    };
+
+    // Load all values from localStorage
+    setEntityName(loadFromStorage("entityName", null));
+    setEntityArt(loadFromStorage("entityArt", null));
+    setEntityType(loadFromStorage("entityType", null));
+    setEntityDescription(loadFromStorage("entityDescription", ""));
+  }, []);
+
+  // Save to localStorage whenever values change (only after hydration)
+  useEffect(() => {
+    if (isHydrated) {
+      try {
+        localStorage.setItem("entityName", JSON.stringify(entityName));
+      } catch (error) {
+        console.error("Error saving entityName to localStorage:", error);
+      }
+    }
+  }, [entityName, isHydrated]);
+
+  useEffect(() => {
+    if (isHydrated) {
+      try {
+        localStorage.setItem("entityArt", JSON.stringify(entityArt));
+      } catch (error) {
+        console.error("Error saving entityArt to localStorage:", error);
+      }
+    }
+  }, [entityArt, isHydrated]);
+
+  useEffect(() => {
+    if (isHydrated) {
+      try {
+        localStorage.setItem("entityType", JSON.stringify(entityType));
+      } catch (error) {
+        console.error("Error saving entityType to localStorage:", error);
+      }
+    }
+  }, [entityType, isHydrated]);
+
+  useEffect(() => {
+    if (isHydrated) {
+      try {
+        localStorage.setItem(
+          "entityDescription",
+          JSON.stringify(entityDescription)
+        );
+      } catch (error) {
+        console.error("Error saving entityDescription to localStorage:", error);
+      }
+    }
+  }, [entityDescription, isHydrated]);
 
   const value = {
     entityName,
