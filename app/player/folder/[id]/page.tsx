@@ -354,9 +354,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
             ) : (
               /* Songs List */
               songList.map((song, id) => (
-                <div>
+                <div key={song.id}>
                   <div
-                    key={song.id}
                     className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer  group backdrop-blur-sm border hover:shadow-lg ${
                       playingSongId === song.id
                         ? `bg-gradient-to-r ${theme.preview} border-white/40 shadow-lg ${themeColors.shadow}`
@@ -410,12 +409,11 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                         {song.album}
                       </span>
                       <span className="col-span-1 text-center text-white/70 truncate">
-                        {song.metadata?.track_length / 60
-                          ? `${Math.floor(song.metadata.track_length / 60)}:${
-                              Math.floor(song.metadata.track_length % 60) < 10
-                                ? "0" +
-                                  Math.floor(song.metadata.track_length % 60)
-                                : Math.floor(song.metadata.track_length % 60)
+                        {song?.metadata.track_length / 60
+                          ? `${Math.floor(song?.metadata.track_length / 60)}:${
+                              Math.floor(song?.metadata.track_length % 60) < 10
+                                ? "0" + Math.floor(song?.metadata.track_length % 60)
+                                : Math.floor(song?.metadata.track_length % 60)
                             }`
                           : "0:00"}
                       </span>

@@ -35,12 +35,19 @@ import { useTheme } from "../utils/theme-context";
 import { PlaylistSelectionDropdown } from "./playlist-selection-dropdown";
 import { Song } from "../utils/music-context";
 import axios from "axios";
+import { metadata } from "../layout";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
-export const FloatingPlayerControls = ({ song , handleNextClick}: { song: Song | null , handleNextClick: (playedSong : Song) => void }) => {
+export const FloatingPlayerControls = ({
+  song,
+  handleNextClick,
+}: {
+  song: Song | null;
+  handleNextClick: (playedSong: Song) => void;
+}) => {
   const [isShuffle, setIsShuffle] = useState(false);
 
   // const [progress, setProgress] = useState(0);
@@ -94,7 +101,7 @@ export const FloatingPlayerControls = ({ song , handleNextClick}: { song: Song |
 
   useEffect(() => {
     if (song) {
-      setliked(song.liked);
+      setliked(song.liked ? true : false);
     }
   }, [song]);
 
@@ -282,20 +289,19 @@ export const FloatingPlayerControls = ({ song , handleNextClick}: { song: Song |
     handleSongDoubleClick(previousSong);
   };
 
-  const handleAddToPlaylist = async (
-    playlistId: number,
-  ) => {
+  const handleAddToPlaylist = async (playlistId: number) => {
     if (!song) return;
 
     try {
-      const response = await axios.post(`${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/tracks`, 
-          { fileIds: [song.id] },
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+      const response = await axios.post(
+        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/tracks`,
+        { fileIds: [song.id] },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       if (response.status === 200) {

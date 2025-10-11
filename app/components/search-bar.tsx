@@ -7,20 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { useMusicContext } from "../utils/music-context";
 import { set } from "react-hook-form";
 import { useSidebar } from "../utils/sidebar-context";
-
-interface Song {
-  id: string;
-  title: string | undefined;
-  filename: string;
-  artist: string | undefined;
-  album: string | undefined;
-  path: string;
-  uploadedAt: Date;
-  // duration: string;
-  source: string;
-  metadata: any;
-  liked: boolean;
-}
+import { Song } from "../utils/music-context";
 
 export function SearchBar() {
   const [searchValue, setSearchValue] = useState("");

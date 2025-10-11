@@ -323,7 +323,7 @@ export default function FavoritePage() {
                     {song.album}
                   </span>
                   <span className="col-span-1 text-center text-white/70 truncate">
-                    {song.metadata?.track_length / 60
+                    {song?.metadata.track_length / 60
                       ? `${Math.floor(song.metadata.track_length / 60)}:${
                           Math.floor(song.metadata.track_length % 60) < 10
                             ? "0" + Math.floor(song.metadata.track_length % 60)

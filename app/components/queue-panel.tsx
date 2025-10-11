@@ -18,6 +18,7 @@ import {
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { metadata } from "../layout";
 
 export function QueuePanel() {
   const { theme } = useTheme();
@@ -249,8 +250,8 @@ export function QueuePanel() {
                 {/* Duration Column */}
                 <div className="col-span-2 flex items-center justify-end gap-2">
                   <div className="text-sm text-white/70">
-                    {song.metadata?.track_length
-                      ? formatDuration(parseFloat(song.metadata.track_length))
+                    {song?.metadata?.track_length
+                      ? formatDuration(song.metadata.track_length)
                       : "0:00"}
                   </div>
 

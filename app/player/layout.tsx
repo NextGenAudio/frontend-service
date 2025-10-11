@@ -147,7 +147,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     if (newQueue.length < 2) {
       axios
         .get(
-          `${MUSIC_LIBRARY_SERVICE_URL}/files/recommendations?genre=${playingSong?.genre?.genre},mood=${playingSong?.mood?.mood},artist=${playingSong?.artist}`,
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/recommendations?genre=${playingSong?.genre},mood=${playingSong?.mood},artist=${playingSong?.artist}`,
           { withCredentials: true }
         )
         .then((response) => {
@@ -246,7 +246,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       onload: () => {
         // Auto-play when the song is loaded and isPlaying is true
         setPlayingSongDuration(
-          parseFloat(playingSong.metadata?.track_length) || 0
+          playingSong?.metadata.track_length || 0
         );
         // If isPlaying was set to true before the song loaded, start playing now
         if (isPlaying && soundRef.current && !soundRef.current.playing()) {

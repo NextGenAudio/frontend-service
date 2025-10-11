@@ -40,13 +40,48 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
   const { player, setDetailPanel } = useSidebar();
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
-  useEffect(() => {
-    console.log(song?.metadata);
-    if (song) {
-      setliked(song.liked);
-    }
-  }, [song]);
+  const [mood, setMood] = useState<string>("Unknown");
+  const [genre, setGenre] = useState<string>("Unknown");
+  const [uploadedAt, setUploadedAt] = useState<string>("Unknown");
   const { entityName, entityType } = useEntityContext();
+  const { selectSong, setSelectSong, selectSongId } = useMusicContext();
+
+  useEffect(() => {
+    const fetchSongDetails = async () => {
+      if (song?.id) {
+        setliked(song.liked ? true : false);
+        try {
+          const response = await axios.get(
+            `${MUSIC_LIBRARY_SERVICE_URL}/files/music/${song.id}`,
+            {
+              withCredentials: true,
+            }
+          );
+          console.log("🔍 Fetched detailed song data:", response.data);
+
+          setMood(response.data?.mood || "Unknown");
+          setGenre(response.data?.genre || "Unknown");
+          setUploadedAt(response.data?.uploadedAt || "Unknown");
+          // Merge the current song data with the fetched detailed data
+          // This preserves all existing fields and adds/updates with API data
+          setSelectSong({
+            ...song,
+            // Ensure these specific fields are updated
+            mood: response.data?.mood,
+            genre: response.data?.genre,
+            uploadedAt: response.data?.uploadedAt,
+          });
+        } catch (err) {
+          console.error("Failed to fetch song details:", err);
+          // Don't show alert for failed API calls in production
+          console.warn("Song details fetch failed, using existing data");
+        }
+      }
+    };
+
+    fetchSongDetails();
+  }, [song?.id]); // Depend on song.id, not selectSongId
+
   const handleLikeClick = async () => {
     const newLikeStatus = !liked; // Calculate the new status first
     setliked(newLikeStatus);
@@ -128,7 +163,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
             <Music className={`w-6 h-6 ${themeColors.text}`} />
             <h2 className="text-lg font-semibold text-white/90">
               Music Details
-                {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
+              {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
                 <span className="text-sm text-white/60 font-normal ml-2">{}</span> */}
             </h2>
             <Button
@@ -207,13 +242,13 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
                 <div className="p-3 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl border border-purple-400/30 text-center">
                   <div className="text-xs text-white/60 mb-1">Mood</div>
                   <div className="text-sm font-medium text-white/90">
-                    {song?.mood?.mood || "Unknown"}
+                    {mood}
                   </div>
                 </div>
                 <div className="p-3 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-xl border border-green-400/30 text-center">
                   <div className="text-xs text-white/60 mb-1">Genre</div>
                   <div className="text-sm font-medium text-white/90">
-                    {song?.genre?.genre || "Unknown"}
+                    {genre}
                   </div>
                 </div>
               </div>
@@ -257,8 +292,8 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Added</span>
                   <span className="text-white/80 font-medium">
-                    {song?.uploadedAt
-                      ? new Date(song.uploadedAt).toLocaleDateString()
+                    {uploadedAt
+                      ? new Date(uploadedAt).toLocaleDateString()
                       : ""}
                   </span>
                 </div>
