@@ -96,9 +96,9 @@ export function QueuePanel() {
     <div className="h-full bg-slate-900/50 backdrop-blur-xl border-l border-white/10 flex flex-col">
       {/* Header */}
       <div className="p-4 cursor-pointer group transition-all duration-300">
-        <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg">
+        <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl px-3 border py-2 border-white/20 shadow-lg">
           <ListMusic className={`w-6 h-6 ${themeColors.text}`} />
-          <h2 className="text-lg font-semibold text-white/90">
+          <h2 className="text-lg font-semibold text-white/90 flex items-center">
             Queue
             <span className="text-2xl text-white/60 font-normal ml-2">|</span>
             <span className="text-sm text-white/60 font-normal ml-2">

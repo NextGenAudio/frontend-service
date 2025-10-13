@@ -14,6 +14,7 @@ import { Song, useMusicContext } from "../utils/music-context";
 import { usePlayerSettings } from "../hooks/use-player-settings";
 import { SongDetailsPanel } from "../components/song-details-panel";
 import { QueuePanel } from "../components/queue-panel";
+import { CollaboratorsPanel } from "../components/collaborators-panel";
 import { EntityHandlingProvider } from "../utils/entity-handling-context";
 import { Howl } from "howler";
 import AudioVisualizer from "../components/audio-visualizer";
@@ -28,8 +29,16 @@ const MUSIC_LIBRARY_SERVICE_URL =
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const { theme, setTheme } = useTheme();
-  const { player, home, upload, profile, detailPanel, visualizer, queue } =
-    useSidebar();
+  const {
+    player,
+    home,
+    upload,
+    profile,
+    detailPanel,
+    visualizer,
+    queue,
+    collaborators,
+  } = useSidebar();
 
   const {
     setIsPlaying,
@@ -107,7 +116,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   useEffect(() => {
     if (!selectSong) return;
 
-    const url = `${MUSIC_LIBRARY_SERVICE_URL}/files/download/${selectSong.filename}`;
+    const url = `${MUSIC_LIBRARY_SERVICE_URL}/files/download/${selectSong.id}`;
     console.log("Song URL:", url);
 
     // Update state with direct backend URL
@@ -123,7 +132,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         URL.revokeObjectURL(playingSong.source);
       }
     };
-  }, [playingSong?.filename]);
+  }, [selectSong?.id]);
 
   function handleSongDoubleClick(song: any) {
     setPlayingSongId(song.id);
@@ -244,10 +253,24 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       preload: true,
       loop: repeatMode === 1,
       onload: () => {
+        // Set crossOrigin safely here after audio element is ready
+        try {
+          if ((sound as any)._sounds?.[0]?._node) {
+            (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
+            console.log("✅ CrossOrigin set successfully");
+
+            // Trigger a custom event to notify visualizer that audio is ready
+            window.dispatchEvent(
+              new CustomEvent("audioReady", {
+                detail: { audioElement: (sound as any)._sounds[0]._node },
+              })
+            );
+          }
+        } catch (err) {
+          console.warn("Could not set crossOrigin:", err);
+        }
         // Auto-play when the song is loaded and isPlaying is true
-        setPlayingSongDuration(
-          playingSong?.metadata.track_length || 0
-        );
+        setPlayingSongDuration(playingSong?.metadata.track_length || 0);
         // If isPlaying was set to true before the song loaded, start playing now
         if (isPlaying && soundRef.current && !soundRef.current.playing()) {
           soundRef.current.play();
@@ -264,7 +287,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         updateListenedSong(listenedSong);
       },
     });
-    (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
+    // (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
 
     soundRef.current = sound;
 
@@ -272,7 +295,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       // only cleanup if unmounting, not when replaying same song
       sound.unload();
     };
-  }, [playingSong?.source]);
+  }, [playingSong?.source, volume, isMuted, repeatMode]);
 
   // Handle play/pause state changes
   useEffect(() => {
@@ -331,13 +354,21 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                 </ResizablePanelGroup>
               </ResizablePanel>
               <ResizableHandle className="w-[2px] bg-white/20 hover:bg-white/40 transition-colors" />
-              {(detailPanel || queue) && (
+              {(detailPanel || queue || collaborators) && (
                 <ResizablePanel defaultSize={22} minSize={20} maxSize={25}>
                   <ResizablePanelGroup direction="vertical">
                     {queue && (
                       <ResizablePanel defaultSize={50} minSize={0}>
                         <QueuePanel />
                       </ResizablePanel>
+                    )}
+                    {collaborators && (
+                      <>
+                        <ResizableHandle className="w-1 bg-white/20 hover:bg-white/40 transition-colors" />
+                        <ResizablePanel defaultSize={50} minSize={0}>
+                          <CollaboratorsPanel />
+                        </ResizablePanel>
+                      </>
                     )}
                     <ResizableHandle className="w-1 bg-white/20 hover:bg-white/40 transition-colors" />
                     {detailPanel && (

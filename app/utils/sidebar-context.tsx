@@ -23,6 +23,8 @@ type SidebarContextType = {
   setPlaylist: (value: boolean) => void;
   queue: boolean;
   setQueue: (value: boolean) => void;
+  collaborators: boolean;
+  setCollaborators: (value: boolean) => void;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -39,6 +41,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [playlist, setPlaylist] = useState(false);
   const soundRef = useRef<Howl | null>(null);
   const [queue, setQueue] = useState(false);
+  const [collaborators, setCollaborators] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   return (
     <SidebarContext.Provider
@@ -53,6 +56,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         profile,
         playlist,
         queue,
+        collaborators,
         setHome,
         setPlayer,
         setSearchBar,
@@ -63,6 +67,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         setProfile,
         setPlaylist,
         setQueue,
+        setCollaborators,
       }}
     >
       {children}

@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Play, Pause, MoreHorizontal, Shuffle, Music } from "lucide-react";
+import {
+  Play,
+  Pause,
+  MoreHorizontal,
+  Shuffle,
+  Music,
+  Users,
+} from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { SearchBar } from "@/app/components/search-bar";
@@ -47,13 +54,21 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const { entityName, entityArt, entityType, entityDescription } =
     useEntityContext();
   const { songList, setSongList } = useMusicContext();
-  const { searchBar, player, visualizer, setPlayer, setDetailPanel } =
-    useSidebar();
+  const {
+    searchBar,
+    player,
+    visualizer,
+    setPlayer,
+    setDetailPanel,
+    collaborators,
+    setCollaborators,
+  } = useSidebar();
   const router = useRouter();
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
     setDetailPanel(true);
+    setCollaborators(false);
   };
 
   const handleSongDoubleClick = (song: Song) => {
@@ -261,6 +276,24 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                       <Shuffle className="w-4 h-4 mr-2" />
                       Shuffle
                     </Button>
+                    <Button
+                      onClick={() => {
+                        setCollaborators(true);
+                        // Hide other panels when collaborators is shown
+                        if (!collaborators) {
+                          setDetailPanel(false);
+                        }
+                      }}
+                      variant="outline"
+                      className={`${
+                        collaborators
+                          ? `bg-gradient-to-r ${themeColors.gradient} text-white border-transparent`
+                          : `${themeColors.border} ${themeColors.text} ${themeColors.hoverBg}`
+                      } px-6 py-3 rounded-full transition-all duration-300`}
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Collaborators
+                    </Button>
                   </div>
                 )}
                 {entityDescription !== "" && (
@@ -307,14 +340,11 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
               <div className="flex flex-col items-center justify-center pt-20 text-center">
                 <div className="relative mb-6">
                   <div
-                    className={`w-32 h-32 rounded-full bg-gradient-to-br ${themeColors.gradient} opacity-20 backdrop-blur-sm ${themeColors.border} flex items-center justify-center`}
+                    className={`w-32 h-32 rounded-full bg-gradient-to-br ${themeColors.gradient} opacity-50 backdrop-blur-sm ${themeColors.border} flex items-center justify-center`}
                   >
                     <Music
-                      className={`w-16 h-16 ${themeColors.text} opacity-60`}
+                      className={`w-16 h-16 text-white`}
                     />
-                  </div>
-                  <div className="absolute -top-2 -right-2">
-                    <Play className="w-8 h-8 text-white/40 animate-bounce" />
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">

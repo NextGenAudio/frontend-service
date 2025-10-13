@@ -159,7 +159,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
 
       <div className="relative h-full flex flex-col">
         <div className="p-4 cursor-pointer group transition-all duration-300 ">
-          <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20 shadow-lg  ">
+          <div className="flex items-center justify-between bg-white/10 backdrop-blur-md rounded-xl px-3 py-2 border border-white/20 shadow-lg  ">
             <Music className={`w-6 h-6 ${themeColors.text}`} />
             <h2 className="text-lg font-semibold text-white/90">
               Music Details
