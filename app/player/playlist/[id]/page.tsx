@@ -72,9 +72,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   };
 
   const handleSongDoubleClick = (song: Song) => {
-    setSelectSongId(song.id);
-    setSelectSong(song); // ← Added this missing line
-    setDetailPanel(true);
+    handleSongSingleClick(song);
     setPlayingSongId(song.id);
     setPlayingSong(song);
     const newScore = (song?.xscore ?? 0) + 1;
@@ -310,7 +308,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
         {/* Glass Visualizer Area */}
 
         <div className="px-4 pt-4">
-          <div className="grid grid-cols-11 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+          <div className="flex-1 grid grid-cols-11 gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-1">#</div>
             <div className="col-span-5">Title</div>
 
@@ -342,9 +340,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                   <div
                     className={`w-32 h-32 rounded-full bg-gradient-to-br ${themeColors.gradient} opacity-50 backdrop-blur-sm ${themeColors.border} flex items-center justify-center`}
                   >
-                    <Music
-                      className={`w-16 h-16 text-white`}
-                    />
+                    <Music className={`w-16 h-16 text-white`} />
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">
@@ -390,10 +386,12 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                           if (playingSongId === song.id) {
                             setIsPlaying(!isPlaying); // toggle play/pause
                           } else {
-                            setPlayingSongId(song.id);
                             setSelectSongId(song.id);
                             setSelectSong(song);
+                            setPlayingSongId(song.id);
                             setPlayingSong(song);
+                            setPlayer(true);
+                            setIsPlaying(true);
                           }
                         }}
                       >

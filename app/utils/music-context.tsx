@@ -37,10 +37,9 @@ export interface Song {
 }
 
 type MusicContextType = {
-  isPlaying: boolean;
   songList: Song[];
   setSongList: (value: Song[]) => void;
-
+  isPlaying: boolean;
   setIsPlaying: (value: boolean) => void;
   duration: number;
   setDuration: (value: number) => void;

@@ -22,6 +22,7 @@ import { ProfileDropdown } from "../components/profile-dropdown";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
+import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";
 
 const MUSIC_LIBRARY_SERVICE_URL =
@@ -68,6 +69,9 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
   // Add state to track if we're using recommendations
   const [usingRecommendations, setUsingRecommendations] = useState(false);
+
+  // Get AudioManager instance
+  const audioManager = AudioManager.getInstance();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -123,7 +127,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     setPlayingSong({
       ...selectSong,
       source: url,
-      id: selectSong.id,
     });
 
     // Cleanup object URL if you used Blob before
@@ -246,54 +249,110 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       soundRef.current.unload();
     }
 
-    const sound = new Howl({
-      src: [playingSong.source],
-      html5: true,
-      volume: isMuted ? 0 : volume / 100,
-      preload: true,
-      loop: repeatMode === 1,
-      onload: () => {
-        // Set crossOrigin safely here after audio element is ready
-        try {
-          if ((sound as any)._sounds?.[0]?._node) {
-            (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
-            console.log("✅ CrossOrigin set successfully");
+    console.log("🎵 Creating new audio instance for:", playingSong.source);
 
-            // Trigger a custom event to notify visualizer that audio is ready
-            window.dispatchEvent(
-              new CustomEvent("audioReady", {
-                detail: { audioElement: (sound as any)._sounds[0]._node },
-              })
-            );
+    // Create audio with CORS support using AudioManager
+    audioManager
+      .createHowl({
+        src: [playingSong.source],
+        html5: true, // Use HTML5 for better compatibility
+        volume: isMuted ? 0 : volume / 100,
+        preload: true,
+        loop: repeatMode === 1,
+        format: ["mp3", "wav", "ogg", "aac", "m4a"], // Specify supported formats
+        corsConfig: {
+          enabled: true,
+          mode: "use-credentials",
+        },
+        onload: () => {
+          console.log("✅ Audio loaded successfully:", playingSong.title);
+          setPlayingSongDuration(playingSong?.metadata?.track_length || 0);
+
+          // Auto-play if needed
+          if (isPlaying && soundRef.current && !soundRef.current.playing()) {
+            soundRef.current.play();
           }
-        } catch (err) {
-          console.warn("Could not set crossOrigin:", err);
-        }
-        // Auto-play when the song is loaded and isPlaying is true
-        setPlayingSongDuration(playingSong?.metadata.track_length || 0);
-        // If isPlaying was set to true before the song loaded, start playing now
-        if (isPlaying && soundRef.current && !soundRef.current.playing()) {
-          soundRef.current.play();
-        }
-      },
-      onplay: () => {
-        setIsPlaying(true);
-      },
-      onpause: () => setIsPlaying(false),
-      onend: () => {
-        const listenedSong = playingSong;
-        setIsPlaying(false);
-        handleNextClick(listenedSong); // Automatically move to next song
-        updateListenedSong(listenedSong);
-      },
-    });
-    // (sound as any)._sounds[0]._node.crossOrigin = "use-credentials";
+        },
+        onloaderror: (id: number, error: any) => {
+          console.error("❌ Audio load error:", error);
 
-    soundRef.current = sound;
+          // Try fallback without CORS as last resort
+          if (playingSong?.source) {
+            console.log("🔄 Trying fallback without CORS...");
+            audioManager
+              .createHowl({
+                src: [playingSong.source],
+                html5: false, // Try Web Audio API
+                volume: isMuted ? 0 : volume / 100,
+                preload: true,
+                loop: repeatMode === 1,
+                format: ["mp3", "wav", "ogg", "aac", "m4a"],
+                corsConfig: {
+                  enabled: false,
+                },
+                onload: () => {
+                  console.log("✅ Fallback audio loaded");
+                  setPlayingSongDuration(
+                    playingSong?.metadata?.track_length || 0
+                  );
+                  if (
+                    isPlaying &&
+                    soundRef.current &&
+                    !soundRef.current.playing()
+                  ) {
+                    soundRef.current.play();
+                  }
+                },
+                onloaderror: (id: number, fallbackError: any) => {
+                  console.error(
+                    "❌ Fallback audio also failed:",
+                    fallbackError
+                  );
+                },
+                onplay: () => setIsPlaying(true),
+                onpause: () => setIsPlaying(false),
+                onend: () => {
+                  const listenedSong = playingSong;
+                  setIsPlaying(false);
+                  handleNextClick(listenedSong);
+                  updateListenedSong(listenedSong);
+                },
+              })
+              .then((fallbackSound) => {
+                soundRef.current = fallbackSound;
+              })
+              .catch((err) => {
+                console.error("❌ AudioManager createHowl failed:", err);
+              });
+          }
+        },
+        onplay: () => {
+          console.log("🎵 Audio playing");
+          setIsPlaying(true);
+        },
+        onpause: () => {
+          console.log("🎵 Audio paused");
+          setIsPlaying(false);
+        },
+        onend: () => {
+          console.log("🎵 Audio ended");
+          const listenedSong = playingSong;
+          setIsPlaying(false);
+          handleNextClick(listenedSong);
+          updateListenedSong(listenedSong);
+        },
+      })
+      .then((sound) => {
+        soundRef.current = sound;
+        console.log("🎵 SoundRef updated with new Howl instance");
+      })
+      .catch((error) => {
+        console.error("❌ AudioManager createHowl failed:", error);
+      });
 
     return () => {
-      // only cleanup if unmounting, not when replaying same song
-      sound.unload();
+      // Cleanup is handled by AudioManager
+      audioManager.cleanup();
     };
   }, [playingSong?.source, volume, isMuted, repeatMode]);
 

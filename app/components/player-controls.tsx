@@ -241,7 +241,7 @@ export const FloatingPlayerControls = ({
     }
 
     // Update music score based on like status (only if like was successful)
-    let newScore = 0;
+    let newScore;
     if (newLikeStatus) {
       newScore = (song?.xscore ?? 0) + 2;
     } else {

@@ -26,11 +26,11 @@ export function PlaylistSelectionDropdown({
 }: PlaylistSelectionDropdownProps) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPlaylist, setSelectedPlaylist] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
   const { playlistList } = useEntityContext();
+  const [addedPlaylistIds, setAddedPlaylistIds] = useState<number[]>([]);
   const router = useRouter();
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -74,6 +74,22 @@ export function PlaylistSelectionDropdown({
   //   onAddToPlaylist?.(playlist.id);
   //   onClose?.();
   // };
+  useEffect(() => {
+    async function fetchAddedPlaylistIds() {
+      const response = await axios.get(
+        `${PLAYLIST_SERVICE_URL}/playlist-service/music/playlist-ids/${songId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      const addedPlaylistIds: number[] = response.data;
+      console.log("Added playlist IDs:", addedPlaylistIds);
+      setAddedPlaylistIds(addedPlaylistIds);
+    }
+
+    fetchAddedPlaylistIds();
+  }, [songId]);
 
   const handleCreateNew = () => {
     onCreateNewPlaylist?.();
@@ -141,7 +157,10 @@ export function PlaylistSelectionDropdown({
                   <button
                     key={playlist.id}
                     className={`w-full px-3 py-2.5 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group rounded-lg hover:bg-white/10`}
-                    onClick={() => onAddToPlaylist?.(playlist.id)}
+                    onClick={() => {
+                      onAddToPlaylist?.(playlist.id);
+                      setAddedPlaylistIds((prev) => [...prev, playlist.id]);
+                    }}
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
                       {playlist.playlistArt ? (
@@ -163,11 +182,17 @@ export function PlaylistSelectionDropdown({
                         {playlist.description && ` • ${playlist.description}`}
                       </div>
                     </div>
-                    {selectedPlaylist === playlist.id && (
-                      <Check
-                        className={`h-4 w-4 ${themeColors.text} flex-shrink-0`}
-                      />
-                    )}
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                        addedPlaylistIds.includes(playlist.id)
+                          ? `${themeColors.border} bg-gradient-to-r ${themeColors.gradient}`
+                          : `border-gray-400 ${themeColors.hover}`
+                      }`}
+                    >
+                      {addedPlaylistIds.includes(playlist.id) && (
+                        <div className="w-3 h-3 bg-white rounded-full"></div>
+                      )}
+                    </div>
                   </button>
                 ))}
               </div>
