@@ -8,21 +8,26 @@ import { useEntityContext } from "../utils/entity-context";
 import { Playlist } from "../utils/entity-context";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { Button } from "./ui/button";
 
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
 interface PlaylistSelectionDropdownProps {
   songId: string;
-  onAddToPlaylist?: (playlistId: number) => void;
+  onAddToPlaylist?: (playlistIds: number[]) => void;
+  onRemoveFromPlaylist?: (playlistIds: number[]) => void;
   onCreateNewPlaylist?: () => void;
   onClose?: () => void;
+  onShowAlert?: (message: string) => void;
 }
 
 export function PlaylistSelectionDropdown({
   songId,
   onAddToPlaylist,
+  onRemoveFromPlaylist,
   onCreateNewPlaylist,
   onClose,
+  onShowAlert,
 }: PlaylistSelectionDropdownProps) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +36,8 @@ export function PlaylistSelectionDropdown({
   const themeColors = getGeneralThemeColors(theme.primary);
   const { playlistList } = useEntityContext();
   const [addedPlaylistIds, setAddedPlaylistIds] = useState<number[]>([]);
+  const [databasePlaylistIds, setDatabasePlaylistIds] = useState<number[]>([]);
+  const [hasChanges, setHasChanges] = useState(false);
   const router = useRouter();
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -86,15 +93,48 @@ export function PlaylistSelectionDropdown({
       const addedPlaylistIds: number[] = response.data;
       console.log("Added playlist IDs:", addedPlaylistIds);
       setAddedPlaylistIds(addedPlaylistIds);
+      setDatabasePlaylistIds(addedPlaylistIds);
     }
 
     fetchAddedPlaylistIds();
   }, [songId]);
 
-  const handleCreateNew = () => {
-    onCreateNewPlaylist?.();
+  // Check if there are changes
+  useEffect(() => {
+    const playlistsToAdd = addedPlaylistIds.filter(
+      (id) => !databasePlaylistIds.includes(id)
+    );
+    const playlistsToRemove = databasePlaylistIds.filter(
+      (id) => !addedPlaylistIds.includes(id)
+    );
+    setHasChanges(playlistsToAdd.length > 0 || playlistsToRemove.length > 0);
+  }, [addedPlaylistIds, databasePlaylistIds]);
+
+  function handleSubmitPlaylistChanges() {
+    // Determine which playlists to add and which to remove
+    const playlistsToAdd = addedPlaylistIds.filter(
+      (id) => !databasePlaylistIds.includes(id)
+    );
+    const playlistsToRemove = databasePlaylistIds.filter(
+      (id) => !addedPlaylistIds.includes(id)
+    );
+    console.log("Playlists to add:", playlistsToAdd);
+    console.log("Playlists to remove:", playlistsToRemove);
+    // Call the appropriate callbacks
+    if (playlistsToAdd.length > 0) {
+      onAddToPlaylist?.(playlistsToAdd);
+    }
+
+    if (playlistsToRemove.length > 0) {
+      onRemoveFromPlaylist?.(playlistsToRemove);
+    }
+
+    // Show success alert
+    onShowAlert?.("✅ Playlists updated successfully!");
+
+    // Close the dropdown
     onClose?.();
-  };
+  }
 
   return (
     <div className="relative z-[99999]" ref={dropdownRef}>
@@ -158,8 +198,12 @@ export function PlaylistSelectionDropdown({
                     key={playlist.id}
                     className={`w-full px-3 py-2.5 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group rounded-lg hover:bg-white/10`}
                     onClick={() => {
-                      onAddToPlaylist?.(playlist.id);
-                      setAddedPlaylistIds((prev) => [...prev, playlist.id]);
+                      setAddedPlaylistIds((prev) =>
+                        prev.includes(playlist.id)
+                          ? prev.filter((id) => id !== playlist.id)
+                          : [...prev, playlist.id]
+                      );
+                      // Add or remove song from playlist
                     }}
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -190,12 +234,32 @@ export function PlaylistSelectionDropdown({
                       }`}
                     >
                       {addedPlaylistIds.includes(playlist.id) && (
-                        <div className="w-3 h-3 bg-white rounded-full"></div>
+                        <div className="w-3 h-3 bg-white/80 rounded-full"></div>
                       )}
                     </div>
                   </button>
                 ))}
               </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="px-4 py-3 border-t border-white/10 flex items-center justify-end gap-2">
+            <Button
+              onClick={onClose}
+              variant="ghost"
+              size="sm"
+              className="text-white/70 hover:text-white hover:bg-white/10 text-xs px-3 py-1.5 h-auto rounded-lg transition-all duration-200"
+            >
+              Cancel
+            </Button>
+            {hasChanges && (
+              <Button
+                onClick={handleSubmitPlaylistChanges}
+                className={`bg-gradient-to-r ${themeColors.gradient} text-white text-xs px-4 py-1.5 h-auto rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105`}
+              >
+                Done
+              </Button>
             )}
           </div>
         </div>

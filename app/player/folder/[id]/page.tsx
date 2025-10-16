@@ -213,7 +213,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         >
           {/* Background Image in Right Bottom Corner */}
           <div
-            className="absolute bottom-0 right-0 w-[300px] h-[200px] bg-cover bg-center opacity-30 pointer-events-none"
+            className="absolute bottom-0 right-10 w-[260px] h-[200px] bg-cover bg-center opacity-30 pointer-events-none"
             style={{
               backgroundImage: "url('/assets/file-icon-back2.webp')",
               transform: `translateX(30px) translateY(20px)`,
@@ -303,8 +303,8 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
         {/* Glass Visualizer Area */}
 
-        <div className="px-4 pt-4">
-          <div className="grid grid-cols-10 gap-3 p-3 rounded-xl  transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
+        <div className="px-4 pt-4 flex">
+          <div className="grid grid-cols-10 gap-3 w-full p-3 rounded-xl  transition-all duration-300 group backdrop-blur-sm border bg-white/10 border-white/20">
             <div className="col-span-1">#</div>
             <div className="col-span-5 ">Title</div>
 
@@ -387,6 +387,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                             setSelectSongId(song.id);
                             setSelectSong(song);
                             setPlayingSong(song);
+                            setIsPlaying(true); // start playing it
                           }
                         }}
                       >

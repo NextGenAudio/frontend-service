@@ -36,6 +36,7 @@ import { PlaylistSelectionDropdown } from "./playlist-selection-dropdown";
 import { Song } from "../utils/music-context";
 import axios from "axios";
 import { metadata } from "../layout";
+import AlertBar from "./alert-bar";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -64,6 +65,7 @@ export const FloatingPlayerControls = ({
   const [isDragging, setIsDragging] = useState(false);
   const [liked, setliked] = useState(false);
   const [showPlaylistDropdown, setShowPlaylistDropdown] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const toggleShuffle = () => setIsShuffle(!isShuffle);
   const toggleRepeat = () => setRepeatMode((repeatMode + 1) % 3);
   const toggleMute = () => setIsMuted(!isMuted);
@@ -289,13 +291,13 @@ export const FloatingPlayerControls = ({
     handleSongDoubleClick(previousSong);
   };
 
-  const handleAddToPlaylist = async (playlistId: number) => {
+  const handleAddToPlaylist = async (playlistIds: number[]) => {
     if (!song) return;
 
     try {
       const response = await axios.post(
-        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/tracks`,
-        { fileIds: [song.id] },
+        `${PLAYLIST_SERVICE_URL}/playlist-service/music/playlist-ids/${song.id}`,
+        { playlistIds: playlistIds },
         {
           withCredentials: true,
           headers: {
@@ -305,7 +307,7 @@ export const FloatingPlayerControls = ({
       );
 
       if (response.status === 200) {
-        console.log(`Song added to playlist: ${playlistId}`);
+        console.log(`Song added to playlist: ${playlistIds}`);
         // Optional: Show success notification
       } else {
         console.error("Failed to add song to playlist");
@@ -315,10 +317,45 @@ export const FloatingPlayerControls = ({
     }
   };
 
+  const handleRemoveFromPlaylist = async (playlistIds: number[]) => {
+    if (!song) return;
+
+    try {
+      const response = await axios.post(
+        `${PLAYLIST_SERVICE_URL}/playlist-service/music/remove-playlist-ids/${song.id}`,
+        { playlistIds: playlistIds },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log(`Song removed from playlist: ${playlistIds}`);
+        // Optional: Show success notification
+      } else {
+        console.error("Failed to remove song from playlist");
+      }
+    } catch (error) {
+      console.error("Error removing song from playlist:", error);
+    }
+  };
+
   const handleCreateNewPlaylist = () => {
     // Navigate to create playlist page or open modal
     console.log("Create new playlist functionality");
   };
+
+  const handleShowAlert = (message: string) => {
+    setAlertMessage(message);
+    // Auto-hide alert after 3 seconds
+    setTimeout(() => {
+      setAlertMessage(null);
+    }, 3000);
+  };
+
   return (
     <TooltipProvider>
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[85%] max-w-[1800px]">
@@ -390,8 +427,10 @@ export const FloatingPlayerControls = ({
                           <PlaylistSelectionDropdown
                             songId={song.id}
                             onAddToPlaylist={handleAddToPlaylist}
+                            onRemoveFromPlaylist={handleRemoveFromPlaylist}
                             onCreateNewPlaylist={handleCreateNewPlaylist}
                             onClose={() => setShowPlaylistDropdown(false)}
+                            onShowAlert={handleShowAlert}
                           />
                         )}
                       </div>
@@ -669,6 +708,11 @@ export const FloatingPlayerControls = ({
           </div>
         </div>
       </div>
+
+      {/* Alert Bar */}
+      {alertMessage && (
+        <AlertBar message={alertMessage} setMessage={setAlertMessage} />
+      )}
     </TooltipProvider>
   );
 };
