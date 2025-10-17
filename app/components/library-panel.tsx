@@ -1,3 +1,4 @@
+// Common empty state panel for library
 "use client";
 import { useEffect, useState } from "react";
 import {
@@ -9,6 +10,7 @@ import {
   Upload,
   ChevronDown,
 } from "lucide-react";
+import EmptyLibraryPanel from "@/app/components/ui/empty-library-panel";
 import { Button } from "@/app/components/ui/button";
 import {
   Tabs,
@@ -344,48 +346,57 @@ export const LibraryPanel = () => {
               value="all"
               className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
             >
-              <div className="space-y-2">
-                {Array.isArray(playlistList) &&
-                  playlistList.map((playlist) => (
-                    <MediaCard
-                      key={`playlist-${playlist.id}`}
-                      id={playlist.id}
-                      name={playlist.name}
-                      image={
-                        playlist.coverImage ||
-                        playlist.playlistArt ||
-                        defaultPlaylistImage
-                      }
-                      count={playlist.musicCount}
-                      type="playlist"
-                      isActive={
-                        activeItem?.type === "playlist" &&
-                        activeItem?.id === playlist.id
-                      }
-                      onClick={() => handlePlaylistClick(playlist)}
-                      onPlaylistDelete={() => handlePlaylistDelete(playlist.id)}
-                    />
-                  ))}
-              
-                {folderList && folderList?.map((folder) => (
-                  <MediaCard
-                    key={`folder-${folder.id}`}
-                    id={folder.id}
-                    onFolderDelete={() => handleFolderDelete(folder.id)}
-                    name={folder.name}
-                    image={
-                      folder.folderArt ? folder.folderArt : defaultFolderImage
-                    }
-                    count={folder.musicCount}
-                    type="folder"
-                    isActive={
-                      activeItem?.type === "folder" &&
-                      activeItem?.id === folder.id
-                    }
-                    onClick={() => handleFolderClick(folder)}
-                  />
-                ))}
-              </div>
+              {!playlistList?.length && !folderList?.length ? (
+                <EmptyLibraryPanel message="No folders or playlists found" />
+              ) : (
+                <div className="space-y-2">
+                  {Array.isArray(playlistList) &&
+                    playlistList.map((playlist) => (
+                      <MediaCard
+                        key={`playlist-${playlist.id}`}
+                        id={playlist.id}
+                        name={playlist.name}
+                        image={
+                          playlist.coverImage ||
+                          playlist.playlistArt ||
+                          defaultPlaylistImage
+                        }
+                        count={playlist.musicCount}
+                        type="playlist"
+                        isActive={
+                          activeItem?.type === "playlist" &&
+                          activeItem?.id === playlist.id
+                        }
+                        onClick={() => handlePlaylistClick(playlist)}
+                        onPlaylistDelete={() =>
+                          handlePlaylistDelete(playlist.id)
+                        }
+                      />
+                    ))}
+
+                  {folderList &&
+                    folderList?.map((folder) => (
+                      <MediaCard
+                        key={`folder-${folder.id}`}
+                        id={folder.id}
+                        onFolderDelete={() => handleFolderDelete(folder.id)}
+                        name={folder.name}
+                        image={
+                          folder.folderArt
+                            ? folder.folderArt
+                            : defaultFolderImage
+                        }
+                        count={folder.musicCount}
+                        type="folder"
+                        isActive={
+                          activeItem?.type === "folder" &&
+                          activeItem?.id === folder.id
+                        }
+                        onClick={() => handleFolderClick(folder)}
+                      />
+                    ))}
+                </div>
+              )}
             </TabsContent>
 
             {/* Playlists only */}
@@ -393,29 +404,35 @@ export const LibraryPanel = () => {
               value="playlists"
               className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
             >
-              <div className="space-y-2">
-                {Array.isArray(playlistList) &&
-                  playlistList.map((playlist) => (
-                    <MediaCard
-                      key={`playlist-${playlist.id}`}
-                      id={playlist.id}
-                      name={playlist.name}
-                      onPlaylistDelete={() => handlePlaylistDelete(playlist.id)}
-                      image={
-                        playlist.coverImage ||
-                        playlist.playlistArt ||
-                        defaultPlaylistImage
-                      }
-                      count={playlist.musicCount}
-                      type="playlist"
-                      isActive={
-                        activeItem?.type === "playlist" &&
-                        activeItem?.id === playlist.id
-                      }
-                      onClick={() => handlePlaylistClick(playlist)}
-                    />
-                  ))}
-              </div>
+              {!playlistList?.length ? (
+                <EmptyLibraryPanel message="No playlists found" />
+              ) : (
+                <div className="space-y-2">
+                  {Array.isArray(playlistList) &&
+                    playlistList.map((playlist) => (
+                      <MediaCard
+                        key={`playlist-${playlist.id}`}
+                        id={playlist.id}
+                        name={playlist.name}
+                        onPlaylistDelete={() =>
+                          handlePlaylistDelete(playlist.id)
+                        }
+                        image={
+                          playlist.coverImage ||
+                          playlist.playlistArt ||
+                          defaultPlaylistImage
+                        }
+                        count={playlist.musicCount}
+                        type="playlist"
+                        isActive={
+                          activeItem?.type === "playlist" &&
+                          activeItem?.id === playlist.id
+                        }
+                        onClick={() => handlePlaylistClick(playlist)}
+                      />
+                    ))}
+                </div>
+              )}
             </TabsContent>
 
             {/* Folders only */}
@@ -423,26 +440,30 @@ export const LibraryPanel = () => {
               value="folders"
               className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
             >
-              <div className="space-y-2">
-                {folderList?.map((folder) => (
-                  <MediaCard
-                    key={`folder-${folder.id}`}
-                    id={folder.id}
-                    name={folder.name}
-                    onFolderDelete={() => handleFolderDelete(folder.id)}
-                    image={
-                      folder.folderArt ? folder.folderArt : defaultFolderImage
-                    }
-                    count={folder.musicCount}
-                    onClick={() => handleFolderClick(folder)}
-                    type="folder"
-                    isActive={
-                      activeItem?.type === "folder" &&
-                      activeItem?.id === folder.id
-                    }
-                  />
-                ))}
-              </div>
+              {!folderList?.length ? (
+                <EmptyLibraryPanel message="No folders found" />
+              ) : (
+                <div className="space-y-2">
+                  {folderList?.map((folder) => (
+                    <MediaCard
+                      key={`folder-${folder.id}`}
+                      id={folder.id}
+                      name={folder.name}
+                      onFolderDelete={() => handleFolderDelete(folder.id)}
+                      image={
+                        folder.folderArt ? folder.folderArt : defaultFolderImage
+                      }
+                      count={folder.musicCount}
+                      onClick={() => handleFolderClick(folder)}
+                      type="folder"
+                      isActive={
+                        activeItem?.type === "folder" &&
+                        activeItem?.id === folder.id
+                      }
+                    />
+                  ))}
+                </div>
+              )}
             </TabsContent>
           </ScrollArea>
         </Tabs>

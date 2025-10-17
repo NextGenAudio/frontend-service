@@ -7,12 +7,17 @@ import { useTheme } from "../../utils/theme-context";
 import { getGeneralThemeColors } from "../../lib/theme-colors";
 import Image from "next/image";
 import { useEntityContext } from "@/app/utils/entity-context";
+import EmptyLibraryPanel from "@/app/components/ui/empty-library-panel";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { status, data: session } = useSession();
   const { theme } = useTheme();
   const { playlistList } = useEntityContext();
   const themeColors = getGeneralThemeColors(theme.primary);
+
+  const router = useRouter();
+
   const topArtists = [
     { name: "The Weeknd", image: "/the-weeknd-artist-photo.png" },
     { name: "Billie Eilish", image: "/billie-eilish-artist-photo.png" },
@@ -22,45 +27,6 @@ export default function ProfilePage() {
     { name: "Ariana Grande", image: "/ariana-grande-artist-photo.png" },
     { name: "Ed Sheeran", image: "/ed-sheeran-artist-photo.png" },
   ];
-
-  const topTracks = [
-    {
-      title: "Blinding Lights",
-      artist: "The Weeknd",
-      album: "After Hours",
-      duration: "3:20",
-      image: "/blinding-lights-album-cover.png",
-    },
-    {
-      title: "Good 4 U",
-      artist: "Olivia Rodrigo",
-      album: "SOUR",
-      duration: "2:58",
-      image: "/good-4-u-album-cover.png",
-    },
-    {
-      title: "Stay",
-      artist: "The Kid LAROI, Justin Bieber",
-      album: "F*CK LOVE 3",
-      duration: "2:21",
-      image: "/stay-album-cover.png",
-    },
-    {
-      title: "Levitating",
-      artist: "Dua Lipa",
-      album: "Future Nostalgia",
-      duration: "3:23",
-      image: "/levitating-album-cover.png",
-    },
-    {
-      title: "Peaches",
-      artist: "Justin Bieber ft. Daniel Caesar",
-      album: "Justice",
-      duration: "3:18",
-      image: "/peaches-album-cover.png",
-    },
-  ];
-
 
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-y-auto custom-scrollbar">
@@ -97,7 +63,7 @@ export default function ProfilePage() {
               </h1>
               <div className="flex items-center gap-6 text-white/80">
                 <span className="font-medium">
-                  {playlistList.length} Public Playlists
+                  {playlistList.length} Playlists
                 </span>
                 {/* <span>•</span>
                 <span className="font-medium">1.2K Followers</span>
@@ -106,6 +72,8 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+          {/* Horizontal separator */}
+          <hr className="border-t border-white/20 my-6" />
 
           {/* Action Buttons */}
           {/* <div className="flex items-center gap-4">
@@ -130,53 +98,72 @@ export default function ProfilePage() {
           </div> */}
         </div>
 
-        {/* Created Playlists */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Created Playlists</h2>
-            <Button
-              variant="ghost"
-              className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
-            >
-              Show all
-            </Button>
-          </div>
-          <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
-            {playlistList.map((playlist, index) => (
-              <div key={index} className="group cursor-pointer">
-                <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
-                  <div className="relative mb-4">
-                    <Image
-                      src={playlist.playlistArt || "/assets/music-icon.webp"}
-                      alt={playlist.name}
-                      width={256}
-                      height={256}
-                      className="w-full aspect-square object-cover rounded-xl"
-                    />
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${theme.preview} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
-                    />
-                    <Button
-                      size="icon"
-                      className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} hover:${themeColors.gradient} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg`}
-                    >
-                      <Play className="w-5 h-5" />
-                    </Button>
+        {/* Created Playlists or Empty Profile Insight */}
+        {playlistList.length > 0 ? (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Created Playlists</h2>
+              <Button
+                variant="ghost"
+                className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
+              >
+                Show all
+              </Button>
+            </div>
+            <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
+              {playlistList.map((playlist, index) => (
+                <div key={index} className="group cursor-pointer">
+                  <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
+                    <div className="relative mb-4">
+                      <Image
+                        src={playlist.playlistArt || "/assets/music-icon.webp"}
+                        alt={playlist.name}
+                        width={256}
+                        height={256}
+                        className="w-full aspect-square object-cover rounded-xl"
+                      />
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-br ${theme.preview} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
+                      />
+                      <Button
+                        size="icon"
+                        className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg}  text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg`}
+                        onClick={() =>
+                          router.push(`/player/playlist/${playlist.id}`)
+                        }
+                      >
+                        <Play className="w-5 h-5" />
+                      </Button>
+                    </div>
+                    <h3 className="font-semibold text-white mb-1">
+                      {playlist.name}
+                    </h3>
+                    <p className="text-sm text-white/60">
+                      {playlist.musicCount} songs
+                    </p>
                   </div>
-                  <h3 className="font-semibold text-white mb-1">
-                    {playlist.name}
-                  </h3> 
-                  <p className="text-sm text-white/60">
-                    {playlist.musicCount} songs
-                  </p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="mb-6">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-500/20 to-slate-500/20 opacity-50 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                <UserPlus className="w-12 h-12 text-white/60" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              No profile insight yet
+            </h3>
+            <p className="text-white/70 text-lg mb-6 max-w-md mx-16">
+              You haven't created any playlists or activity yet. Start exploring
+              and create your first playlist!
+            </p>
+          </div>
+        )}
         {/* Top Artists */}
-        <div className="mb-12">
+        {/* <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold">Top artists this month</h2>
@@ -213,10 +200,10 @@ export default function ProfilePage() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Top Tracks */}
-        <div>
+        {/* <div>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold">Top tracks this month</h2>
@@ -276,9 +263,8 @@ export default function ProfilePage() {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
 }
-
