@@ -366,7 +366,8 @@ export const LibraryPanel = () => {
                       onPlaylistDelete={() => handlePlaylistDelete(playlist.id)}
                     />
                   ))}
-                {folderList.map((folder) => (
+              
+                {folderList && folderList?.map((folder) => (
                   <MediaCard
                     key={`folder-${folder.id}`}
                     id={folder.id}
@@ -423,7 +424,7 @@ export const LibraryPanel = () => {
               className={clsx(`px-3 flex-1 ${player ? "pb-80" : "pb-44"}`)}
             >
               <div className="space-y-2">
-                {folderList.map((folder) => (
+                {folderList?.map((folder) => (
                   <MediaCard
                     key={`folder-${folder.id}`}
                     id={folder.id}

@@ -20,7 +20,7 @@ import { Howl } from "howler";
 import AudioVisualizer from "../components/audio-visualizer";
 import { ProfileDropdown } from "../components/profile-dropdown";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";

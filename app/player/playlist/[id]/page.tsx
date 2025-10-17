@@ -8,6 +8,7 @@ import {
   Shuffle,
   Music,
   Users,
+  Music2,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
@@ -26,6 +27,11 @@ import { Song } from "@/app/utils/music-context";
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
+
+interface Collaborator{
+  userId: string;
+  role: number;
+}
 export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const {
     selectSong,
@@ -50,6 +56,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const { isPlaying, setIsPlaying } = useMusicContext();
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
+  );
+  const [playlistCollaborators, setPlaylistCollaborators] = useState<Collaborator[]>(
+    []
   );
   const { entityName, entityArt, entityType, entityDescription } =
     useEntityContext();
@@ -125,7 +134,26 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
         setLoading(false);
       }
     };
+
+    const fetchCollaborators = async () => {
+      try {
+        const res = await fetch(
+          `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${params.id}/collaborators`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        const data = await res.json();
+        console.log("Playlist collaborators:", data);
+        setPlaylistCollaborators(data);
+      } catch (err) {
+        console.error("Error fetching collaborators:", err);
+      }
+    };
+
     fetchSongs();
+    fetchCollaborators();
   }, []);
 
   // Monitor songQueue changes
@@ -197,7 +225,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
 
       <div className="pt-3 relative z-10 h-full flex flex-col">
         <div
-          className="h-fit p-5 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
+          className="h-fit p-5  group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
           style={{
             transform: `translateY(${Math.min(scrollY * 0.3, 30)}px)`,
           }}
@@ -245,16 +273,37 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                 >
                   {entityName}
                 </h2>
-                <p
-                  className="text-white/80 transition-all duration-700 ease-out ml-2 mt-1"
-                  style={{
-                    fontSize: "1.1rem",
-                    transform: `translateX(${"0px"})`,
-                    opacity: 0.8,
-                  }}
-                >
-                  {songList.length} songs
+
+                <p className="ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose mt-2">
+                  {entityDescription}
                 </p>
+                {entityDescription !== "" && (
+                  <hr className="mt-2 mb-2 border-t border-white/20" />
+                )}
+
+                {/* Collaborators Display */}
+                {playlistCollaborators.length > 0 && (
+                  <div className="ml-2 mt-3 flex items-center gap-2 flex-wrap">
+                    {/* Songs Count - moved here */}
+                    <Music2 className="w-4 h-4 text-white/60" />
+                    <div className="text-white/80 text-base font-semibold">
+                      {songList.length} song{songList.length === 1 ? "" : "s"}
+                    </div>
+                    {/* Dot separator */}
+                    <span className="text-white/60 text-lg font-bold select-none">
+                      &bull;
+                    </span>
+                    <Users className="w-4 h-4 text-white/60" />
+                    {playlistCollaborators.map((collaborator, index) => (
+                      <span
+                        key={index}
+                        className="text-xs px-2 py-1 rounded-full bg-white/10 text-white/70 border border-white/20"
+                      >
+                        {collaborator.userId}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 {songList.length > 0 && (
@@ -294,12 +343,6 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                     </Button>
                   </div>
                 )}
-                {entityDescription !== "" && (
-                  <hr className="mt-4 mb-2 border-t border-white/20" />
-                )}
-                <p className="ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose">
-                  {entityDescription}
-                </p>
               </div>
             </div>
           </div>

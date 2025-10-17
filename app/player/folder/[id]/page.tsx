@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Play, Pause, MoreHorizontal, Shuffle, Music } from "lucide-react";
+import {
+  Play,
+  Pause,
+  MoreHorizontal,
+  Shuffle,
+  Music,
+  Music2,
+} from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { SearchBar } from "@/app/components/search-bar";
@@ -259,17 +266,19 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 >
                   {entityName}
                 </h2>
-                <p
-                  className="text-white/80 transition-all duration-700 ease-out ml-2 mt-1"
-                  style={{
-                    fontSize: isHeaderCompact ? "0.875rem" : "1.1rem",
-
-                    opacity: isHeaderCompact ? 0.9 : 0.8,
-                  }}
-                >
-                  {songList.length} songs
+                <p className="ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose mt-2">
+                  {entityDescription}
                 </p>
-
+                {entityDescription !== "" && (
+                  <hr className="mt-2 mb-2 border-t border-white/20" />
+                )}
+                {/* Songs Count - moved here */}
+                <div className="ml-2 mt-3 flex items-center gap-2 flex-wrap">
+                  <Music2 className="w-4 h-4 text-white/60" />
+                  <div className="text-white/80 text-base font-semibold">
+                    {songList.length} song{songList.length === 1 ? "" : "s"}
+                  </div>
+                </div>
                 {/* Action Buttons */}
                 {!isHeaderCompact && songList.length > 0 && (
                   <div className="flex items-center gap-4 mt-4">
@@ -290,12 +299,6 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                     </Button>
                   </div>
                 )}
-                {entityDescription !== "" && (
-                  <hr className="mt-4 mb-2 border-t border-white/20" />
-                )}
-                <p className="ml-1 text-sm md:text-base text-white/70 leading-relaxed max-w-prose">
-                  {entityDescription}
-                </p>
               </div>
             </div>
           </div>
@@ -354,7 +357,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
               </div>
             ) : (
               /* Songs List */
-              songList.map((song, id) => (
+              songList?.map((song, id) => (
                 <div key={song.id}>
                   <div
                     onMouseEnter={() => setHoveredSong(song.id)}
@@ -423,7 +426,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                       <span className="col-span-2 text-m text-white/70 truncate">
                         {song.album}
                       </span>
-                       <span className="col-span-2 text-m text-white/70 truncate ">
+                      <span className="col-span-2 text-m text-white/70 truncate ">
                         {song.listenCount || 0}
                       </span>
                       <span className="col-span-1 text-center text-white/70 truncate">

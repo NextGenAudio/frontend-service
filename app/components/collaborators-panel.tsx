@@ -20,7 +20,13 @@ import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import { useSidebar } from "../utils/sidebar-context";
+import axios from "axios";
+import AlertBar from "@/app/components/alert-bar";
+import { useParams } from "next/navigation";
 
+const USER_MANAGEMENT_SERVICE_URL =
+  process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
+const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 interface Collaborator {
   id: string;
   userId: string;
@@ -34,7 +40,15 @@ interface Collaborator {
   playlistsShared: number;
 }
 
+interface ExistingCollaborator {
+  userId: string;
+  role: string;
+}
+
 export const CollaboratorsPanel = () => {
+  const params = useParams();
+  const playlistId = params?.id as string | undefined; // Get playlist ID from URL path
+
   const [searchQuery, setSearchQuery] = useState("");
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -43,49 +57,65 @@ export const CollaboratorsPanel = () => {
   >(null);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteUserId, setInviteUserId] = useState("");
+  const [selectedRole, setSelectedRole] = useState<{ [key: string]: number }>(
+    {}
+  );
+  const [isAddingCollaborator, setIsAddingCollaborator] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [existingCollaborators, setExistingCollaborators] = useState<
+    ExistingCollaborator[]
+  >([]);
+  const [isLoadingCollaborators, setIsLoadingCollaborators] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
-  const { setCollaborators: setSidebarCollaborators } = useSidebar();
 
-  // Mock data for demonstration
-  const mockCollaborators: Collaborator[] = [
-    {
-      id: "1",
-      userId: "user123",
-      username: "MusicLover_Alex",
-      avatar: "/avatars/alex.jpg",
-      role: "admin",
-      joinedAt: "2024-01-15",
-      isOnline: true,
-      lastActivity: "2 minutes ago",
-      songsShared: 45,
-      playlistsShared: 8,
-    },
-    {
-      id: "2",
-      userId: "user456",
-      username: "BeatMaster_Sam",
-      role: "editor",
-      joinedAt: "2024-02-10",
-      isOnline: false,
-      lastActivity: "1 hour ago",
-      songsShared: 23,
-      playlistsShared: 4,
-    },
-    {
-      id: "3",
-      userId: "user789",
-      username: "SoundWave_Riley",
-      role: "viewer",
-      joinedAt: "2024-03-01",
-      isOnline: true,
-      lastActivity: "Just now",
-      songsShared: 12,
-      playlistsShared: 2,
-    },
-  ];
+  // Fetch existing collaborators when component mounts or playlistId changes
+  useEffect(() => {
+    if (playlistId) {
+      fetchExistingCollaborators();
+    }
+  }, [playlistId]);
+
+  const fetchExistingCollaborators = async () => {
+    if (!playlistId) return;
+
+    setIsLoadingCollaborators(true);
+    try {
+      const response = await axios.get(
+        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/collaborators`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log("Existing collaborators:", response.data);
+      setExistingCollaborators(response.data);
+    } catch (error: any) {
+      console.error("Error fetching collaborators:", error);
+      // Don't show alert for this, just log it
+    } finally {
+      setIsLoadingCollaborators(false);
+    }
+  };
+
+  // Check if a user is already a collaborator
+  const isExistingCollaborator = (userId: string) => {
+    return existingCollaborators.some(
+      (collaborator) => collaborator.userId === userId
+    );
+  };
+
+  // Auto-hide alert after 3 seconds
+  useEffect(() => {
+    if (alertMessage) {
+      const timer = setTimeout(() => {
+        setAlertMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertMessage]);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -95,16 +125,61 @@ export const CollaboratorsPanel = () => {
 
     setIsSearching(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const filtered = mockCollaborators.filter(
-        (collab) =>
-          collab.userId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          collab.username.toLowerCase().includes(searchQuery.toLowerCase())
+    try {
+      // Call backend search endpoint
+      const response = await axios.get(
+        `${USER_MANAGEMENT_SERVICE_URL}/sonex/v1/auth/search-profile`,
+        {
+          params: { search: searchQuery },
+        }
       );
-      setCollaborators(filtered);
+
+      console.log("Search response:", response.data);
+
+      // Map backend response to Collaborator interface
+      const mappedCollaborators: Collaborator[] = response.data.map(
+        (profile: any) => ({
+          id: profile.profileId,
+          userId: profile.email,
+          username: `${profile.firstName} ${profile.lastName}`,
+          avatar: profile.profileImageURL,
+          role: "viewer" as const, // Default role for search results
+          joinedAt: profile.createdAt,
+          isOnline: false, // Default to offline for search results
+          // lastActivity: undefined,
+          // songsShared: 0, // Default values for search results
+          // playlistsShared: 0,
+        })
+      );
+
+      setCollaborators(mappedCollaborators);
+    } catch (error: any) {
+      console.error("Search error:", error);
+      console.error("Error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+      });
+
+      if (error.response?.status === 404) {
+        // No users found
+        setCollaborators([]);
+      } else if (error.response?.status === 403) {
+        // Forbidden - authentication issue
+        alert("Authentication required. Please log in again.");
+        // Optionally redirect to login
+        // window.location.href = '/login';
+      } else {
+        // Other errors
+        const errorMessage =
+          error.response?.data?.message ||
+          "Failed to search users. Please try again.";
+        alert(errorMessage);
+      }
+    } finally {
       setIsSearching(false);
-    }, 800);
+    }
   };
 
   const handleInviteCollaborator = async () => {
@@ -116,6 +191,110 @@ export const CollaboratorsPanel = () => {
     setShowInviteForm(false);
     // You can add actual API call here
   };
+
+  const handleAddCollaborator = async (profileId: string) => {
+    if (!playlistId) {
+      setAlertMessage("No playlist selected");
+      return;
+    }
+
+    const role = selectedRole[profileId] || 1; // Default to role 1 (viewer) if not selected
+
+    setIsAddingCollaborator(true);
+
+    try {
+      const response = await axios.post(
+        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/add-collaborator`,
+        null, // No request body
+        {
+          params: {
+            profileId: profileId,
+            role: role,
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log("Add collaborator response:", response.data);
+
+      // Show success message in AlertBar
+      setAlertMessage(response.data || "Collaborator added successfully!");
+
+      // Refresh the list of existing collaborators
+      await fetchExistingCollaborators();
+
+      // Clear selection after successful addition
+      setSelectedCollaborator(null);
+    } catch (error: any) {
+      console.error("Add collaborator error:", error);
+
+      if (error.response?.status === 400) {
+        setAlertMessage("Invalid request. Please check the details.");
+      } else if (error.response?.status === 403) {
+        setAlertMessage("You don't have permission to add collaborators.");
+      } else {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Failed to add collaborator. Please try again.";
+        setAlertMessage(errorMessage);
+      }
+    } finally {
+      setIsAddingCollaborator(false);
+    }
+  };
+
+  const handleRemoveCollaborator = async (profileId: string) => {
+    if (!playlistId) {
+      setAlertMessage("No playlist selected");
+      return;
+    }
+
+    setIsAddingCollaborator(true);
+
+    try {
+      const response = await axios.delete(
+        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/remove-collaborator/${playlistId}`,
+        {
+          params: {
+            userId: profileId,
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log("Remove collaborator response:", response.data);
+
+      // Show success message in AlertBar
+      setAlertMessage(response.data || "Collaborator removed successfully!");
+
+      // Refresh the list of existing collaborators
+      await fetchExistingCollaborators();
+
+      // Clear selection after successful removal
+      setSelectedCollaborator(null);
+    } catch (error: any) {
+      console.error("Remove collaborator error:", error);
+
+      if (error.response?.status === 400) {
+        setAlertMessage("Invalid request. Please check the details.");
+      } else if (error.response?.status === 403) {
+        setAlertMessage("You don't have permission to remove collaborators.");
+      } else {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Failed to remove collaborator. Please try again.";
+        setAlertMessage(errorMessage);
+      }
+    } finally {
+      setIsAddingCollaborator(false);
+    }
+  };
+
+  const getRoleOptions = () => [
+    { value: 1, label: "Viewer", description: "Can view only" },
+    { value: 2, label: "Editor", description: "Can edit content" },
+    { value: 3, label: "Admin", description: "Full access" },
+  ];
 
   const getRoleIcon = (role: Collaborator["role"]) => {
     switch (role) {
@@ -151,6 +330,13 @@ export const CollaboratorsPanel = () => {
 
   return (
     <div className="h-full flex flex-col relative overflow-hidden">
+      {/* Alert Bar */}
+      {alertMessage && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md">
+          <AlertBar message={alertMessage} setMessage={setAlertMessage} />
+        </div>
+      )}
+
       {/* Glass background */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-slate-900/50 to-slate-900/50 backdrop-blur-xl" /> */}
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" />
@@ -187,25 +373,31 @@ export const CollaboratorsPanel = () => {
           {/* Search Section */}
           <div className="space-y-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50 z-10 pointer-events-none" />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 z-10 pointer-events-none">
+                {isSearching ? (
+                  <div className="relative w-4 h-4">
+                    {/* Spinning circle animation inside search icon */}
+                    <div className="absolute inset-0 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  <Search className="h-4 w-4 text-white/50" />
+                )}
+              </div>
               <Input
                 ref={searchInputRef}
                 placeholder="Search by Username or Email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                className="pl-10 bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:border-white/40 transition-all duration-300"
+                className="pl-10 bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/30 focus:border-white/40 transition-all duration-300"
+                disabled={isSearching}
               />
               <Button
                 onClick={handleSearch}
                 disabled={isSearching}
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 px-3 bg-white/20 hover:bg-white/30 border-0 text-white"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 px-3 bg-white/20 hover:bg-white/30 border-0 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
-                {isSearching ? (
-                  <div className="w-3 h-3 border border-white/60 border-t-white rounded-full animate-spin" />
-                ) : (
-                  "Search"
-                )}
+                {isSearching ? "Searching..." : "Search"}
               </Button>
             </div>
 
@@ -249,8 +441,10 @@ export const CollaboratorsPanel = () => {
           <div className="p-4">
             {!searchQuery && (
               <div className="text-center py-12 space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-violet-500/20 to-purple-500/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                  <Search className="h-6 w-6 text-white/60" />
+                <div
+                  className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${themeColors.gradient} opacity-70 backdrop-blur-md flex items-center justify-center border border-white/10`}
+                >
+                  <Search className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <p className="text-white/80 font-medium">
@@ -335,7 +529,7 @@ export const CollaboratorsPanel = () => {
                           @{collaborator.userId}
                         </p>
 
-                        <div className="flex items-center gap-2 mb-2">
+                        {/* <div className="flex items-center gap-2 mb-2">
                           <span
                             className={`px-2 py-1 rounded-full text-xs font-medium border ${getRoleColor(
                               collaborator.role
@@ -348,14 +542,14 @@ export const CollaboratorsPanel = () => {
                               ? "Online"
                               : collaborator.lastActivity}
                           </span>
-                        </div>
+                        </div> */}
 
                         {/* Stats */}
                         <div className="flex items-center gap-4 text-xs text-white/60">
-                          <div className="flex items-center gap-1">
+                          {/* <div className="flex items-center gap-1">
                             <Music className="h-3 w-3" />
                             <span>{collaborator.songsShared} songs</span>
-                          </div>
+                          </div> */}
                           <div className="flex items-center gap-1">
                             <Heart className="h-3 w-3" />
                             <span>
@@ -377,7 +571,7 @@ export const CollaboratorsPanel = () => {
 
                     {/* Expanded Details */}
                     {selectedCollaborator === collaborator.id && (
-                      <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                      <div className="mt-3 pt-3 border-t border-white/10 space-y-3">
                         <div className="grid grid-cols-2 gap-4 text-xs">
                           <div>
                             <span className="text-white/50">Joined:</span>
@@ -387,21 +581,90 @@ export const CollaboratorsPanel = () => {
                               ).toLocaleDateString()}
                             </p>
                           </div>
-                          <div>
-                            <span className="text-white/50">Last Active:</span>
-                            <p className="text-white/80">
-                              {collaborator.lastActivity || "Unknown"}
-                            </p>
-                          </div>
                         </div>
 
+                        {/* Role Selection */}
+                        {playlistId &&
+                          !isExistingCollaborator(collaborator.userId) && (
+                            <div className="space-y-2">
+                              <label className="text-xs text-white/70 font-medium">
+                                Select Role:
+                              </label>
+                              <div className="grid grid-cols-3 gap-2">
+                                {getRoleOptions().map((roleOption) => (
+                                  <button
+                                    key={roleOption.value}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedRole({
+                                        ...selectedRole,
+                                        [collaborator.id]: roleOption.value,
+                                      });
+                                    }}
+                                    className={`p-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+                                      (selectedRole[collaborator.id] || 1) ===
+                                      roleOption.value
+                                        ? "bg-blue-500/80 text-white border-2 border-blue-400"
+                                        : "bg-white/10 text-white/70 border border-white/20 hover:bg-white/20"
+                                    }`}
+                                    title={roleOption.description}
+                                  >
+                                    {roleOption.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                        {/* Already Collaborator Badge */}
+                        {playlistId &&
+                          isExistingCollaborator(collaborator.userId) && (
+                            <div className="p-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+                              <p className="text-xs text-green-400 font-medium text-center">
+                                ✓ Already a Collaborator
+                              </p>
+                            </div>
+                          )}
+
                         <div className="flex gap-2 pt-2">
-                          <Button
-                            size="sm"
-                            className="flex-1 bg-blue-500/80 hover:bg-blue-500 text-white border-0"
-                          >
-                            View Profile
-                          </Button>
+                          {playlistId &&
+                          isExistingCollaborator(collaborator.userId) ? (
+                            <Button
+                              size="sm"
+                              className="flex-1 bg-red-500/80 hover:bg-red-500 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveCollaborator(collaborator.userId);
+                              }}
+                              disabled={isAddingCollaborator}
+                            >
+                              {isAddingCollaborator
+                                ? "Removing..."
+                                : "Remove Collaborator"}
+                            </Button>
+                          ) : playlistId ? (
+                            <Button
+                              size="sm"
+                              className="flex-1 bg-blue-500/80 hover:bg-blue-500 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddCollaborator(collaborator.userId);
+                              }}
+                              disabled={isAddingCollaborator}
+                            >
+                              {isAddingCollaborator
+                                ? "Adding..."
+                                : "Make a Collaborator"}
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              className="flex-1 bg-blue-500/80 hover:bg-blue-500 text-white border-0"
+                            >
+                              View Profile
+                            </Button>
+                          )}
+
                           <Button
                             size="sm"
                             variant="ghost"
