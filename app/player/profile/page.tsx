@@ -7,7 +7,6 @@ import { useTheme } from "../../utils/theme-context";
 import { getGeneralThemeColors } from "../../lib/theme-colors";
 import Image from "next/image";
 import { useEntityContext } from "@/app/utils/entity-context";
-import EmptyLibraryPanel from "@/app/components/ui/empty-library-panel";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {

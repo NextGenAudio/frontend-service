@@ -10,6 +10,7 @@ import { PlaylistOptionsDropdown } from "../playlist-options-dropdown";
 interface MediaCardProps {
   id: number;
   name: string;
+  role?: number;
   image?: string;
   count?: number;
   onClick?: () => void;
@@ -51,6 +52,7 @@ function MediaCard({
   count,
   onClick,
   type,
+  role,
   isActive = false, // Add default value
   // Folder props
   onFolderOpen,
@@ -87,8 +89,8 @@ function MediaCard({
       onClick={onClick}
       className={`flex items-center gap-3 p-3 rounded-xl backdrop-blur-sm border cursor-pointer shadow-lg group relative transition-all duration-300 ${
         isActive
-          ? "bg-white/25 border-white/40 shadow-xl" // Active state styling
-          : "bg-white/10 border-white/20 hover:bg-white/20" // Default state styling
+          ? "bg-white/25 border-white/40 shadow-xl"
+          : "bg-white/10 border-white/20 hover:bg-white/20"
       } ${showDropdown ? "z-[10000]" : "z-10"}`}
     >
       <Image
@@ -99,7 +101,16 @@ function MediaCard({
         height={48}
       />
       <div className="flex-1 min-w-0 hidden sm:block">
-        <div className="font-medium truncate text-white">{name}</div>
+        <div className="flex items-center gap-2 font-medium truncate text-white">
+          {name}
+          {role === 1 && (
+            <div className="absolute left-1/2 top-1/2 opacity-80 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+              <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full shadow-lg">
+                Shared
+              </span>
+            </div>
+          )}
+        </div>
         {count !== undefined && (
           <div className="text-sm text-white/70">{count} songs</div>
         )}

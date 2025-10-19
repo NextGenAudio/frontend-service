@@ -74,6 +74,7 @@ export function PlaylistCreatePage() {
   const { playlistCreateRefresh, setPlaylistCreateRefresh } = useFileHandling();
 
   useEffect(() => {
+    if (step === 2) {
     const fetchAvailableSongs = async () => {
       try {
         const response = await axios.get(
@@ -89,7 +90,8 @@ export function PlaylistCreatePage() {
       }
     };
     fetchAvailableSongs();
-  }, []);
+  }
+  }, [step]);
 
   // Handle drag-drop for artwork
   const handleArtworkDrop = (e: React.DragEvent) => {
@@ -152,7 +154,7 @@ export function PlaylistCreatePage() {
       }
 
       const playlistResponse = await axios.post(
-        PLAYLIST_SERVICE_URL,
+        `${PLAYLIST_SERVICE_URL}/create`,
         formDataToSend,
         {
           withCredentials: true,

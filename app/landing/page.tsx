@@ -48,7 +48,7 @@ export function Landing() {
               first_name: session.user.name!.split(" ")[0],
               last_name: session.user.name!.split(" ").slice(1).join(" "),
               email: session.user.email,
-              password: null,
+              password: "",
               image: session.user.image,
               created_at: new Date().toISOString(),
               created_by: "provider",

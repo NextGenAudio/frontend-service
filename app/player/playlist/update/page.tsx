@@ -117,7 +117,7 @@ const PlaylistUpdatePage = () => {
   const fetchAvailableSongs = async () => {
     try {
       console.log("Fetching available songs..."); // Debug log
-      const response = await axios.get(MUSIC_LIBRARY_SERVICE_URL!, {
+      const response = await axios.get(`${MUSIC_LIBRARY_SERVICE_URL}/files/list`, {
         withCredentials: true,
       });
       console.log("Available songs response:", response.data?.length, "songs"); // Debug log
@@ -149,7 +149,7 @@ const PlaylistUpdatePage = () => {
       const songIds = selectedSongs.map((song) => parseInt(song.id));
 
       await axios.post(
-        `${PLAYLIST_SERVICE_URL}/${playlistId}/tracks`,
+        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/tracks`,
         { fileIds: songIds },
         {
           withCredentials: true,

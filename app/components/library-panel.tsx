@@ -361,6 +361,7 @@ export const LibraryPanel = () => {
                           playlist.playlistArt ||
                           defaultPlaylistImage
                         }
+                        role={playlist.role}
                         count={playlist.musicCount}
                         type="playlist"
                         isActive={
