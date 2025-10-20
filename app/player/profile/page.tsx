@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
-import { MoreHorizontal, Play, Heart, UserPlus } from "lucide-react";
+import { MoreHorizontal, Play, Heart, UserPlus, MicVocal } from "lucide-react";
 import ProfileAvatar from "../../components/profile-avatar";
 import { useSession } from "next-auth/react";
 import { useTheme } from "../../utils/theme-context";
@@ -43,6 +43,17 @@ export default function ProfilePage() {
       </div> */}
 
       <div className="relative z-10 p-8">
+        {/* Top right Be an Artist button */}
+        <div className="absolute top-8 right-8 z-20">
+          <Button
+            className={`bg-white/20 backdrop-blur-xl border border-white/30 text-white font-bold px-7 py-3 pt-8 pb-8 rounded-2xl  text-lg hover:${theme.preview} hover:backdrop-blur-2xl hover:border-white/40 transition-all duration-200`}
+            style={{ boxShadow: "0 4px 32px 0 rgba(255,255,255,0.12)" }}
+            onClick={() => router.push("/player/beAnArtist")}
+          >
+            <MicVocal className="w-12 h-12 mr-2" />
+            Be an Artist
+          </Button>
+        </div>
         {/* Profile Header */}
         <div className="mb-12">
           <div className="flex items-end gap-8 mb-8">
@@ -126,7 +137,7 @@ export default function ProfilePage() {
                       />
                       <Button
                         size="icon"
-                        className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg}  text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg`}
+                        className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
                         onClick={() =>
                           router.push(`/player/playlist/${playlist.id}`)
                         }

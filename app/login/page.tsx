@@ -50,6 +50,7 @@ export default function Login() {
         ...(isSignUp && { fullName }),
       });
     }, 2000);
+    
   };
 
   return (

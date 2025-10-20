@@ -386,7 +386,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         <div className="bg-slate-900 h-screen ml-[115px] rounded-[32px] bg-background text-foreground flex flex-col overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] drop-shadow-xl">
           <div className="flex-1 min-h-0 h-full">
             <ResizablePanelGroup direction="horizontal" className="h-full">
-              <ResizablePanel defaultSize={20} minSize={10} maxSize={25}>
+              <ResizablePanel defaultSize={20} minSize={20} maxSize={25}>
                 <div className="relative z-10 h-full">
                   <LibraryPanel />
                 </div>

@@ -20,6 +20,7 @@ export interface Playlist {
   musicCount?: number;
   createdAt?: string;
   updatedAt?: string;
+  role?: number;
   musics?: any[]; // Add musics property
   tracks?: any[]; // Add tracks property
 }
