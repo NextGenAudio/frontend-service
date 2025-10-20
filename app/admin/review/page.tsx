@@ -35,14 +35,14 @@ import {
 import { Badge } from "@/app/components/ui/badge";
 import { Textarea } from "@/app/components/ui/textarea";
 import axios from "axios";
-
+import Image from "next/image";
 type RequestStatus = "pending" | "approved" | "rejected";
 
 const requestStatus = {
-    "pending": 1,
-    "approved": 2,
-    "rejected": 3,
-    "reviewing": 4,
+  pending: 1,
+  approved: 2,
+  rejected: 3,
+  reviewing: 4,
 };
 
 const USER_MANAGEMENT_SERVICE_URL =
@@ -128,8 +128,9 @@ export default function ArtistRequestsAdmin() {
   };
 
   const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
-
-    const res = axios.put(`${USER_MANAGEMENT_SERVICE_URL}/requests/${requestId}/status?statusId=${requestStatus[newStatus]}`);
+    const res = axios.put(
+      `${USER_MANAGEMENT_SERVICE_URL}/requests/${requestId}/status?statusId=${requestStatus[newStatus]}`
+    );
     console.log("Status Update Response", res.data);
     setRequests(
       requests.map((req) =>
@@ -406,6 +407,86 @@ export default function ArtistRequestsAdmin() {
                   {new Date(selectedRequest.createdAt).toLocaleString()}
                 </div>
               </div>
+
+              {/* Profile Details */}
+              {selectedRequest.profile && (
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <User className="w-5 h-5 text-orange-500" />
+                    Profile Details
+                  </h3>
+                  <div className="flex items-center gap-6 mb-4">
+                    {selectedRequest.profile.profileImageURL && (
+                      <Image
+                        src={
+                          selectedRequest?.profile?.profileImageURL ||
+                          "/default-profile.png"
+                        }
+                        alt="Profile"
+                        width={80}
+                        height={80}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-orange-500 shadow"
+                      />
+                    )}
+                    <div>
+                      <div className="text-xl font-bold text-white">
+                        {selectedRequest.profile.firstName}{" "}
+                        {selectedRequest.profile.lastName}
+                      </div>
+                      <div className="text-white/70">
+                        {selectedRequest.profile.email}
+                      </div>
+                      {typeof selectedRequest.profile.isActive !==
+                        "undefined" && (
+                        <div className="mt-1">
+                          <span
+                            className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                              selectedRequest.profile.isActive
+                                ? "bg-green-600/30 text-green-400"
+                                : "bg-red-600/30 text-red-400"
+                            }`}
+                          >
+                            {selectedRequest.profile.isActive
+                              ? "Active"
+                              : "Inactive"}
+                          </span>
+                        </div>
+                      )}
+                      {selectedRequest.profile.role && (
+                        <div className="mt-1 text-white/60 text-sm">
+                          Role:{" "}
+                          {selectedRequest.profile.role?.roleName
+                            ?.charAt(0)
+                            .toUpperCase() +
+                            selectedRequest.profile.role?.roleName?.slice(1)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-white/60 mb-1">
+                        Profile ID
+                      </div>
+                      <div className="text-white">
+                        {selectedRequest.profile.profileId}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-white/60 mb-1">
+                        Updated At
+                      </div>
+                      <div className="text-white">
+                        {selectedRequest.profile.updatedAt
+                          ? new Date(
+                              selectedRequest.profile.updatedAt
+                            ).toLocaleString()
+                          : "N/A"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Personal Information */}
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6">

@@ -1,10 +1,10 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
 import { MoreHorizontal, Play, Heart, UserPlus, MicVocal } from "lucide-react";
-import ProfileAvatar from "../../components/profile-avatar";
+import ProfileAvatar from "../../../../components/profile-avatar";
 import { useSession } from "next-auth/react";
-import { useTheme } from "../../utils/theme-context";
-import { getGeneralThemeColors } from "../../lib/theme-colors";
+import { useTheme } from "../../../../utils/theme-context";
+import { getGeneralThemeColors } from "../../../../lib/theme-colors";
 import Image from "next/image";
 import { useEntityContext } from "@/app/utils/entity-context";
 import { useRouter } from "next/navigation";
@@ -29,19 +29,6 @@ export default function ProfilePage() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-y-auto custom-scrollbar">
-      {/* Background Effects */}
-      {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div
-          className={`absolute top-20 left-20 w-96 h-96 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-3xl animate-pulse`}
-        />
-        <div
-          className={`absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r ${themeColors.gradient} opacity-5 rounded-full blur-3xl animate-pulse delay-1000`}
-        />
-        <div
-          className={`absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r ${themeColors.gradient} opacity-8 rounded-full blur-3xl animate-pulse delay-500`}
-        />
-      </div> */}
-
       <div className="relative z-10 p-8">
         {/* Top right Be an Artist button */}
         <div className="absolute top-8 right-8 z-20">
@@ -121,39 +108,44 @@ export default function ProfilePage() {
               </Button>
             </div>
             <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
-              {playlistList.map((playlist, index) => (
-                <div key={index} className="group cursor-pointer">
-                  <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
-                    <div className="relative mb-4">
-                      <Image
-                        src={playlist.playlistArt || "/assets/music-icon.webp"}
-                        alt={playlist.name}
-                        width={256}
-                        height={256}
-                        className="w-full aspect-square object-cover rounded-xl"
-                      />
-                      <div
-                        className={`absolute inset-0 bg-gradient-to-br ${theme.preview} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
-                      />
-                      <Button
-                        size="icon"
-                        className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                        onClick={() =>
-                          router.push(`/player/playlist/${playlist.id}`)
-                        }
-                      >
-                        <Play className="w-5 h-5" />
-                      </Button>
+              {playlistList.map(
+                (playlist, index) =>
+                  playlist.role === 0 && (
+                    <div key={index} className="group cursor-pointer">
+                      <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
+                        <div className="relative mb-4">
+                          <Image
+                            src={
+                              playlist.playlistArt || "/assets/music-icon.webp"
+                            }
+                            alt={playlist.name}
+                            width={256}
+                            height={256}
+                            className="w-full aspect-square object-cover rounded-xl"
+                          />
+                          <div
+                            className={`absolute inset-0 bg-gradient-to-br ${theme.preview} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
+                          />
+                          <Button
+                            size="icon"
+                            className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
+                            onClick={() =>
+                              router.push(`/player/playlist/${playlist.id}`)
+                            }
+                          >
+                            <Play className="w-5 h-5" />
+                          </Button>
+                        </div>
+                        <h3 className="font-semibold text-white mb-1">
+                          {playlist.name}
+                        </h3>
+                        <p className="text-sm text-white/60">
+                          {playlist.musicCount} songs
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-white mb-1">
-                      {playlist.name}
-                    </h3>
-                    <p className="text-sm text-white/60">
-                      {playlist.musicCount} songs
-                    </p>
-                  </div>
-                </div>
-              ))}
+                  )
+              )}
             </div>
           </div>
         ) : (

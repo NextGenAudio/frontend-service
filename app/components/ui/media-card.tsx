@@ -104,7 +104,7 @@ function MediaCard({
         <div className="flex items-center gap-2 font-medium truncate text-white">
           {name}
           {role === 1 && (
-            <div className="absolute right-20 top-1/2 opacity-80 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+            <div className="absolute right-20 top-1/2 opacity-90 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
               <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full">
                 Shared
               </span>
