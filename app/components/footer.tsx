@@ -13,7 +13,7 @@ export function AppFooter() {
                 <Music className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent text-white [text-shadow:_0_1px_5px_rgb(251_146_60_/_40%)]">
-                SoundWave
+                SoneX 
               </span>
             </div>
             <p className="text-white leading-relaxed">
@@ -138,7 +138,7 @@ export function AppFooter() {
         <div className="border-t border-white/20 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-white text-sm">
-              © 2025 SoundWave. All rights reserved. Built with glassmorphism and love.
+              © 2025 SoneX. All rights reserved. Built with glassmorphism and love.
             </p>
             <div className="flex space-x-6 text-sm">
               <a href="#privacy" className="text-white hover:text-orange-400 transition-colors">

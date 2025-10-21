@@ -24,6 +24,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";
+import Cookies from "js-cookie";
+
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -72,9 +74,9 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
   // Get AudioManager instance
   const audioManager = AudioManager.getInstance();
-
   useEffect(() => {
-    if (status === "unauthenticated") {
+    const userCookie = Cookies.get("sonex_user");
+    if (status === "unauthenticated" && !userCookie) {
       router.push("/login");
     }
   }, [status, router]);

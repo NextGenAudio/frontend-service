@@ -16,9 +16,12 @@ import {
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { signIn } from "next-auth/react";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-
-const USER_MANAGEMENT_SERVICE_URL = process.env.USER_MANAGEMENT_SERVICE_URL;
+const USER_MANAGEMENT_SERVICE_URL =
+  process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,45 +32,93 @@ export default function Login() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showEmailSent, setShowEmailSent] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     // Simulate auth process
-    const result = await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/",
-    });
+    // const result = await signIn("credentials", {
+    //   email,
+    //   password,
+    //   callbackUrl: "/",
+    // });
 
-    console.log("SignIn result:", result);
+    // console.log("SignIn result:", result);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log(`[v0] ${isSignUp ? "Sign up" : "Sign in"} attempted with:`, {
-        email,
-        password,
-        ...(isSignUp && { fullName }),
-      });
-    }, 2000);
-    
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    //   console.log(`[v0] ${isSignUp ? "Sign up" : "Sign in"} attempted with:`, {
+    //     email,
+    //     password,
+    //     ...(isSignUp && { fullName }),
+    //   });
+    // }, 2000);
+
+    if (isSignUp) {
+      try {
+        await axios.post(
+          `${USER_MANAGEMENT_SERVICE_URL}/sonex/v1/auth/signup`,
+          {
+            firstName: fullName.split(" ")[0],
+            lastName: fullName.split(" ").slice(1).join(" "),
+            email: email,
+            password: password,
+            creatdeBy: "user",
+          }
+        );
+        setShowEmailSent(true);
+      } catch (err) {
+        // Optionally handle error
+        console.error("Signup error:", err);
+      }
+    } else {
+      try {
+        const res = await axios.post(
+          `${USER_MANAGEMENT_SERVICE_URL}/sonex/v1/auth/login`,
+          {
+            email: email,
+            password: password,
+          }
+        );
+        console.log("Login response:", res);
+        if (res.status === 200) {
+          // Store response data in cookies
+          Cookies.set("sonex_user", JSON.stringify(res.data), { expires: 7 });
+          router.push("/player/home");
+        }
+      } catch (err) {
+        // Optionally handle error
+        console.error("Login error:", err);
+      }
+    }
+    setIsLoading(false);
   };
 
+  if (showEmailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black p-4">
+        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 shadow-2xl p-10 max-w-md w-full text-center">
+          <div className="flex flex-col items-center mb-6">
+            <Mail className="w-16 h-16 text-orange-300 mb-4" />
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Check your email
+            </h2>
+            <p className="text-white/80 text-lg">
+              We've sent you an activation link. Please check your inbox and
+              follow the instructions to activate your account.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 opacity-5 bg-cover bg-center" />
-      <div className="absolute top-20 left-20 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-amber-500/8 rounded-full blur-3xl animate-pulse delay-1000" />
-      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-orange-400/5 rounded-full blur-2xl animate-pulse delay-500" />
-
       {/* Left Side - Player Image/Visualization */}
       <div className="flex-1 flex items-center justify-center p-8 relative z-10">
         {/* Background overlay for content readability */}
-
-        <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-orange-400/20 to-amber-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 left-20 w-48 h-48 bg-gradient-to-tl from-orange-300/15 to-yellow-400/10 rounded-full blur-2xl animate-pulse delay-500" />
-        <div className="absolute top-1/3 left-1/3 w-32 h-32 bg-orange-500/10 rounded-full blur-xl animate-pulse delay-1000" />
 
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-orange-300/30 rounded-full animate-bounce delay-300" />
@@ -106,15 +157,15 @@ export default function Login() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center space-x-4 text-white/95 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-4 hover:bg-white/10 hover:scale-105 transition-all duration-300 group">
+            <div className="flex items-center space-x-4 text-white/95 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-4 hover:bg-white/10 transition-all duration-300 group">
               <div className="w-3 h-3 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full shadow-lg group-hover:shadow-orange-400/50"></div>
               <span className="font-medium">High-quality audio streaming</span>
             </div>
-            <div className="flex items-center space-x-4 text-white/95 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-4 hover:bg-white/10 hover:scale-105 transition-all duration-300 group delay-100">
+            <div className="flex items-center space-x-4 text-white/95 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-4 hover:bg-white/10 transition-all duration-300 group delay-100">
               <div className="w-3 h-3 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full shadow-lg group-hover:shadow-orange-400/50"></div>
               <span className="font-medium">Personalized playlists</span>
             </div>
-            <div className="flex items-center space-x-4 text-white/95 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-4 hover:bg-white/10 hover:scale-105 transition-all duration-300 group delay-200">
+            <div className="flex items-center space-x-4 text-white/95 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-4 hover:bg-white/10 transition-all duration-300 group delay-200">
               <div className="w-3 h-3 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full shadow-lg group-hover:shadow-orange-400/50"></div>
               <span className="font-medium">Social music sharing</span>
             </div>

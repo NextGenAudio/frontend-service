@@ -15,14 +15,30 @@ import { Sign } from "crypto";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
+import Cookies from "js-cookie";
+import { getFullName } from "../player/profile/page";
 
 export function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
-  const { status, data: session } = useSession();
+  const [userData, setUserData] = useState<any>(null);
   const router = useRouter();
   const themeColors = getGeneralThemeColors(theme.primary);
+
+  useEffect(() => {
+    const cookie = Cookies.get("sonex_user");
+    if (cookie) {
+      try {
+        const parsed = JSON.parse(cookie);
+        console.log("Parsed cookie data:", parsed);
+        setUserData(parsed.User);
+      } catch (err) {
+        console.error("Invalid cookie data:", err);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -43,10 +59,6 @@ export function ProfileDropdown() {
     { icon: HelpCircle, label: "Help & Support", href: "/help" },
   ];
 
-  function handleProfileClick() {
-    router.push("/player/profile");
-  }
-
   return (
     <div className="relative" ref={dropdownRef}>
       {isOpen && (
@@ -65,9 +77,13 @@ export function ProfileDropdown() {
               </div> */}
               <div>
                 <h3 className="text-white font-semibold text-sm">
-                  {session?.user?.name}
+                  {userData
+                    ? getFullName(userData.firstName, userData.lastName)
+                    : "Guest"}
                 </h3>
-                <p className="text-white/60 text-xs">{session?.user?.email}</p>
+                <p className="text-white/60 text-xs">
+                  {userData ? userData.email : "guest@example.com"}
+                </p>
               </div>
             </div>
           </div>
@@ -78,10 +94,9 @@ export function ProfileDropdown() {
               <button
                 key={index}
                 onClick={() => {
-                  if (item.href == "/profile") {
-                    handleProfileClick();
-                  }
-                  // Handle navigation here
+                  userData.role.roleName === "artist"
+                    ? router.push("/player/profile/artist")
+                    : router.push(`/player/profile`);
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 group`}
               >
@@ -96,7 +111,17 @@ export function ProfileDropdown() {
           {/* Logout Section */}
           <div className="border-t border-white/10 p-2">
             <button
-              onClick={() => signOut()}
+              onClick={() => {
+                // Remove cookies
+                Cookies.remove("sonex_user");
+                // Remove localStorage/sessionStorage tokens if any
+                localStorage.clear();
+                sessionStorage.clear();
+                // Optionally sign out from NextAuth
+                signOut({ redirect: false });
+                // Redirect to login
+                router.push("/login");
+              }}
               className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 rounded-lg group"
             >
               <LogOut className="w-4 h-4" />

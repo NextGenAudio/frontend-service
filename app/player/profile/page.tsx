@@ -1,19 +1,44 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
 import { MoreHorizontal, Play, Heart, UserPlus, MicVocal } from "lucide-react";
-import ProfileAvatar from "../../../../components/profile-avatar";
+import ProfileAvatar from "../../components/profile-avatar";
 import { useSession } from "next-auth/react";
-import { useTheme } from "../../../../utils/theme-context";
-import { getGeneralThemeColors } from "../../../../lib/theme-colors";
+import { useTheme } from "../../utils/theme-context";
+import { getGeneralThemeColors } from "../../lib/theme-colors";
 import Image from "next/image";
 import { useEntityContext } from "@/app/utils/entity-context";
 import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
+import Cookies from "js-cookie";
+
+const USER_MANAGEMENT_SERVICE_URL =
+  process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
+
+export function getFullName(firstName: string, lastName: string) {
+  return `${firstName?.charAt(0).toUpperCase()}${firstName?.slice(1)} ${lastName
+    ?.charAt(0)
+    .toUpperCase()}${lastName?.slice(1)}`;
+}
 
 export default function ProfilePage() {
-  const { status, data: session } = useSession();
+  // const { status, data: session } = useSession();
   const { theme } = useTheme();
   const { playlistList } = useEntityContext();
   const themeColors = getGeneralThemeColors(theme.primary);
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    const cookie = Cookies.get("sonex_user");
+    if (cookie) {
+      try {
+        const parsed = JSON.parse(cookie);
+        console.log("Parsed cookie data:", parsed);
+        setUserData(parsed.User);
+      } catch (err) {
+        console.error("Invalid cookie data:", err);
+      }
+    }
+  }, []);
 
   const router = useRouter();
 
@@ -56,7 +81,8 @@ export default function ProfilePage() {
               <h1
                 className={`text-6xl font-bold mb-4 text-white bg-clip-text text-transparent`}
               >
-                {session?.user?.name || "User Name"}
+                {getFullName(userData?.firstName, userData?.lastName) ||
+                  "User Name"}
               </h1>
               <div className="flex items-center gap-6 text-white/80">
                 <span className="font-medium">
