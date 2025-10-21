@@ -25,6 +25,7 @@ import { useTheme } from "../utils/theme-context";
 import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { ProfileUpdatePanel } from "../components/profile-update-panel";
 
 
 const MUSIC_LIBRARY_SERVICE_URL =
@@ -36,6 +37,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     player,
     home,
     upload,
+    profileUpdate,
     profile,
     detailPanel,
     visualizer,
@@ -66,7 +68,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
   const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
     usePlayerSettings();
-  const { status } = useSession();
   const router = useRouter();
 
   // Add state to track if we're using recommendations
@@ -415,9 +416,16 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                 </ResizablePanelGroup>
               </ResizablePanel>
               <ResizableHandle className="w-[2px] bg-white/20 hover:bg-white/40 transition-colors" />
-              {(detailPanel || queue || collaborators) && (
+              {(profileUpdate || detailPanel || queue || collaborators) && (
                 <ResizablePanel defaultSize={22} minSize={20} maxSize={25}>
                   <ResizablePanelGroup direction="vertical">
+                    {profileUpdate && (
+                      <ResizablePanel defaultSize={50} minSize={0}>
+                        <div className="p-4">
+                          <ProfileUpdatePanel />
+                        </div>
+                      </ResizablePanel>
+                    )}
                     {queue && (
                       <ResizablePanel defaultSize={50} minSize={0}>
                         <QueuePanel />

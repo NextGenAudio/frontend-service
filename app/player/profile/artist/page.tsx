@@ -7,6 +7,7 @@ import {
   MicVocal,
   Globe,
   Youtube,
+  SquarePen,
 } from "lucide-react";
 import ProfileAvatar from "../../../components/profile-avatar";
 import { useTheme } from "../../../utils/theme-context";
@@ -27,6 +28,8 @@ import {
   Facebook,
   Linkedin,
 } from "lucide-react";
+import { Edit3 } from "lucide-react";
+import { useSidebar } from "@/app/utils/sidebar-context";
 
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
@@ -40,15 +43,18 @@ export function getFullName(firstName: string, lastName: string) {
 export default function ProfilePage() {
   const { theme } = useTheme();
   const entityContext = useEntityContext();
+  const { setProfileUpdate, setCollaborators, setDetailPanel, setQueue } =
+    useSidebar();
   const playlistList = Array.isArray(entityContext?.playlistList)
     ? entityContext.playlistList
     : [];
   const themeColors = getGeneralThemeColors(theme.primary);
   const [userData, setUserData] = useState<any>(null);
   const [artistData, setArtistData] = useState<any>(null);
+  const [bioOpen, setBioOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  
+
   useEffect(() => {
     const cookie = Cookies.get("sonex_user");
     if (cookie) {
@@ -106,43 +112,85 @@ export default function ProfilePage() {
 
       <div className="relative z-10 p-8 pt-32">
         {/* Profile Header - special for artist */}
-        <div className="mb-6 flex flex-col md:flex-row items-end gap-10 md:gap-16">
+        <div className="mb-6 flex flex-col md:flex-row items-end gap-10 md:gap-16 relative">
           <div className="relative group -mt-32 md:mt-0">
-            <div className="w-64 h-64 md:w-48 md:h-48 rounded-full overflow-hidden bg-white/10 backdrop-blur-md border-4 border-orange-400 shadow-2xl flex items-center justify-center">
+            <div
+              className={`w-64 h-64 md:w-48 md:h-48 rounded-full overflow-hidden bg-white/10 backdrop-blur-md border-4 border-${themeColors.border} shadow-2xl flex items-center justify-center`}
+            >
               <ProfileAvatar w={48} h={48} />
             </div>
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/30 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {/* <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/30 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" /> */}
             {/* <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-orange-500/90 px-6 py-2 rounded-full text-white font-semibold text-sm shadow-lg border-2 border-white/20">
               <MicVocal className="inline-block w-3 h-3 mr-2 -mt-1" />
               Artist
             </div> */}
           </div>
           <div className="flex-1 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            {/* Top-right edit button (separate from social icons at bottom-right) */}
+            <div className="absolute right-4 top-4 z-30">
+              <button
+                onClick={() => {
+                  setProfileUpdate(true);
+                  setCollaborators(false);
+                  setDetailPanel(false);
+                  setQueue(false);
+                }}
+                aria-label="Edit profile"
+                className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
+              >
+                <SquarePen className="w-5 h-5 text-white" />
+              </button>
+            </div>
             <div className="flex-1">
-              <p className="text-sm text-orange-200 mb-1 font-semibold tracking-widest uppercase">
+              <p className="text-sm  mb-1 font-semibold tracking-widest uppercase">
                 Artist Profile
               </p>
-              <h1 className="text-6xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-orange-300 via-orange-100 to-white bg-clip-text text-transparent drop-shadow-lg">
-                {getFullName(userData?.firstName, userData?.lastName) ||
-                  "Artist Name"}
+              <h1
+                className={`text-6xl md:text-6xl font-extrabold pb-4 bg-clip-text text-transparent drop-shadow-lg bg-gradient-to-r ${themeColors.gradientText}`}
+              >
+                {artistData?.artistName || "Artist Name"}
               </h1>
-              <div className="flex items-center gap-8 text-white/90 text-lg font-medium mb-4">
+              <div className="flex items-center gap-3 text-white/90 text-lg font-medium mb-4">
+                <span>
+                  {getFullName(userData?.firstName, userData?.lastName)}
+                </span>
+                <span className="text-white/60">•</span>
                 <span>{playlistList.length} Playlists</span>
               </div>
               {artistData?.artistBio && (
-                <div className="mb-4">
-                  <p className="text-white/80 text-base whitespace-pre-line">
-                    {artistData.artistBio}
-                  </p>
-                </div>
+                <>
+                  <div className="mb-4">
+                    <button
+                      onClick={() => setBioOpen(true)}
+                      className={`px-3 py-2 bg-white/5 backdrop-blur-md rounded-md text-sm text-white/90 hover:bg-white/10 transition ${themeColors.solidBg}`}
+                    >
+                      Bio
+                    </button>
+                  </div>
+
+                  {bioOpen && (
+                    <div className="mt-4 max-w-3xl bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-lg relative transition-opacity duration-300 opacity-100">
+                      <button
+                        onClick={() => setBioOpen(false)}
+                        aria-label="Close bio"
+                        className="absolute top-3 right-3 text-white/70 hover:text-white text-sm"
+                      >
+                        Close
+                      </button>
+                      <p className="text-white/80 text-base whitespace-pre-line">
+                        {artistData.artistBio}
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <div className="flex flex-col items-baseline">
-              <div className="flex flex-wrap gap-3 mb-2 justify-evenly">
+              <div className="absolute right-0 bottom-0 flex flex-wrap gap-3 mb-2 justify-end md:justify-evenly z-20">
                 {artistData?.youtube && (
                   <a
                     href={artistData.youtube}
-                    className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-red-500 transition-all duration-300 border border-white/20 hover:scale-110 transform"
+                    className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
                     aria-label="YouTube"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -153,7 +201,7 @@ export default function ProfilePage() {
                 {artistData?.twitter && (
                   <a
                     href={artistData.twitter}
-                    className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-red-500 transition-all duration-300 border border-white/20 hover:scale-110 transform"
+                    className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
                     aria-label="Twitter"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -164,7 +212,7 @@ export default function ProfilePage() {
                 {artistData?.instagram && (
                   <a
                     href={artistData.instagram}
-                    className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-red-500 transition-all duration-300 border border-white/20 hover:scale-110 transform"
+                    className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
                     aria-label="Instagram"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -175,7 +223,7 @@ export default function ProfilePage() {
                 {artistData?.facebook && (
                   <a
                     href={artistData.facebook}
-                    className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-red-500 transition-all duration-300 border border-white/20 hover:scale-110 transform"
+                    className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
                     aria-label="Facebook"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -186,7 +234,7 @@ export default function ProfilePage() {
                 {artistData?.website && (
                   <a
                     href={artistData.website}
-                    className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br hover:from-orange-400 hover:to-red-500 transition-all duration-300 border border-white/20 hover:scale-110 transform"
+                    className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
                     aria-label="Website"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -224,7 +272,7 @@ export default function ProfilePage() {
       {playlistList.length > 0 ? (
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-orange-200">
+            <h2 className={`text-2xl font-bold ${themeColors.text}`}>
               Created Playlists
             </h2>
             <Button
@@ -278,14 +326,18 @@ export default function ProfilePage() {
       ) : (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="mb-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400/20 to-orange-200/20 opacity-70 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-              <MicVocal className="w-12 h-12 text-orange-300" />
+            <div
+              className={`w-24 h-24 rounded-full ${themeColors.solidBg}/20 opacity-70 backdrop-blur-sm ${themeColors.border} flex items-center justify-center`}
+            >
+              <MicVocal className={`text-white w-12 h-12`} />
             </div>
           </div>
-          <h3 className="text-2xl font-bold text-orange-200 mb-2">
+          <h3 className={`text-2xl font-bold text-white mb-2`}>
             No artist activity yet
           </h3>
-          <p className="text-orange-100/80 text-lg mb-6 max-w-md mx-16">
+          <p
+            className={`text-white/75 text-opacity-80 text-lg mb-6 max-w-md mx-16`}
+          >
             You haven't created any playlists or activity yet. Start sharing
             your music and grow your audience!
           </p>

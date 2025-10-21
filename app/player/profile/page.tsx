@@ -1,6 +1,13 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
-import { MoreHorizontal, Play, Heart, UserPlus, MicVocal } from "lucide-react";
+import {
+  MoreHorizontal,
+  Play,
+  Heart,
+  UserPlus,
+  MicVocal,
+  Edit3,
+} from "lucide-react";
 import ProfileAvatar from "../../components/profile-avatar";
 import { useSession } from "next-auth/react";
 import { useTheme } from "../../utils/theme-context";
@@ -10,6 +17,7 @@ import { useEntityContext } from "@/app/utils/entity-context";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { useSidebar } from "../../utils/sidebar-context";
 
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
@@ -26,7 +34,8 @@ export default function ProfilePage() {
   const { playlistList } = useEntityContext();
   const themeColors = getGeneralThemeColors(theme.primary);
   const [userData, setUserData] = useState<any>(null);
-
+  const { setProfileUpdate, setCollaborators, setDetailPanel, setQueue } =
+    useSidebar();
   useEffect(() => {
     const cookie = Cookies.get("sonex_user");
     if (cookie) {
@@ -53,19 +62,8 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-y-auto custom-scrollbar">
+    <div className="h-screen relative text-white overflow-y-auto custom-scrollbar">
       <div className="relative z-10 p-8">
-        {/* Top right Be an Artist button */}
-        <div className="absolute top-8 right-8 z-20">
-          <Button
-            className={`bg-white/20 backdrop-blur-xl border border-white/30 text-white font-bold px-7 py-3 pt-8 pb-8 rounded-2xl  text-lg hover:${theme.preview} hover:backdrop-blur-2xl hover:border-white/40 transition-all duration-200`}
-            style={{ boxShadow: "0 4px 32px 0 rgba(255,255,255,0.12)" }}
-            onClick={() => router.push("/player/beAnArtist")}
-          >
-            <MicVocal className="w-12 h-12 mr-2" />
-            Be an Artist
-          </Button>
-        </div>
         {/* Profile Header */}
         <div className="mb-12">
           <div className="flex items-end gap-8 mb-8">
@@ -75,7 +73,29 @@ export default function ProfilePage() {
               </div>
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
+            {/* Top-right controls: Be an Artist + Edit (aligned) */}
+            <div className="absolute top-6 right-6 z-30 flex items-center gap-3">
+              <Button
+                className={`bg-white/20 backdrop-blur-xl border border-white/30 text-white font-bold px-6 py-3 rounded-lg text-lg hover:bg-gradient-to-br ${themeColors.gradient} hover:backdrop-blur-2xl hover:border-white/40 transition-all duration-200 flex items-center`}
+                onClick={() => router.push("/player/beAnArtist")}
+              >
+                <MicVocal className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+                <span className="hidden md:inline">Be an Artist</span>
+              </Button>
 
+              <button
+                onClick={() => {
+                  setProfileUpdate(true);
+                  setCollaborators(false);
+                  setDetailPanel(false);
+                  setQueue(false);
+                }}
+                aria-label="Edit profile"
+                className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
+              >
+                <Edit3 className="w-5 h-5 text-white" />
+              </button>
+            </div>
             <div className="flex-1">
               <p className="text-sm text-white/60 mb-2 font-medium">Profile</p>
               <h1
