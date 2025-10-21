@@ -54,6 +54,7 @@ export const usePlayerSettings = () => {
     }
   }, [progress]);
 
+
   return {
     volume,
     setVolume,

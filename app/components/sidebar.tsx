@@ -21,6 +21,7 @@ import ProfileAvatar from "./profile-avatar";
 import { useSidebar } from "../utils/sidebar-context";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
+import { usePlayerSettings } from "../hooks/use-player-settings";
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("Home");
@@ -47,6 +48,7 @@ export const Sidebar = () => {
     setCreateFolder,
     setVisualizer,
   } = useSidebar();
+
 
   const router = useRouter();
   const { status, data: session } = useSession();

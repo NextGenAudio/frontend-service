@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState, useContext, useRef } from "react";
+import { createContext, useState, useContext, useRef, useEffect } from "react";
 
 type SidebarContextType = {
   home: boolean;
@@ -38,7 +38,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [detailPanel, setDetailPanel] = useState(false);
   const [upload, setUpload] = useState(false);
   const [createFolder, setCreateFolder] = useState(false);
-  const [visualizer, setVisualizer] = useState(true);
+  const [visualizer, setVisualizer] = useState<boolean>(
+    getInitialVisualizerState()
+  );
   const [profile, setProfile] = useState(false);
   const [playlist, setPlaylist] = useState(false);
   const soundRef = useRef<Howl | null>(null);
@@ -46,6 +48,26 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [collaborators, setCollaborators] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [profileUpdate, setProfileUpdate] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("visualizer", String(visualizer));
+    } catch (e) {
+      // ignore
+    }
+  }, [visualizer]);
+
+  function getInitialVisualizerState() {
+    try {
+      if (typeof window === "undefined") return true;
+      const raw = localStorage.getItem("visualizer");
+      if (raw === null) return true;
+      return raw === "true";
+    } catch (e) {
+      return true;
+    }
+  }
+
   return (
     <SidebarContext.Provider
       value={{
