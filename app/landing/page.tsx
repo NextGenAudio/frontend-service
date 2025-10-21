@@ -15,24 +15,32 @@ import {
   Mail,
   User,
 } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+// import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import ProfileAvatar from "../components/profile-avatar";
 import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
 import Header from "../components/header";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export function Landing() {
-  const { status, data: session } = useSession();
-  if (status === "loading") {
-    return null; // or a loading spinner
-  }
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
-  // Change the navigation of the TrySonex button if user is authenticated
+  useEffect(() => {
+    const cookie = Cookies.get("sonex_user");
+    if (cookie) {
+      setIsLoggedIn(true);
+    }
+  }, [router]);
+
   const TrySonexHandler = () => {
-    if (status === "authenticated") {
-      window.location.href = "/player";
+    if (isLoggedIn) {
+      router.push("/player/home");
+    } else {
+      router.push("/login");
     }
   };
 

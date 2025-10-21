@@ -1,7 +1,7 @@
 "use client";
 
-import type React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import {
   Eye,
   EyeOff,
@@ -34,28 +34,19 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Redirect to player if already logged in
+  useEffect(() => {
+    const cookie = Cookies.get("sonex_user");
+    if (cookie) {
+      setIsLoggedIn(true);
+      router.push("/player/home");
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate auth process
-    // const result = await signIn("credentials", {
-    //   email,
-    //   password,
-    //   callbackUrl: "/",
-    // });
-
-    // console.log("SignIn result:", result);
-
-    // setTimeout(() => {
-    //   setIsLoading(false);
-    //   console.log(`[v0] ${isSignUp ? "Sign up" : "Sign in"} attempted with:`, {
-    //     email,
-    //     password,
-    //     ...(isSignUp && { fullName }),
-    //   });
-    // }, 2000);
-
     if (isSignUp) {
       try {
         await axios.post(
@@ -114,6 +105,7 @@ export default function Login() {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black flex items-center justify-center p-4 relative overflow-hidden">
       {/* Left Side - Player Image/Visualization */}
