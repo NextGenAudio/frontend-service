@@ -33,6 +33,7 @@ export default function Login() {
   const [fullName, setFullName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Redirect to player if already logged in
@@ -47,8 +48,15 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError("");
     if (isSignUp) {
       try {
+        console.log("Signing up with:", {
+          fullName,
+          email,
+          password,
+          confirmPassword,
+        });
         await axios.post(
           `${USER_MANAGEMENT_SERVICE_URL}/sonex/v1/auth/signup`,
           {
@@ -56,13 +64,18 @@ export default function Login() {
             lastName: fullName.split(" ").slice(1).join(" "),
             email: email,
             password: password,
-            creatdeBy: "user",
+            createdBy: "user",
           }
         );
         setShowEmailSent(true);
-      } catch (err) {
-        // Optionally handle error
-        console.error("Signup error:", err);
+      } catch (err: any) {
+        // Show backend error message if available
+        if (err.response && err.response.data && err.response.data.error) {
+          setLoginError(err.response.data.error);
+        } else {
+          setLoginError("An error occurred. Please try again.");
+        }
+        console.error("Signup error:", err.response || err);
       }
     } else {
       try {
@@ -79,8 +92,13 @@ export default function Login() {
           Cookies.set("sonex_user", JSON.stringify(res.data), { expires: 7 });
           router.push("/player/home");
         }
-      } catch (err) {
-        // Optionally handle error
+      } catch (err: any) {
+        // Show error if 403
+        if (err.response && err.response.status === 403) {
+          setLoginError("Email or password is incorrect.");
+        } else {
+          setLoginError("An error occurred. Please try again.");
+        }
         console.error("Login error:", err);
       }
     }
@@ -169,6 +187,11 @@ export default function Login() {
           {/* Auth Form */}
           <div className="bg-white/10  backdrop-blur-2xl rounded-3xl border border-white/20 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] p-8 hover:bg-white/15 transition-all duration-500">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {loginError && (
+                <div className="bg-red-500/20 border border-red-500/40 text-red-300 rounded-xl px-4 py-2 text-center text-sm font-medium mb-2">
+                  {loginError}
+                </div>
+              )}
               {isSignUp && (
                 <div className="space-y-2">
                   <label

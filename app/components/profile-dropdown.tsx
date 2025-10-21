@@ -94,7 +94,7 @@ export function ProfileDropdown() {
               <button
                 key={index}
                 onClick={() => {
-                  userData.role.roleName === "artist"
+                  userData.role?.roleName === "artist"
                     ? router.push("/player/profile/artist")
                     : router.push(`/player/profile`);
                 }}
