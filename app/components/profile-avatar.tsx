@@ -43,7 +43,7 @@ const profileAvatar = ({ w, h }: { w: number; h: number }) => {
                   priority
                 />
               ) : (
-                <User className="w-full h-full text-white/80 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
+                <User data-testid="lucide-user-icon" className="w-full h-full text-white/80 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
               )}
             </div>
           </button>

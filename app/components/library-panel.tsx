@@ -37,6 +37,7 @@ import clsx from "clsx";
 import { Playlist } from "../utils/entity-context";
 import { Song } from "../utils/music-context";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { on } from "events";
 import AlertBar from "./alert-bar";
 import { usePathname } from "next/navigation";
@@ -100,13 +101,19 @@ export const LibraryPanel = () => {
 
   // Fetch folders
   useEffect(() => {
+    const sonexUserCookie = Cookies.get("sonex_token");
+    console.log("JWT Token:", sonexUserCookie);
+    const authHeader = sonexUserCookie
+      ? { Authorization: `Bearer ${sonexUserCookie}` }
+      : {};
+
     const fetchFolders = async () => {
       try {
-        const res = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/folders`, {
-          method: "GET",
-          credentials: "include",
+        const res = await axios.get(`${MUSIC_LIBRARY_SERVICE_URL}/folders`, {
+          headers: { ...authHeader },
+          withCredentials: true,
         });
-        const data = await res.json();
+        const data = res.data;
         console.log("Fetched folders:", data);
         setFolderList(data);
       } catch (err) {
@@ -118,29 +125,23 @@ export const LibraryPanel = () => {
 
   // Fetch playlists
   useEffect(() => {
+    const sonexUserCookie = Cookies.get("sonex_token");
+    console.log("JWT Token:", sonexUserCookie);
+    const authHeader = sonexUserCookie
+      ? { Authorization: `Bearer ${sonexUserCookie}` }
+      : {};
+
     const fetchPlaylists = async () => {
       try {
-        const res = await fetch(
+        const res = await axios.get(
           `${PLAYLIST_SERVICE_URL}/playlist-service/playlists`,
           {
-            method: "GET",
-            credentials: "include",
+            headers: { ...authHeader },
+            withCredentials: true,
           }
         );
 
-        console.log("Playlist fetch response status:", res.status);
-        console.log(
-          "Playlist fetch response headers:",
-          res.headers.get("content-type")
-        );
-
-        if (!res.ok) {
-          const errorText = await res.text();
-          console.error("Playlist fetch failed:", res.status, errorText);
-          return;
-        }
-
-        const data = await res.json();
+        const data = res.data;
         console.log("Fetched playlists:", data);
         console.log("Playlists type:", typeof data);
         console.log("Is array:", Array.isArray(data));
@@ -199,9 +200,14 @@ export const LibraryPanel = () => {
       router.back();
 
       // Make the API call
+      const sonexUserCookie = Cookies.get("sonex_token");
+      const authHeader = sonexUserCookie
+        ? { Authorization: `Bearer ${sonexUserCookie}` }
+        : {};
       const response = await axios.delete(
         `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${id}`,
         {
+          headers: { ...authHeader },
           withCredentials: true,
         }
       );
@@ -234,9 +240,14 @@ export const LibraryPanel = () => {
       router.back();
 
       // Make the API call
+      const sonexUserCookie = Cookies.get("sonex_token");
+      const authHeader = sonexUserCookie
+        ? { Authorization: `Bearer ${sonexUserCookie}` }
+        : {};
       const response = await axios.delete(
         `${MUSIC_LIBRARY_SERVICE_URL}/folders/${id}`,
         {
+          headers: { ...authHeader },
           withCredentials: true,
         }
       );

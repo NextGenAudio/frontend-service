@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
 import { useFileHandling } from "@/app/utils/entity-handling-context";
+import Cookies from "js-cookie";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -76,11 +77,15 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     setPlayingSongId(song.id);
     setPlayingSong(song);
     const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
     fetch(
       `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
       {
         method: "POST",
         credentials: "include",
+        headers: {
+          ...(sonexUserCookie ? { Authorization: `Bearer ${sonexUserCookie}` } : {}),
+        },
       }
     ).catch((err) => console.error("Failed to update song score", err));
     song.xscore = newScore; // Optimistically update score in UI
@@ -121,11 +126,15 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       }
       try {
         setLoading(true);
+        const sonexUserCookie = Cookies.get("sonex_token");
         const res = await fetch(
           `${MUSIC_LIBRARY_SERVICE_URL}/files/list?folderId=${folderId}`,
           {
             method: "GET",
             credentials: "include",
+            headers: {
+              ...(sonexUserCookie ? { Authorization: `Bearer ${sonexUserCookie}` } : {}),
+            },
           }
         );
         const data = await res.json();
@@ -167,6 +176,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       const folderId = params.id;
       setCache((prev) => new Map(prev).set(folderId, updatedSongList));
 
+      const sonexUserCookie = Cookies.get("sonex_token");
       const response = await fetch(
         `${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`,
         {
@@ -174,6 +184,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            ...(sonexUserCookie ? { Authorization: `Bearer ${sonexUserCookie}` } : {}),
           },
         }
       );
