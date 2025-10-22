@@ -15,6 +15,7 @@ export interface ThemeColors {
   hoverFrom?: string;
   hoverTo?: string;
   gradientText: string;
+  solidBgHover: string;
 }
 
 export interface ThemeColorVariants {
@@ -44,7 +45,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         gradient: "from-orange-600 to-pink-600",
         shadow: "shadow-orange-400/20",
         solidBg: "bg-orange-500",
-        gradientText: "bg-gradient-to-r from-orange-300 via-orange-100 to-white"
+        gradientText: "bg-gradient-to-r from-orange-300 via-orange-100 to-white",
+        solidBgHover: "hover:bg-orange-600"
       },
       controls: {
         hover: "hover:text-orange-400",
@@ -57,7 +59,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         hoverFrom: "hover:from-orange-500",
         hoverTo: "hover:to-orange-400",
         solidBg: "bg-orange-500",
-        gradientText: "bg-gradient-to-r from-orange-300 via-orange-100 to-white"
+        gradientText: "bg-gradient-to-r from-orange-300 via-orange-100 to-white",
+        solidBgHover: "hover:bg-orange-600"
       },
     },
     "purple-500": {
@@ -69,7 +72,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         gradient: "from-purple-600 to-indigo-600",
         shadow: "shadow-purple-400/20",
         solidBg: "bg-purple-500",
-        gradientText: "bg-gradient-to-r from-purple-300 via-purple-100 to-white"
+        gradientText: "bg-gradient-to-r from-purple-300 via-purple-100 to-white",
+        solidBgHover: "hover:bg-purple-600"
       },
       controls: {
         hover: "hover:text-purple-400",
@@ -82,7 +86,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         hoverFrom: "hover:from-purple-500",
         hoverTo: "hover:to-purple-400",
         solidBg: "bg-purple-500",
-        gradientText: "bg-gradient-to-r from-purple-300 via-purple-100 to-white"
+        gradientText: "bg-gradient-to-r from-purple-300 via-purple-100 to-white",
+        solidBgHover: "hover:bg-purple-600"
       },
     },
     "blue-500": {
@@ -94,7 +99,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         gradient: "from-blue-600 to-cyan-600",
         shadow: "shadow-blue-400/20",
         solidBg: "bg-blue-500",
-        gradientText: "bg-gradient-to-r from-blue-300 via-blue-100 to-white"
+        gradientText: "bg-gradient-to-r from-blue-300 via-blue-100 to-white",
+        solidBgHover: "hover:bg-blue-600"
       },
       controls: {
         hover: "hover:text-blue-400",
@@ -107,7 +113,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         hoverFrom: "hover:from-blue-500",
         hoverTo: "hover:to-blue-400",
         solidBg: "bg-blue-500",
-        gradientText: "bg-gradient-to-r from-blue-300 via-blue-100 to-white"
+        gradientText: "bg-gradient-to-r from-blue-300 via-blue-100 to-white",
+        solidBgHover: "hover:bg-blue-600"
       },
     },
     "green-500": {
@@ -119,7 +126,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         gradient: "from-green-600 to-emerald-600",
         shadow: "shadow-green-400/20",
         solidBg: "bg-green-500",
-        gradientText: "bg-gradient-to-r from-green-300 via-green-100 to-white"
+        gradientText: "bg-gradient-to-r from-green-300 via-green-100 to-white",
+        solidBgHover: "hover:bg-green-600"
       },
       controls: {
         hover: "hover:text-green-400",
@@ -132,7 +140,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         hoverFrom: "hover:from-green-500",
         hoverTo: "hover:to-green-400",
         solidBg: "bg-green-500",
-        gradientText: "bg-gradient-to-r from-green-300 via-green-100 to-white"
+        gradientText: "bg-gradient-to-r from-green-300 via-green-100 to-white",
+        solidBgHover: "hover:bg-green-600"
       },
     },
     "pink-500": {
@@ -144,7 +153,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         gradient: "from-pink-600 to-rose-600",
         shadow: "shadow-pink-400/20",
         solidBg: "bg-pink-500",
-        gradientText: "bg-gradient-to-r from-pink-300 via-pink-100 to-white"
+        gradientText: "bg-gradient-to-r from-pink-300 via-pink-100 to-white",
+        solidBgHover: "hover:bg-pink-600"
       },
       controls: {
         hover: "hover:text-pink-400",
@@ -157,7 +167,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         hoverFrom: "hover:from-pink-500",
         hoverTo: "hover:to-pink-400",
         solidBg: "bg-pink-500",
-        gradientText: "bg-gradient-to-r from-pink-300 via-pink-100 to-white"
+        gradientText: "bg-gradient-to-r from-pink-300 via-pink-100 to-white",
+        solidBgHover: "hover:bg-pink-600"
       },
     },
     "teal-500": {
@@ -169,8 +180,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         gradient: "from-teal-600 to-cyan-600",
         shadow: "shadow-teal-400/20",
         solidBg: "bg-teal-500",
-
-        gradientText: "bg-gradient-to-r from-teal-300 via-teal-100 to-white"
+        gradientText: "bg-gradient-to-r from-teal-300 via-teal-100 to-white",
+        solidBgHover: "hover:bg-teal-600"
       },
       controls: {
         hover: "hover:text-teal-400",
@@ -183,7 +194,8 @@ export function getThemeColors(primaryColor: string): ThemeColorVariants {
         hoverFrom: "hover:from-teal-500",
         hoverTo: "hover:to-teal-400",
         solidBg: "bg-teal-500",
-        gradientText: "bg-gradient-to-r from-teal-300 via-teal-100 to-white"
+        gradientText: "bg-gradient-to-r from-teal-300 via-teal-100 to-white",
+        solidBgHover: "hover:bg-teal-600",
       },
     },
   };

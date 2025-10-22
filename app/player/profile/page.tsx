@@ -7,6 +7,7 @@ import {
   UserPlus,
   MicVocal,
   Edit3,
+  SquarePen,
 } from "lucide-react";
 import ProfileAvatar from "../../components/profile-avatar";
 import { useSession } from "next-auth/react";
@@ -42,7 +43,7 @@ export default function ProfilePage() {
       try {
         const parsed = JSON.parse(cookie);
         console.log("Parsed cookie data:", parsed);
-        setUserData(parsed.User);
+        setUserData(parsed);
       } catch (err) {
         console.error("Invalid cookie data:", err);
       }
@@ -93,7 +94,7 @@ export default function ProfilePage() {
                 aria-label="Edit profile"
                 className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
               >
-                <Edit3 className="w-5 h-5 text-white" />
+                <SquarePen className="w-5 h-5 text-white" />
               </button>
             </div>
             <div className="flex-1">

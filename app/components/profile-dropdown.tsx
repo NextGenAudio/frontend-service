@@ -32,7 +32,7 @@ export function ProfileDropdown() {
       try {
         const parsed = JSON.parse(cookie);
         console.log("Parsed cookie data:", parsed);
-        setUserData(parsed.User);
+        setUserData(parsed);
       } catch (err) {
         console.error("Invalid cookie data:", err);
       }
@@ -113,6 +113,7 @@ export function ProfileDropdown() {
             <button
               onClick={() => {
                 // Remove cookies
+                Cookies.remove("sonex_token");
                 Cookies.remove("sonex_user");
                 // Remove localStorage/sessionStorage tokens if any
                 localStorage.clear();

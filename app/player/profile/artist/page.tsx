@@ -60,7 +60,7 @@ export default function ProfilePage() {
     if (cookie) {
       try {
         const parsed = JSON.parse(cookie);
-        setUserData(parsed.User);
+        setUserData(parsed);
         console.log("User data from cookie:", parsed.User);
       } catch (err) {
         console.error("Invalid cookie data:", err);
@@ -86,7 +86,7 @@ export default function ProfilePage() {
   }, [userData]);
 
   const backdropUrl =
-    userData?.profileImageURL || "/assets/artist-backdrop.jpg";
+    artistData?.artistImageURL || "/assets/artist-backdrop.jpg";
 
   if (loading) {
     return (
@@ -115,9 +115,19 @@ export default function ProfilePage() {
         <div className="mb-6 flex flex-col md:flex-row items-end gap-10 md:gap-16 relative">
           <div className="relative group -mt-32 md:mt-0">
             <div
-              className={`w-64 h-64 md:w-48 md:h-48 rounded-full overflow-hidden bg-white/10 backdrop-blur-md border-4 border-${themeColors.border} shadow-2xl flex items-center justify-center`}
+              className={`w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden bg-white/10 backdrop-blur-md border-4 border-${themeColors.border} shadow-2xl flex items-center justify-center`}
             >
-              <ProfileAvatar w={48} h={48} />
+              {userData?.profileImageURL ? (
+                <Image
+                  src={userData.profileImageURL}
+                  alt="Profile Photo"
+                  fill
+                  className="object-cover w-full h-full"
+                  priority
+                />
+              ) : (
+                <ProfileAvatar w={48} h={48} />
+              )}
             </div>
             {/* <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/30 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" /> */}
             {/* <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-orange-500/90 px-6 py-2 rounded-full text-white font-semibold text-sm shadow-lg border-2 border-white/20">

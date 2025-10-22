@@ -38,7 +38,7 @@ export default function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Redirect to player if already logged in
   useEffect(() => {
-    const cookie = Cookies.get("sonex_user");
+    const cookie = Cookies.get("sonex_token");
     if (cookie) {
       setIsLoggedIn(true);
       router.push("/player/home");
@@ -68,6 +68,8 @@ export default function Login() {
           }
         );
         setShowEmailSent(true);
+
+
       } catch (err: any) {
         // Show backend error message if available
         if (err.response && err.response.data && err.response.data.error) {
@@ -89,7 +91,8 @@ export default function Login() {
         console.log("Login response:", res);
         if (res.status === 200) {
           // Store response data in cookies
-          Cookies.set("sonex_user", JSON.stringify(res.data), { expires: 7 });
+          Cookies.set("sonex_token", res.data.Access_Token, { expires: 7 });
+          Cookies.set("sonex_user", JSON.stringify(res.data.User), { expires: 7 });
           router.push("/player/home");
         }
       } catch (err: any) {
