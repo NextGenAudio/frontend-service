@@ -267,10 +267,10 @@ export function ProfileUpdatePanel({
         <UserRoundPen className={`w-6 h-6 ${themeColors.text}`} />
         <h2 className="text-lg font-semibold text-white/90 flex items-center">
           Edit Profile
-          <span className="text-2xl text-white/60 font-normal ml-2">|</span>
+          {/* <span className="text-2xl text-white/60 font-normal ml-2">|</span>
           <span className="text-sm text-white/60 font-normal ml-2">
             {profile?.firstName} {profile?.lastName}
-          </span>
+          </span> */}
         </h2>
         <Button
           size="icon"
@@ -414,19 +414,21 @@ export function ProfileUpdatePanel({
 
         {/* Form Fields */}
         <div className="space-y-4">
-          <div>
-            <label className="text-sm font-semibold text-white/90 block mb-2">
-              Artist Name
-            </label>
-            <input
-              type="text"
-              name="artistName"
-              value={formData.artistName}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all"
-              placeholder="Artist name"
-            />
-          </div>
+          {userData?.role?.roleName === "artist" && (
+            <div>
+              <label className="text-sm font-semibold text-white/90 block mb-2">
+                Artist Name
+              </label>
+              <input
+                type="text"
+                name="artistName"
+                value={formData.artistName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-white/50 focus:bg-white/10 transition-all"
+                placeholder="Artist name"
+              />
+            </div>
+          )}
           {/* Name */}
           <div>
             <label className="text-sm font-semibold text-white/90 block mb-2">

@@ -11,9 +11,11 @@ import {
   Trash2,
   Edit3,
   ListStart,
+  CloudUpload,
 } from "lucide-react";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
+import Cookies from "js-cookie";
 
 interface SongOptionsDropdownProps {
   songId: string;
@@ -24,7 +26,7 @@ interface SongOptionsDropdownProps {
   onToggleLike?: () => void;
   onAddToQueue?: () => void;
   onShare?: () => void;
-  onDownload?: () => void;
+  onPublish?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
   onClose?: () => void;
@@ -39,7 +41,7 @@ export function SongOptionsDropdown({
   onAddToQueue,
   onToggleLike,
   onShare,
-  onDownload,
+  onPublish,
   onDelete,
   onEdit,
   onClose,
@@ -47,6 +49,17 @@ export function SongOptionsDropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    const cookie = Cookies.get("sonex_user");
+    let userDataTemp: any;
+    if (cookie) {
+      userDataTemp = JSON.parse(cookie);
+      setUserData(userDataTemp);
+    }
+  }, []);
+
   useEffect(() => {
     console.log("Dropdown mounted");
     function handleClickOutside(event: MouseEvent) {
@@ -69,7 +82,7 @@ export function SongOptionsDropdown({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="absolute right-0 top-full mt-2 z-[999999] min-w-[200px] bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+      <div className="absolute right-0 top-full mt-2 z-[999999] min-w-[200px] bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in-0 zoom-in-95 ">
         {/* Glass background overlay */}
         <div
           className={`absolute inset-0 bg-gradient-to-br opacity-10 backdrop-blur-xl`}
@@ -136,16 +149,17 @@ export function SongOptionsDropdown({
           </button>
 
           {/* Download */}
-          {/* <button
-            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
-            onClick={() => handleOptionClick(onDownload)}
-          >
-            <Download
-              className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
-            />
-            Download
-          </button> */}
-
+          {userData?.role.roleName === "artist" && (
+            <button
+              className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
+              onClick={() => handleOptionClick(onPublish)}
+            >
+              <CloudUpload
+                className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
+              />
+              Publish
+            </button>
+          )}
           {/* Edit */}
           <button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}

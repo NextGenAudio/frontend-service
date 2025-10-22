@@ -84,7 +84,9 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         method: "POST",
         credentials: "include",
         headers: {
-          ...(sonexUserCookie ? { Authorization: `Bearer ${sonexUserCookie}` } : {}),
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
         },
       }
     ).catch((err) => console.error("Failed to update song score", err));
@@ -133,7 +135,9 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
             method: "GET",
             credentials: "include",
             headers: {
-              ...(sonexUserCookie ? { Authorization: `Bearer ${sonexUserCookie}` } : {}),
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
             },
           }
         );
@@ -184,7 +188,9 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            ...(sonexUserCookie ? { Authorization: `Bearer ${sonexUserCookie}` } : {}),
+            ...(sonexUserCookie
+              ? { Authorization: `Bearer ${sonexUserCookie}` }
+              : {}),
           },
         }
       );

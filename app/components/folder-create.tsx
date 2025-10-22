@@ -7,6 +7,7 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useFileHandling } from "../utils/entity-handling-context";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
@@ -73,8 +74,13 @@ export function FolderCreate() {
         formDataToSend.append("artwork", artworkFile.file);
       }
 
+      const sonexUserCookie = Cookies.get("sonex_token");
+      const authHeader = sonexUserCookie
+        ? { Authorization: `Bearer ${sonexUserCookie}` }
+        : {};
+
       await axios.post(`${MUSIC_LIBRARY_SERVICE_URL}/folders`, formDataToSend, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data", ...authHeader },
         withCredentials: true,
       });
 

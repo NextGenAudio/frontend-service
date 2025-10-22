@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/app/components/ui/select";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useMusicContext } from "../utils/music-context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFileHandling } from "../utils/entity-handling-context";
@@ -183,11 +184,16 @@ export function MusicUpload() {
         });
       }
 
+      const sonexUserCookie = Cookies.get("sonex_token");
+      const authHeader = sonexUserCookie
+        ? { Authorization: `Bearer ${sonexUserCookie}` }
+        : {};
+
       const response = await axios.post(
         `${MUSIC_LIBRARY_SERVICE_URL}/files/upload`,
         formDataToSend,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data", ...authHeader },
           withCredentials: true,
           onUploadProgress: (progressEvent) => {
             if (progressEvent.total) {
