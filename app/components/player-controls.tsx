@@ -370,11 +370,7 @@ export const FloatingPlayerControls = ({
                   <div
                     className={`overflow-hidden w-16 h-16 ${themeColors.hoverBg} backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 border border-orange-300/30 transition-all duration-300 group-hover:scale-105`}
                   >
-                    <SongCover song={song} />
-                    {/* />
-                    ) : (
-                      <div className="text-sm text-orange-200/90 font-medium">♪</div>
-                    )} */}
+                    {song && <SongCover song={song} />}
                   </div>
                 </div>
 

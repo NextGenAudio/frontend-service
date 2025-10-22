@@ -34,6 +34,7 @@ export interface Song {
   xscore?: number;
   yscore?: number;
   listenCount?: number;
+  artworkURL?: string;
 }
 
 type MusicContextType = {

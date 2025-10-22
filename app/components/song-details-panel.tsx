@@ -183,7 +183,7 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
         <div className="space-y-6 mx-3">
           <div className="overflow-hidden aspect-square bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20  transition-all duration-500 group">
             <div className="text-center">
-              <SongCover song={song} />
+              {song && <SongCover song={song} />}
             </div>
           </div>
 

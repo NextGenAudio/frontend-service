@@ -350,7 +350,7 @@ export function MusicPlayerHome() {
                   <Image
                     src={
                       track.musicArt ||
-                      track.metadata?.cover_art ||
+                      track.artworkURL || track.metadata?.cover_art ||
                       "/placeholder.svg"
                     }
                     alt={track.filename}
@@ -420,7 +420,7 @@ export function MusicPlayerHome() {
                 <div className="relative mb-4">
                   <Image
                     src={
-                      track.musicArt ||
+                      track.artworkURL ||
                       track.metadata?.cover_art ||
                       "/placeholder.svg"
                     }
@@ -510,7 +510,7 @@ export function MusicPlayerHome() {
                   <div className="relative">
                     <Image
                       src={
-                        track.musicArt ||
+                        track.artworkURL ||
                         track.metadata?.cover_art ||
                         "/placeholder.svg"
                       }

@@ -1,7 +1,7 @@
 import Image from "next/image";
-
-export default function SongCover({ song }: { song: any }) {
-  const picture = song?.metadata?.cover_art;
+import { Song } from "../utils/music-context";
+export default function SongCover({ song }: { song: Song }) {
+  const picture = song.artworkURL || song?.metadata?.cover_art;
 
   if (!picture) {
     // fallback image
