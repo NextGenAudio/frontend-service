@@ -24,7 +24,10 @@ import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
 import { useFileHandling } from "@/app/utils/entity-handling-context";
 import Cookies from "js-cookie";
+import axios from "axios";
 
+const USER_MANAGEMENT_SERVICE_URL =
+  process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
@@ -216,6 +219,53 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       setCache((prev) => new Map(prev).set(folderId, songList));
     }
   };
+
+  async function publishSong(songId: string) {
+    const userDataStr: any = Cookies.get("sonex_user");
+    if (!userDataStr) return;
+    let userData;
+    try {
+      userData = JSON.parse(userDataStr);
+    } catch {
+      return;
+    }
+    if (!userData || !userData.profileId) return;
+    const artistData = await fetchArtistData(userData.profileId);
+    if (!artistData || !artistData.artistId || !artistData.artistName) return;
+    const sonexUserCookie = Cookies.get("sonex_token");
+    try {
+      const response = await axios.post(
+        `${MUSIC_LIBRARY_SERVICE_URL}/public/music/publish?artistId=${
+          artistData.artistId
+        }&artistName=${encodeURIComponent(
+          artistData.artistName
+        )}&musicId=${songId}`,
+        {},
+        {
+          headers: {
+            Authorization: sonexUserCookie ? `Bearer ${sonexUserCookie}` : "",
+          },
+        }
+      );
+      console.log("Publish response:", response.data);
+    } catch (err) {
+      console.error("Error publishing song:", err);
+    }
+  }
+
+  const fetchArtistData = async (profileId: number) => {
+    try {
+      const res = await axios.get(
+        `${USER_MANAGEMENT_SERVICE_URL}/artists?profileId=${profileId}`
+      );
+
+      console.log("Artist data:", res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching artist data:", error);
+    }
+  };
+
   return (
     <div
       ref={scrollRef}
@@ -508,6 +558,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                         deleteSong(song.id);
                         setOpenDropdownSongId(null);
                       }}
+                      onPublish={() => publishSong(song.id)}
                       onClose={() => setOpenDropdownSongId(null)}
                     />
                   )}
