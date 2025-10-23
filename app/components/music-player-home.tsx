@@ -22,6 +22,7 @@ import { Song } from "../utils/music-context";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import clsx from "clsx";
+import { SuggestedPlaylists } from "./suggested-playlists";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -597,6 +598,9 @@ export function MusicPlayerHome() {
             </div>
           </div>
         </div>
+
+        {/* Suggested Playlists */}
+        <SuggestedPlaylists />
 
         {/* Mood Playlists */}
         <div>
