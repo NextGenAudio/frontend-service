@@ -38,28 +38,28 @@ export default function Login() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Redirect to player if already logged in
-  useEffect(() => {
-    const jwt = Cookies.get("sonex_token");
-    if (jwt) {
-      try {
-        const decoded: any = jwt_decode(jwt);
-        console.log("Decoded JWT:", decoded);
-        if (decoded.exp && Date.now() >= decoded.exp * 1000) {
-          // Cookies.remove("sonex_token");
-        } else {
-          setIsLoggedIn(true);
-          router.push("/player/home");
-        }
-      } catch (e) {
-        console.log("eerror", e);
-        // If token is invalid, remove and redirect
-        // Cookies.remove("sonex_token");
-      }
-    } else {
-      // No JWT, redirect to login
-      router.push("/login");
-    }
-  }, []);
+  // useEffect(() => {
+  //   const jwt = Cookies.get("sonex_token");
+  //   if (jwt) {
+  //     try {
+  //       const decoded: any = jwt_decode(jwt);
+  //       console.log("Decoded JWT:", decoded);
+  //       if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+  //         // Cookies.remove("sonex_token");
+  //       } else {
+  //         setIsLoggedIn(true);
+  //         router.push("/player/home");
+  //       }
+  //     } catch (e) {
+  //       console.log("eerror", e);
+  //       // If token is invalid, remove and redirect
+  //       // Cookies.remove("sonex_token");
+  //     }
+  //   } else {
+  //     // No JWT, redirect to login
+  //     router.push("/login");
+  //   }
+  // }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
