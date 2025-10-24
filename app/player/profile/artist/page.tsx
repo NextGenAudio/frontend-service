@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { Edit3 } from "lucide-react";
 import { useSidebar } from "@/app/utils/sidebar-context";
+import { useMusicContext, Song } from "@/app/utils/music-context";
 
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
@@ -115,8 +116,83 @@ export default function ProfilePage() {
     setLoading(false);
   }, [artistData?.artistId]);
 
+  // Music context for playback
+  const {
+    setSelectSongId,
+    setSelectSong,
+    setPlayingSongId,
+    setPlayingSong,
+    setSongList,
+    setIsPlaying,
+  } = useMusicContext();
+  const { setPlayer } = useSidebar();
+
+  // Helper to get the current song list for next/previous navigation
+  const getCurrentSongList = (song: Song): Song[] => {
+    if (
+      publishedSongs.length > 0 &&
+      publishedSongs.some((s) => s.id === song.id)
+    ) {
+      return publishedSongs;
+    }
+    return [song];
+  };
+
+  // Play button: play song only, do NOT open details
+  const handleSongPlayButton = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    setPlayingSongId(song.id);
+    setPlayingSong(song);
+    const currentList = getCurrentSongList(song);
+    setSongList(currentList);
+    setPlayer(true);
+    setIsPlaying(true);
+    const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
+    fetch(
+      `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
+        },
+      }
+    ).catch((err) => console.error("Failed to update song score", err));
+  };
+
+  // Double click: open details, then play
+  const handleSongDoubleClick = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    setDetailPanel(true);
+    setPlayingSongId(song.id);
+    setPlayingSong(song);
+    const currentList = getCurrentSongList(song);
+    setSongList(currentList);
+    setPlayer(true);
+    setIsPlaying(true);
+    const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
+    fetch(
+      `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
+        },
+      }
+    ).catch((err) => console.error("Failed to update song score", err));
+  };
+
   return (
-    <div className="h-screen relative text-white overflow-y-auto custom-scrollbar">
+    <div className="h-screen relative text-white overflow-y-auto custom-scrollbar pb-60">
       {/* Backdrop image with overlay */}
       <div className="absolute inset-0 h-96 w-full z-0">
         <Image
@@ -291,7 +367,7 @@ export default function ProfilePage() {
           <p className="text-white/70 mt-4 text-lg">Loading songs...</p>
         </div>
       ) : (
-        <div className="relative z-10 p-8 pt-0 max-w-6xl mx-auto">
+        <div className="relative z-10 p-8 pt-0 max-w-full mx-auto">
           {/* Published Songs Section */}
           <div className="mb-12">
             {publishedSongs.length > 0 || playlistList.length > 0 ? (
@@ -323,11 +399,22 @@ export default function ProfilePage() {
                           <Button
                             size="icon"
                             className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                            // onClick={() => {}}
-                            disabled
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSongPlayButton(song.music);
+                            }}
                           >
                             <Play className="w-5 h-5" />
                           </Button>
+                          {/* Double click anywhere on card also plays, and opens details */}
+                          <div
+                            className="absolute inset-0"
+                            onDoubleClick={(e) => {
+                              e.stopPropagation();
+                              handleSongDoubleClick(song.music);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          />
                         </div>
                         <h3 className="font-semibold text-white mb-1">
                           {song.music.title ||
@@ -343,63 +430,64 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Created Playlists or Empty Profile Insight */}
-
-                <div className="mb-12">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className={`text-2xl font-bold ${themeColors.text}`}>
-                      Created Playlists
-                    </h2>
-                    <Button
-                      variant="ghost"
-                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
-                    >
-                      Show all
-                    </Button>
-                  </div>
-                  <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
-                    {playlistList.map(
-                      (playlist, index) =>
-                        playlist.role === 0 && (
-                          <div key={index} className="group cursor-pointer">
-                            <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
-                              <div className="relative mb-4">
-                                <Image
-                                  src={
-                                    playlist.playlistArt ||
-                                    "/assets/music-icon.webp"
-                                  }
-                                  alt={playlist.name}
-                                  width={256}
-                                  height={256}
-                                  className="w-full aspect-square object-cover rounded-xl"
-                                />
-                                <div
-                                  className={`absolute inset-0 bg-gradient-to-br ${themeColors.solidBg} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
-                                />
-                                <Button
-                                  size="icon"
-                                  className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                                  onClick={() =>
-                                    router.push(
-                                      `/player/playlist/${playlist.id}`
-                                    )
-                                  }
-                                >
-                                  <Play className="w-5 h-5" />
-                                </Button>
+                {playlistList.length > 0 && (
+                  <div className="mb-12">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className={`text-2xl font-bold ${themeColors.text}`}>
+                        Created Playlists
+                      </h2>
+                      <Button
+                        variant="ghost"
+                        className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
+                      >
+                        Show all
+                      </Button>
+                    </div>
+                    <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
+                      {playlistList.map(
+                        (playlist, index) =>
+                          playlist.role === 0 && (
+                            <div key={index} className="group cursor-pointer">
+                              <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
+                                <div className="relative mb-4">
+                                  <Image
+                                    src={
+                                      playlist.playlistArt ||
+                                      "/assets/music-icon.webp"
+                                    }
+                                    alt={playlist.name}
+                                    width={256}
+                                    height={256}
+                                    className="w-full aspect-square object-cover rounded-xl"
+                                  />
+                                  <div
+                                    className={`absolute inset-0 bg-gradient-to-br ${themeColors.solidBg} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
+                                  />
+                                  <Button
+                                    size="icon"
+                                    className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
+                                    onClick={() =>
+                                      router.push(
+                                        `/player/playlist/${playlist.id}`
+                                      )
+                                    }
+                                  >
+                                    <Play className="w-5 h-5" />
+                                  </Button>
+                                </div>
+                                <h3 className="font-semibold text-white mb-1">
+                                  {playlist.name}
+                                </h3>
+                                <p className="text-sm text-white/60">
+                                  {playlist.musicCount} songs
+                                </p>
                               </div>
-                              <h3 className="font-semibold text-white mb-1">
-                                {playlist.name}
-                              </h3>
-                              <p className="text-sm text-white/60">
-                                {playlist.musicCount} songs
-                              </p>
                             </div>
-                          </div>
-                        )
-                    )}
+                          )
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-24 text-center">

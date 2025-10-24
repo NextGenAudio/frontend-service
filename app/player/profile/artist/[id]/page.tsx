@@ -56,10 +56,11 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
     setPlayingSongId,
     setPlayingSong,
     setSongList,
+    setIsPlaying,
   } = useMusicContext();
-  const playlistList = Array.isArray(entityContext?.playlistList)
-    ? entityContext.playlistList
-    : [];
+
+  const { setPlayer } = useSidebar();
+
   const themeColors = getGeneralThemeColors(theme.primary);
 
   const [artistData, setArtistData] = useState<any>(null);
@@ -123,37 +124,79 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
     setLoading(false);
   }, [artistData?.artistId]);
 
+  // Helper to get the current song list for next/previous navigation
+  const getCurrentSongList = (song: Song): Song[] => {
+    if (
+      publishedSongs.length > 0 &&
+      publishedSongs.some((s) => s.id === song.id)
+    ) {
+      return publishedSongs;
+    }
+    return [song];
+  };
+
+  // Single click: show details only
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
     setSelectSong(song);
-    // setDetailPanel(true);
+    setDetailPanel(true);
   };
-  const handleSongDoubleClick = (song: Song) => {
-    // First call single click to set selection and detail panel
-    handleSongSingleClick(song);
 
-    // Set the playing song
+  // Play button: play song only, do NOT open details
+  const handleSongPlayButton = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
     setPlayingSongId(song.id);
     setPlayingSong(song);
-
-    // Update the song list with the current context (recent, trending, or most played)
-    // This ensures proper next/previous functionality
-    // const currentList = getCurrentSongList(song);
-    // setSongList(currentList);
-
+    const currentList = getCurrentSongList(song);
+    setSongList(currentList);
+    setPlayer(true);
+    setIsPlaying(true);
     const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
     fetch(
       `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
       {
         method: "POST",
         credentials: "include",
+        headers: {
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
+        },
       }
     ).catch((err) => console.error("Failed to update song score", err));
   };
 
+  // Double click: open details, then play
+  const handleSongDoubleClick = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    setDetailPanel(true);
+    setPlayingSongId(song.id);
+    setPlayingSong(song);
+    const currentList = getCurrentSongList(song);
+    setSongList(currentList);
+    setPlayer(true);
+    setIsPlaying(true);
+    const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
+    fetch(
+      `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
+        },
+      }
+    ).catch((err) => console.error("Failed to update song score", err));
+  };
 
   return (
-    <div className="h-screen relative text-white overflow-y-auto custom-scrollbar">
+    <div className="h-screen relative text-white overflow-y-auto custom-scrollbar pb-60">
       {/* Backdrop image with overlay */}
       <div className="absolute inset-0 h-96 w-full z-0">
         <Image
@@ -192,21 +235,6 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
               </div> */}
           </div>
           <div className="flex-1 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            {/* Top-right edit button (separate from social icons at bottom-right) */}
-            <div className="absolute right-4 top-4 z-30">
-              <button
-                onClick={() => {
-                  setProfileUpdate(true);
-                  setCollaborators(false);
-                  setDetailPanel(false);
-                  setQueue(false);
-                }}
-                aria-label="Edit profile"
-                className={`w-10 h-10 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center hover:bg-gradient-to-br ${themeColors.gradient} transition-all duration-300 border border-white/20 hover:scale-110 transform`}
-              >
-                <SquarePen className="w-5 h-5 text-white" />
-              </button>
-            </div>
             <div className="flex-1">
               <p className="text-sm  mb-1 font-semibold tracking-widest uppercase">
                 Artist Profile
@@ -221,7 +249,7 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                   {getFullName(userData?.firstName, userData?.lastName)}
                 </span>
                 <span className="text-white/60">•</span> */}
-                <span>{playlistList.length} Playlists</span>
+                <span>{publishedSongs.length} Songs</span>
               </div>
               {artistData?.artistBio && (
                 <>
@@ -328,10 +356,10 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
           <p className="text-white/70 mt-4 text-lg">Loading songs...</p>
         </div>
       ) : (
-        <div className="relative z-10 p-8 pt-0 max-w-6xl mx-auto">
+        <div className="relative z-10 p-8 pt-0 max-w-full mx-auto">
           {/* Published Songs Section */}
           <div className="mb-12">
-            {publishedSongs.length > 0 || playlistList.length > 0 ? (
+            {publishedSongs.length > 0 ? (
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className={`text-2xl font-bold ${themeColors.text}`}>
@@ -340,9 +368,10 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                 </div>
                 <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
                   {publishedSongs.map((song, idx) => (
-                    <div key={song.id || idx} className="group cursor-pointer"
-                      onDoubleClick={() => handleSongDoubleClick(song)}
-                      onClick={() => handleSongSingleClick(song)}
+                    <div
+                      key={song.id || idx}
+                      className="group cursor-pointer"
+                      onClick={() => handleSongSingleClick(song.music)}
                     >
                       <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
                         <div className="relative mb-4">
@@ -363,11 +392,22 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                           <Button
                             size="icon"
                             className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                            onClick={() => handleSongDoubleClick(song)}
-                            disabled
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSongPlayButton(song.music);
+                            }}
                           >
                             <Play className="w-5 h-5" />
                           </Button>
+                          {/* Double click anywhere on card also plays, and opens details */}
+                          <div
+                            className="absolute inset-0"
+                            onDoubleClick={(e) => {
+                              e.stopPropagation();
+                              handleSongDoubleClick(song.music);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          />
                         </div>
                         <h3 className="font-semibold text-white mb-1">
                           {song.music.title ||
@@ -380,65 +420,6 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                       </div>
                     </div>
                   ))}
-                </div>
-
-                {/* Created Playlists or Empty Profile Insight */}
-
-                <div className="mb-12">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className={`text-2xl font-bold ${themeColors.text}`}>
-                      Created Playlists
-                    </h2>
-                    <Button
-                      variant="ghost"
-                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
-                    >
-                      Show all
-                    </Button>
-                  </div>
-                  <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
-                    {playlistList.map(
-                      (playlist, index) =>
-                        playlist.role === 0 && (
-                          <div key={index} className="group cursor-pointer">
-                            <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
-                              <div className="relative mb-4">
-                                <Image
-                                  src={
-                                    playlist.playlistArt ||
-                                    "/assets/music-icon.webp"
-                                  }
-                                  alt={playlist.name}
-                                  width={256}
-                                  height={256}
-                                  className="w-full aspect-square object-cover rounded-xl"
-                                />
-                                <div
-                                  className={`absolute inset-0 bg-gradient-to-br ${themeColors.solidBg} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
-                                />
-                                <Button
-                                  size="icon"
-                                  className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                                  onClick={() =>
-                                    router.push(
-                                      `/player/playlist/${playlist.id}`
-                                    )
-                                  }
-                                >
-                                  <Play className="w-5 h-5" />
-                                </Button>
-                              </div>
-                              <h3 className="font-semibold text-white mb-1">
-                                {playlist.name}
-                              </h3>
-                              <p className="text-sm text-white/60">
-                                {playlist.musicCount} songs
-                              </p>
-                            </div>
-                          </div>
-                        )
-                    )}
-                  </div>
                 </div>
               </div>
             ) : (
