@@ -19,6 +19,7 @@ import { signIn } from "next-auth/react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import jwt_decode from "jwt-decode";
 
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
@@ -38,12 +39,27 @@ export default function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Redirect to player if already logged in
   useEffect(() => {
-    const cookie = Cookies.get("sonex_token");
-    if (cookie) {
-      setIsLoggedIn(true);
-      router.push("/player/home");
+    const jwt = Cookies.get("sonex_token");
+    if (jwt) {
+      try {
+        const decoded: any = jwt_decode(jwt);
+        console.log("Decoded JWT:", decoded);
+        if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+          // Cookies.remove("sonex_token");
+        } else {
+          setIsLoggedIn(true);
+          router.push("/player/home");
+        }
+      } catch (e) {
+        console.log("eerror", e);
+        // If token is invalid, remove and redirect
+        // Cookies.remove("sonex_token");
+      }
+    } else {
+      // No JWT, redirect to login
+      router.push("/login");
     }
-  }, [router]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,8 +84,6 @@ export default function Login() {
           }
         );
         setShowEmailSent(true);
-
-
       } catch (err: any) {
         // Show backend error message if available
         if (err.response && err.response.data && err.response.data.error) {
@@ -92,7 +106,9 @@ export default function Login() {
         if (res.status === 200) {
           // Store response data in cookies
           Cookies.set("sonex_token", res.data.Access_Token, { expires: 7 });
-          Cookies.set("sonex_user", JSON.stringify(res.data.User), { expires: 7 });
+          Cookies.set("sonex_user", JSON.stringify(res.data.User), {
+            expires: 7,
+          });
           router.push("/player/home");
         }
       } catch (err: any) {

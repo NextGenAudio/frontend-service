@@ -32,7 +32,8 @@ import {
 } from "lucide-react";
 import { Edit3 } from "lucide-react";
 import { useSidebar } from "@/app/utils/sidebar-context";
-
+import { useMusicContext } from "@/app/utils/music-context";
+import { Song } from "@/app/utils/music-context";
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
 const MUSIC_LIBRARY_SERVICE_URL =
@@ -49,6 +50,13 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
   const entityContext = useEntityContext();
   const { setProfileUpdate, setCollaborators, setDetailPanel, setQueue } =
     useSidebar();
+  const {
+    setSelectSongId,
+    setSelectSong,
+    setPlayingSongId,
+    setPlayingSong,
+    setSongList,
+  } = useMusicContext();
   const playlistList = Array.isArray(entityContext?.playlistList)
     ? entityContext.playlistList
     : [];
@@ -114,6 +122,35 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
     fetchPublishedSongs();
     setLoading(false);
   }, [artistData?.artistId]);
+
+  const handleSongSingleClick = (song: Song) => {
+    setSelectSongId(song.id);
+    setSelectSong(song);
+    // setDetailPanel(true);
+  };
+  const handleSongDoubleClick = (song: Song) => {
+    // First call single click to set selection and detail panel
+    handleSongSingleClick(song);
+
+    // Set the playing song
+    setPlayingSongId(song.id);
+    setPlayingSong(song);
+
+    // Update the song list with the current context (recent, trending, or most played)
+    // This ensures proper next/previous functionality
+    // const currentList = getCurrentSongList(song);
+    // setSongList(currentList);
+
+    const newScore = (song?.xscore ?? 0) + 1;
+    fetch(
+      `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    ).catch((err) => console.error("Failed to update song score", err));
+  };
+
 
   return (
     <div className="h-screen relative text-white overflow-y-auto custom-scrollbar">
@@ -303,7 +340,10 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                 </div>
                 <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
                   {publishedSongs.map((song, idx) => (
-                    <div key={song.id || idx} className="group cursor-pointer">
+                    <div key={song.id || idx} className="group cursor-pointer"
+                      onDoubleClick={() => handleSongDoubleClick(song)}
+                      onClick={() => handleSongSingleClick(song)}
+                    >
                       <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
                         <div className="relative mb-4">
                           <Image
@@ -323,7 +363,7 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                           <Button
                             size="icon"
                             className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                            // onClick={() => {}}
+                            onClick={() => handleSongDoubleClick(song)}
                             disabled
                           >
                             <Play className="w-5 h-5" />

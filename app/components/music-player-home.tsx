@@ -238,19 +238,6 @@ export function MusicPlayerHome() {
           style={{ backgroundImage: "url('/assets/sonex-wall.webp')" }}
         />
       </div>
-      {/* Animated Background Elements */}
-      {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div
-          className={`absolute top-20 left-10 w-32 h-32 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-xl animate-pulse`}
-        ></div>
-        <div
-          className={`absolute top-40 right-20 w-24 h-24 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-lg animate-pulse delay-1000`}
-        ></div>
-        <div
-          className={`absolute bottom-32 left-1/3 w-40 h-40 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-2xl animate-pulse delay-2000`}
-        ></div>
-      </div> */}
-
       <div className="relative z-10 p-8 pt-96 space-y-8">
         {/* Hero Section */}
         <div className="relative">

@@ -14,8 +14,10 @@ import {
 
 import SidebarButton from "./sidebar-button";
 import * as Avatar from "@radix-ui/react-avatar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import jwt_decode from "jwt-decode";
+import Cookies from "js-cookie";
 import Image from "next/image";
 import ProfileAvatar from "./profile-avatar";
 import { useSidebar } from "../utils/sidebar-context";
@@ -51,7 +53,29 @@ export const Sidebar = () => {
 
 
   const router = useRouter();
-  const { status, data: session } = useSession();
+
+  // Check JWT expiration from cookies and redirect if expired
+  // useEffect(() => {
+  //   const jwt = Cookies.get("sonex_token");
+  //   if (jwt) {
+  //     try {
+  //       const decoded: any = jwt_decode(jwt);
+  //       console.log("Decoded JWT:", decoded);
+  //       if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+  //         // Cookies.remove("sonex_token");
+  //         router.push("/login");
+  //       }
+  //     } catch (e) {
+  //       // If token is invalid, remove and redirect
+  //       // Cookies.remove("sonex_token");
+  //       router.push("/login");
+  //     }
+  //   } else {
+  //     // No JWT, redirect to login
+  //     router.push("/login");
+  //   }
+  // }, []);
+
   if (status === "loading") {
     return null;
   }
