@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Cookies from "js-cookie";
 import {
   Play,
   Pause,
@@ -28,7 +29,7 @@ const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
-interface Collaborator{
+interface Collaborator {
   userId: string;
   role: number;
 }
@@ -57,9 +58,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
   );
-  const [playlistCollaborators, setPlaylistCollaborators] = useState<Collaborator[]>(
-    []
-  );
+  const [playlistCollaborators, setPlaylistCollaborators] = useState<
+    Collaborator[]
+  >([]);
   const { entityName, entityArt, entityType, entityDescription } =
     useEntityContext();
   const { songList, setSongList } = useMusicContext();
@@ -85,11 +86,17 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     setPlayingSongId(song.id);
     setPlayingSong(song);
     const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
     fetch(
       `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
       {
         method: "POST",
         credentials: "include",
+        headers: {
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
+        },
       }
     ).catch((err) => console.error("Failed to update song score", err));
     song.xscore = newScore; // Optimistically update score in UI
@@ -118,11 +125,17 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     const fetchSongs = async () => {
       try {
         setLoading(true);
+        const sonexUserCookie = Cookies.get("sonex_token");
         const res = await fetch(
           `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/list?playlistId=${params.id}`,
           {
             method: "GET",
             credentials: "include",
+            headers: {
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
+            },
           }
         );
         const data = await res.json();
@@ -137,11 +150,17 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
 
     const fetchCollaborators = async () => {
       try {
+        const sonexUserCookie = Cookies.get("sonex_token");
         const res = await fetch(
           `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${params.id}/collaborators`,
           {
             method: "GET",
             credentials: "include",
+            headers: {
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
+            },
           }
         );
         const data = await res.json();
@@ -163,6 +182,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
 
   const removeSongFromPlaylist = async (songId: string) => {
     try {
+      const sonexUserCookie = Cookies.get("sonex_token");
       const response = await fetch(
         `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${params.id}/tracks?musicIds=${songId}`,
         {
@@ -170,6 +190,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            ...(sonexUserCookie
+              ? { Authorization: `Bearer ${sonexUserCookie}` }
+              : {}),
           },
         }
       );
@@ -188,6 +211,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   };
   const deleteSong = async (songId: string) => {
     try {
+      const sonexUserCookie = Cookies.get("sonex_token");
       const response = await fetch(
         `${MUSIC_LIBRARY_SERVICE_URL}/files/${songId}`,
         {
@@ -195,6 +219,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            ...(sonexUserCookie
+              ? { Authorization: `Bearer ${sonexUserCookie}` }
+              : {}),
           },
         }
       );

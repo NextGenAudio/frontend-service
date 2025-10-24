@@ -16,7 +16,7 @@ import SidebarButton from "./sidebar-button";
 import * as Avatar from "@radix-ui/react-avatar";
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import ProfileAvatar from "./profile-avatar";

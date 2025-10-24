@@ -6,6 +6,7 @@ import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
@@ -28,10 +29,16 @@ export function SuggestedPlaylists() {
   useEffect(() => {
     const fetchSuggestedPlaylists = async () => {
       try {
+        const sonexUserCookie = Cookies.get("sonex_token");
         const response = await axios.get(
           `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/suggestedplaylist`,
           {
             withCredentials: true,
+            headers: {
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
+            },
           }
         );
         setSuggestedPlaylists(response.data);
@@ -100,10 +107,10 @@ export function SuggestedPlaylists() {
               >
                 {/* Animated background effect */}
                 <div className="absolute inset-0 bg-black/20"></div>
-                
+
                 {/* Music icon */}
                 <Music2 className="w-16 h-16 text-white/90 z-10" />
-                
+
                 {/* Play button overlay */}
                 <div
                   className={`absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center transition-opacity duration-300 ${

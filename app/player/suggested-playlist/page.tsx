@@ -20,6 +20,7 @@ import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Song } from "@/app/utils/music-context";
 import axios from "axios";
+import Cookies from "js-cookie";
 import clsx from "clsx";
 
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
@@ -60,11 +61,17 @@ function SuggestedPlaylistContent() {
     const fetchTracks = async () => {
       try {
         setLoading(true);
+        const sonexUserCookie = Cookies.get("sonex_token");
         const response = await axios.get(
           `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/suggestedplaylist/tracks`,
           {
             params: { mood, genre },
             withCredentials: true,
+            headers: {
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
+            },
           }
         );
         setSongList(response.data);
@@ -108,11 +115,17 @@ function SuggestedPlaylistContent() {
     setGlobalSongList(songList);
 
     const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
     fetch(
       `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
       {
         method: "POST",
         credentials: "include",
+        headers: {
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
+        },
       }
     ).catch((err) => console.error("Failed to update song score", err));
     song.xscore = newScore;
@@ -156,13 +169,13 @@ function SuggestedPlaylistContent() {
       {/* Background decorative elements */}
       <div className="fixed -top-32 left-1/2 transform -translate-x-1/2 z-0">
         <div
-          className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-90"
+          className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-20"
           style={{ backgroundImage: "url('/assets/sonex-wall.webp')" }}
         />
       </div>
 
       <ScrollArea className={clsx("h-full", player ? "pb-48" : "pb-24")}>
-        <div className="relative z-10 p-8 pt-80">
+        <div className="relative z-10 p-8 pt-4">
           {/* Back Button */}
           <Button
             variant="ghost"

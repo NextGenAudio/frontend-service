@@ -19,7 +19,7 @@ import { signIn } from "next-auth/react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;

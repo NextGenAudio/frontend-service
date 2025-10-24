@@ -18,6 +18,7 @@ import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import Image from "next/image";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { Song } from "../utils/music-context";
 import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
@@ -49,10 +50,16 @@ export function MusicPlayerHome() {
   useEffect(() => {
     const fetchRecentMusics = async () => {
       try {
+        const sonexUserCookie = Cookies.get("sonex_token");
         const response = await axios.get(
           `${MUSIC_LIBRARY_SERVICE_URL}/files/recent`,
           {
             withCredentials: true,
+            headers: {
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
+            },
           }
         );
         setRecentMusics(response.data);
@@ -64,10 +71,16 @@ export function MusicPlayerHome() {
 
     const fetchTrendingMusics = async () => {
       try {
+        const sonexUserCookie = Cookies.get("sonex_token");
         const response = await axios.get(
           `${MUSIC_LIBRARY_SERVICE_URL}/files/trending`,
           {
             withCredentials: true,
+            headers: {
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
+            },
           }
         );
         setTrendingMusics(response.data);
@@ -76,10 +89,16 @@ export function MusicPlayerHome() {
         console.error("Error fetching trending musics:", error);
         // Fallback to recent if trending endpoint doesn't exist
         try {
+          const sonexUserCookie = Cookies.get("sonex_token");
           const fallbackResponse = await axios.get(
             `${MUSIC_LIBRARY_SERVICE_URL}/files/recent`,
             {
               withCredentials: true,
+              headers: {
+                ...(sonexUserCookie
+                  ? { Authorization: `Bearer ${sonexUserCookie}` }
+                  : {}),
+              },
             }
           );
           setTrendingMusics(fallbackResponse.data.slice(0, 8)); // Show top 8
@@ -91,10 +110,16 @@ export function MusicPlayerHome() {
 
     const fetchMostPlayedMusics = async () => {
       try {
+        const sonexUserCookie = Cookies.get("sonex_token");
         const response = await axios.get(
           `${MUSIC_LIBRARY_SERVICE_URL}/files/most-played`,
           {
             withCredentials: true,
+            headers: {
+              ...(sonexUserCookie
+                ? { Authorization: `Bearer ${sonexUserCookie}` }
+                : {}),
+            },
           }
         );
         setMostPlayedMusics(response.data);
@@ -103,10 +128,16 @@ export function MusicPlayerHome() {
         console.error("Error fetching most played musics:", error);
         // Fallback to recent if most-played endpoint doesn't exist
         try {
+          const sonexUserCookie = Cookies.get("sonex_token");
           const fallbackResponse = await axios.get(
             `${MUSIC_LIBRARY_SERVICE_URL}/files/recent`,
             {
               withCredentials: true,
+              headers: {
+                ...(sonexUserCookie
+                  ? { Authorization: `Bearer ${sonexUserCookie}` }
+                  : {}),
+              },
             }
           );
           setMostPlayedMusics(fallbackResponse.data.slice(0, 6)); // Show top 6
@@ -156,11 +187,17 @@ export function MusicPlayerHome() {
     setSongList(currentList);
 
     const newScore = (song?.xscore ?? 0) + 1;
+    const sonexUserCookie = Cookies.get("sonex_token");
     fetch(
       `${MUSIC_LIBRARY_SERVICE_URL}/files/${song.id}/score?score=${newScore}`,
       {
         method: "POST",
         credentials: "include",
+        headers: {
+          ...(sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {}),
+        },
       }
     ).catch((err) => console.error("Failed to update song score", err));
   };
@@ -200,36 +237,6 @@ export function MusicPlayerHome() {
       setIsPlaying(true);
     }
   };
-  const moodPlaylists = [
-    {
-      id: 1,
-      name: "Chill Vibes",
-      description: "Relax and unwind",
-      songs: 42,
-      color: themeColors.gradient,
-    },
-    {
-      id: 2,
-      name: "Workout Energy",
-      description: "High energy beats",
-      songs: 38,
-      color: themeColors.gradient,
-    },
-    {
-      id: 3,
-      name: "Focus Flow",
-      description: "Deep concentration",
-      songs: 29,
-      color: themeColors.gradient,
-    },
-    {
-      id: 4,
-      name: "Night Drive",
-      description: "Late night cruising",
-      songs: 35,
-      color: themeColors.gradient,
-    },
-  ];
 
   return (
     <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
@@ -338,7 +345,8 @@ export function MusicPlayerHome() {
                   <Image
                     src={
                       track.musicArt ||
-                      track.artworkURL || track.metadata?.cover_art ||
+                      track.artworkURL ||
+                      track.metadata?.cover_art ||
                       "/placeholder.svg"
                     }
                     alt={track.filename}
@@ -588,42 +596,6 @@ export function MusicPlayerHome() {
 
         {/* Suggested Playlists */}
         <SuggestedPlaylists />
-
-        {/* Mood Playlists */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Made For You</h2>
-            <button
-              className={`${themeColors.text} ${themeColors.hover} transition-colors`}
-            >
-              Refresh
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            {moodPlaylists.map((playlist) => (
-              <div
-                key={playlist.id}
-                className={`bg-gradient-to-br ${playlist.color} backdrop-blur-xl border border-white/20 rounded-2xl p-6  transition-all duration-300 cursor-pointer group`}
-                style={{ opacity: 0.8 }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">
-                      {playlist.name}
-                    </h3>
-                    <p className="text-white/70">{playlist.description}</p>
-                  </div>
-                  <div
-                    className={`bg-white/20 backdrop-blur-md rounded-full p-3 group-hover:bg-gradient-to-r group-hover:${theme.preview} transition-colors duration-300`}
-                  >
-                    <Play className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <p className="text-white/60 text-sm">{playlist.songs} songs</p>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Quick Actions */}
         <div
