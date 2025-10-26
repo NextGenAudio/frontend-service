@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { SearchBar } from "@/app/components/search-bar";
 import { useSidebar } from "@/app/utils/sidebar-context";
 import { useMusicContext } from "@/app/utils/music-context";
 import { clsx } from "clsx";
@@ -35,11 +34,9 @@ interface Collaborator {
 }
 export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const {
-    selectSong,
     setSelectSong,
     playingSong,
     setPlayingSong,
-    selectSongId,
     setSelectSongId,
     playingSongId,
     setPlayingSongId,
@@ -53,7 +50,6 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(true);
   const { isPlaying, setIsPlaying } = useMusicContext();
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
@@ -61,13 +57,11 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const [playlistCollaborators, setPlaylistCollaborators] = useState<
     Collaborator[]
   >([]);
-  const { entityName, entityArt, entityType, entityDescription } =
+  const { entityName, entityArt, entityDescription } =
     useEntityContext();
   const { songList, setSongList } = useMusicContext();
   const {
-    searchBar,
     player,
-    visualizer,
     setPlayer,
     setDetailPanel,
     collaborators,

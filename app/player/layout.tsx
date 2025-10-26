@@ -16,11 +16,9 @@ import { SongDetailsPanel } from "../components/song-details-panel";
 import { QueuePanel } from "../components/queue-panel";
 import { CollaboratorsPanel } from "../components/collaborators-panel";
 import { EntityHandlingProvider } from "../utils/entity-handling-context";
-import { Howl } from "howler";
 import AudioVisualizer from "../components/audio-visualizer";
 import { ProfileDropdown } from "../components/profile-dropdown";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter} from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";
@@ -33,11 +31,9 @@ const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
-  const { theme, setTheme } = useTheme();
+  const { theme} = useTheme();
   const {
     player,
-    home,
-    upload,
     profileUpdate,
     profile,
     detailPanel,
@@ -54,11 +50,8 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     playingSong,
     setPlayingSong,
     soundRef,
-    currentTime,
     setPlayingSongDuration,
     repeatMode,
-    analyserRef,
-    dataArrayRef,
     songList,
     setSelectSong,
     setSelectSongId,
@@ -68,8 +61,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     shuffleQueue,
   } = useMusicContext();
 
-  const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
-    usePlayerSettings();
+  const { volume, isMuted } = usePlayerSettings();
   const router = useRouter();
 
   // Add state to track if we're using recommendations
@@ -413,14 +405,14 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                   )}
                   {searchBar && (
                     <ResizablePanel defaultSize={10} minSize={8} maxSize={15}>
-                      <div className="z-50">
-                        <SearchBar />
+                      <div className="relative z-50">
+                        <SearchBar  />
                       </div>
                     </ResizablePanel>
                   )}
 
                   <ResizablePanel defaultSize={85} minSize={88}>
-                    <div className="h-full z-0">{children}</div>
+                    <div className="h-full relative z-0">{children}</div>
                   </ResizablePanel>
                 </ResizablePanelGroup>
               </ResizablePanel>

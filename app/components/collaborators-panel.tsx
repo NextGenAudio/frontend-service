@@ -19,7 +19,6 @@ import { Input } from "@/app/components/ui/input";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
-import { useSidebar } from "../utils/sidebar-context";
 import axios from "axios";
 import AlertBar from "@/app/components/alert-bar";
 import { useParams } from "next/navigation";

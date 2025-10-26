@@ -17,6 +17,7 @@ import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import Cookies from "js-cookie";
 import { getFullName } from "../player/profile/page";
+import { Button } from "@radix-ui/themes";
 
 export function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(true);
@@ -91,7 +92,7 @@ export function ProfileDropdown() {
           {/* Menu Items */}
           <div className="py-2">
             {menuItems.map((item, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={() => {
                   userData.role?.roleName === "artist"
@@ -104,13 +105,13 @@ export function ProfileDropdown() {
                   className={`w-4 h-4 text-white/60 transition-colors`}
                 />
                 <span className="text-sm font-medium">{item.label}</span>
-              </button>
+              </Button>
             ))}
           </div>
 
           {/* Logout Section */}
           <div className="border-t border-white/10 p-2">
-            <button
+            <Button
               onClick={() => {
                 // Remove cookies
                 Cookies.remove("sonex_token");
@@ -127,7 +128,7 @@ export function ProfileDropdown() {
             >
               <LogOut className="w-4 h-4" />
               <span className="text-sm font-medium">Sign Out</span>
-            </button>
+            </Button>
           </div>
         </div>
       )}

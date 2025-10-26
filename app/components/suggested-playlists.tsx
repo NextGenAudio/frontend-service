@@ -7,6 +7,7 @@ import { getGeneralThemeColors } from "../lib/theme-colors";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { Button } from "@radix-ui/themes";
 
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
 
@@ -83,11 +84,11 @@ export function SuggestedPlaylists() {
           <Sparkles className={`w-6 h-6 ${themeColors.text}`} />
           Suggested For You
         </h2>
-        <button
+        <Button
           className={`${themeColors.text} ${themeColors.hover} transition-colors text-sm`}
         >
           See All
-        </button>
+        </Button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {suggestedPlaylists.map((playlist, index) => (

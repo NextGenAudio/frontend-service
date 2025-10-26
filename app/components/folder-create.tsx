@@ -36,7 +36,7 @@ export function FolderCreate() {
   const themeColors = getGeneralThemeColors(theme.primary);
 
   const artworkInputRef = useRef<HTMLInputElement>(null);
-  const { folderCreateRefresh, setFolderCreateRefresh } = useFileHandling();
+  const { setFolderCreateRefresh } = useFileHandling();
   const { player } = useSidebar();
   // Handle drag-drop for artwork
   const handleArtworkDrop = (e: React.DragEvent) => {
@@ -98,16 +98,6 @@ export function FolderCreate() {
 
   return (
     <div className="h-screen overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
-      {/* Background Effects */}
-      {/* <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div
-          className={`absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r ${themeColors.gradient} opacity-10 rounded-full blur-3xl animate-pulse`}
-        />
-        <div
-          className={`absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r ${themeColors.gradient} opacity-5 rounded-full blur-3xl animate-pulse delay-1000`}
-        />
-      </div> */}
-
       <div
         className={clsx(
           `h-screen overflow-y-auto relative max-w-4xl mx-auto min-h-full ${

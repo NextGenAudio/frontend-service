@@ -5,7 +5,7 @@ import { useTheme } from "../utils/theme-context";
 import { getThemeHexColors } from "../lib/theme-colors";
 
 export default function AudioVisualizer() {
-  const { soundRef, isPlaying } = useMusicContext();
+  const { isPlaying } = useMusicContext();
   const { theme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);

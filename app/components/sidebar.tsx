@@ -24,13 +24,14 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { usePlayerSettings } from "../hooks/use-player-settings";
+import { useMusicContext } from "../utils/music-context";
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("Home");
 
   const [notifications, setNotifications] = useState(false);
   const [favorites, setFavorites] = useState(false);
-  const [analytics, setAnalytics] = useState(false);
+  const { playingSong } = useMusicContext();
   const [settings, setSettings] = useState(false);
   const { theme, setTheme } = useTheme();
   const {
@@ -87,7 +88,11 @@ export const Sidebar = () => {
       router.push("/player/home");
     }
     if (label == "Player") {
-      setPlayer(!player);
+      if(playingSong){
+        setPlayer(!player);
+      }else{
+        console.log("No song is currently playing.");
+      }
     }
     if (label === "Search") {
       setSearchBar(!searchBar);

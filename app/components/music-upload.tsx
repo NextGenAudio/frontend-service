@@ -13,9 +13,7 @@ import {
   Pause,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
-// import { Textarea } from "@/app/components/ui/textarea"
 import { Plus, FolderPlus } from "lucide-react";
 import {
   Select,
@@ -26,7 +24,6 @@ import {
 } from "@/app/components/ui/select";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useMusicContext } from "../utils/music-context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFileHandling } from "../utils/entity-handling-context";
 import { useEntityContext } from "../utils/entity-context";
@@ -309,7 +306,6 @@ export function MusicUpload() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Button
-                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => setIsPlaying(!isPlaying)}
@@ -322,7 +318,6 @@ export function MusicUpload() {
                       )}
                     </Button>
                     <Button
-                      type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => setMusicFile(null)}

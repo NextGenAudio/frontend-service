@@ -6,10 +6,8 @@ import { Button } from "@/app/components/ui/button";
 import { Music, ShieldUser } from "lucide-react";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import Image from "next/image";
 import ProfileAvatar from "../components/profile-avatar";
 import { useEffect, useState } from "react";
-import { set } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 const Header = () => {

@@ -38,7 +38,6 @@ function SuggestedPlaylistContent() {
   const [filteredSongs, setFilteredSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showDropdown, setShowDropdown] = useState<string | null>(null);
 
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);

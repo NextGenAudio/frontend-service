@@ -1,10 +1,8 @@
-// Common empty state panel for library
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   Plus,
-  Music,
-  MoreHorizontal,
   FolderPlus,
   ListMusic,
   Upload,
@@ -23,22 +21,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/app/components/ui/dropdown-menu";
 import { useSidebar } from "../utils/sidebar-context";
-import { useMusicContext } from "../utils/music-context";
+
 import MediaCard from "./ui/media-card";
-import { set } from "react-hook-form";
 import { useFileHandling } from "../utils/entity-handling-context";
 import { useRouter } from "next/navigation";
 import { useEntityContext } from "../utils/entity-context";
 import { ScrollArea } from "./ui/scroll-area";
 import clsx from "clsx";
 import { Playlist } from "../utils/entity-context";
-import { Song } from "../utils/music-context";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { on } from "events";
 import AlertBar from "./alert-bar";
 import { usePathname } from "next/navigation";
 
@@ -73,8 +67,7 @@ export const LibraryPanel = () => {
     setEntityDescription,
   } = useEntityContext();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
-  const [songs, setSongs] = useState<Song[]>([]);
-  const { setSongList } = useMusicContext();
+ 
   const {
     folderCreateRefresh,
     songUploadRefresh,

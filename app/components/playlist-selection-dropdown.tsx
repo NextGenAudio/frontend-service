@@ -156,7 +156,7 @@ export function PlaylistSelectionDropdown({
 
           {/* Create New Playlist Button */}
           <div className="p-2">
-            <button
+            <Button
               className={`w-full px-3 py-2.5 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group rounded-lg border border-white/10 hover:border-white/20`}
               onClick={() => router.push("/player/playlist/create")}
             >
@@ -171,7 +171,7 @@ export function PlaylistSelectionDropdown({
                   Make a new playlist for this song
                 </div>
               </div>
-            </button>
+            </Button>
           </div>
 
           {/* Playlists List */}
@@ -194,7 +194,7 @@ export function PlaylistSelectionDropdown({
             ) : (
               <div className="p-2 space-y-1">
                 {playlists.map((playlist: Playlist) => (
-                  <button
+                  <Button
                     key={playlist.id}
                     className={`w-full px-3 py-2.5 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group rounded-lg hover:bg-white/10`}
                     onClick={() => {
@@ -237,7 +237,7 @@ export function PlaylistSelectionDropdown({
                         <div className="w-3 h-3 bg-white/80 rounded-full"></div>
                       )}
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

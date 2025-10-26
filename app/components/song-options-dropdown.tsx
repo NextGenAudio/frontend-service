@@ -2,12 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import {
-  MoreHorizontal,
   Plus,
   Minus,
   Heart,
   Share2,
-  Download,
   Trash2,
   Edit3,
   ListStart,
@@ -16,6 +14,7 @@ import {
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import Cookies from "js-cookie";
+import { Button } from "@radix-ui/themes";
 
 interface SongOptionsDropdownProps {
   songId: string;
@@ -33,7 +32,6 @@ interface SongOptionsDropdownProps {
 }
 
 export function SongOptionsDropdown({
-  songId,
   liked = false,
   isInPlaylist = false,
   onAddToPlaylist,
@@ -92,7 +90,7 @@ export function SongOptionsDropdown({
         <div className="relative z-10 py-2">
           {/* Add/Remove from Playlist */}
           {isInPlaylist ? (
-            <button
+            <Button
               className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
               onClick={() => handleOptionClick(onRemoveFromPlaylist)}
             >
@@ -100,9 +98,9 @@ export function SongOptionsDropdown({
                 className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
               />
               Remove from playlist
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
               onClick={() => handleOptionClick(onAddToPlaylist)}
             >
@@ -110,11 +108,11 @@ export function SongOptionsDropdown({
                 className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
               />
               Add to playlist
-            </button>
+            </Button>
           )}
 
           {/* Like/Unlike */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onToggleLike)}
           >
@@ -124,8 +122,8 @@ export function SongOptionsDropdown({
               }`}
             />
             {liked ? "Remove from liked songs" : "Add to liked songs"}
-          </button>
-          <button
+          </Button>
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onAddToQueue)}
           >
@@ -133,12 +131,12 @@ export function SongOptionsDropdown({
               className={`h-4 w-4 group-hover:scale-110 transition-transform ${themeColors.text}`}
             />
             {"Add to queue"}
-          </button>
+          </Button>
           {/* Divider */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
           {/* Share */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onShare)}
           >
@@ -146,11 +144,11 @@ export function SongOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Share
-          </button>
+          </Button>
 
           {/* Download */}
           {userData?.role.roleName === "artist" && (
-            <button
+            <Button
               className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
               onClick={() => handleOptionClick(onPublish)}
             >
@@ -158,10 +156,10 @@ export function SongOptionsDropdown({
                 className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
               />
               Publish
-            </button>
+            </Button>
           )}
           {/* Edit */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onEdit)}
           >
@@ -169,19 +167,19 @@ export function SongOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Edit song info
-          </button>
+          </Button>
 
           {/* Divider */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
           {/* Delete */}
-          <button
+          <Button
             className="w-full px-4 py-3 text-left text-sm text-white hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 flex items-center gap-3 group"
             onClick={() => handleOptionClick(onDelete)}
           >
             <Trash2 className="h-4 w-4 text-red-400 group-hover:scale-110 transition-transform" />
             Delete from library
-          </button>
+          </Button>
         </div>
       </div>
     </div>

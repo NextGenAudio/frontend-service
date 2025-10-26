@@ -1,19 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import {
-  MoreHorizontal,
   FolderOpen,
   Edit3,
   Trash2,
-  Share2,
-  Copy,
-  Move,
-  Download,
-  FolderPlus,
 } from "lucide-react";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
+import { Button } from "@radix-ui/themes";
 
 interface FolderOptionsDropdownProps {
   folderId: number;
@@ -77,7 +72,7 @@ export function FolderOptionsDropdown({
 
         <div className="relative z-10 py-2">
           {/* Open Folder */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onOpen)}
           >
@@ -85,24 +80,13 @@ export function FolderOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Open folder
-          </button>
-
-          {/* Create Subfolder */}
-          {/* <button
-            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
-            onClick={() => handleOptionClick(onCreateSubfolder)}
-          >
-            <FolderPlus
-              className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
-            />
-            Create subfolder
-          </button> */}
+          </Button>
 
           {/* Divider */}
           {/* <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" /> */}
 
           {/* Rename */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onRename)}
           >
@@ -110,66 +94,19 @@ export function FolderOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Rename folder
-          </button>
-
-          {/* Copy */}
-          {/* <button
-            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
-            onClick={() => handleOptionClick(onCopy)}
-          >
-            <Copy
-              className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
-            />
-            Duplicate folder
-          </button> */}
-
-          {/* Move */}
-          {/* <button
-            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
-            onClick={() => handleOptionClick(onMove)}
-          >
-            <Move
-              className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
-            />
-            Move folder
-          </button> */}
-
-          {/* Divider */}
-          {/* <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" /> */}
-
-          {/* Share */}
-          {/* <button
-            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
-            onClick={() => handleOptionClick(onShare)}
-          >
-            <Share2
-              className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
-            />
-            Share folder
-          </button> */}
-
-          {/* Download */}
-          {/* <button
-            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
-            onClick={() => handleOptionClick(onDownload)}
-          >
-            <Download
-              className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
-            />
-            Download folder
-          </button> */}
+          </Button>
 
           {/* Divider */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
           {/* Delete */}
-          <button
+          <Button
             className="w-full px-4 py-3 text-left text-sm text-white hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 flex items-center gap-3 group"
             onClick={() => handleOptionClick(onDelete)}
           >
             <Trash2 className="h-4 w-4 text-red-400 group-hover:scale-110 transition-transform" />
             Delete folder
-          </button>
+          </Button>
         </div>
       </div>
     </div>

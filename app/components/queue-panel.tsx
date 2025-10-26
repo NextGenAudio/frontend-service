@@ -120,7 +120,7 @@ export function QueuePanel() {
           {/* <span>{songQueue.length} songs</span> */}
           {/* Queue Controls */}
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={handleShuffleQueue}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r ${
                 shuffleQueue ? theme.preview : "bg-white/10"
@@ -128,7 +128,7 @@ export function QueuePanel() {
             >
               <Shuffle className="w-3 h-3" />
               Shuffle
-            </button>
+            </Button>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
@@ -256,7 +256,7 @@ export function QueuePanel() {
                   </div>
 
                   {/* Remove Button */}
-                  <button
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRemoveFromQueue(song.id);
@@ -264,7 +264,7 @@ export function QueuePanel() {
                     className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-white/10 transition-all"
                   >
                     <X className="w-3 h-3 text-white/50" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}

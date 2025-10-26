@@ -189,7 +189,7 @@ export default function AdminDashboard() {
             Manage users, monitor activity, and view insights
           </p>
         </div>
-        <button
+        <Button
           className="relative flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-xl border border-yellow-400/40 rounded-full shadow-lg hover:bg-yellow-100/20 transition-all duration-200"
           onClick={() => router.push("/admin/review")}
           title="Inbox / Requests"
@@ -199,7 +199,7 @@ export default function AdminDashboard() {
           <span className="absolute -top-2 -right-2 bg-yellow-400 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow border border-white/30">
             {requestCount}
           </span>
-        </button>
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -281,58 +281,58 @@ export default function AdminDashboard() {
                 <thead>
                   <tr className="border-b border-white/10">
                     <th className="text-left py-3 px-4 text-white/70 font-medium">
-                      <button
+                      <Button
                         onClick={() => handleSort("profileId")}
                         className="flex items-center gap-2 hover:text-white transition-colors"
                       >
                         User ID
                         <SortIcon field="profileId" />
-                      </button>
+                      </Button>
                     </th>
                     <th className="text-left py-3 px-4 text-white/70 font-medium">
-                      <button
+                      <Button
                         onClick={() => handleSort("firstName")}
                         className="flex items-center gap-2 hover:text-white transition-colors"
                       >
                         First Name
                         <SortIcon field="firstName" />
-                      </button>
+                      </Button>
                     </th>
                     <th className="text-left py-3 px-4 text-white/70 font-medium">
-                      <button
+                      <Button
                         onClick={() => handleSort("lastName")}
                         className="flex items-center gap-2 hover:text-white transition-colors"
                       >
                         Last Name
                         <SortIcon field="lastName" />
-                      </button>
+                      </Button>
                     </th>
                     <th className="text-left py-3 px-4 text-white/70 font-medium">
-                      <button
+                      <Button
                         onClick={() => handleSort("email")}
                         className="flex items-center gap-2 hover:text-white transition-colors"
                       >
                         Email
                         <SortIcon field="email" />
-                      </button>
+                      </Button>
                     </th>
                     <th className="text-left py-3 px-4 text-white/70 font-medium">
-                      <button
+                      <Button
                         onClick={() => handleSort("createdAt")}
                         className="flex items-center gap-2 hover:text-white transition-colors"
                       >
                         Created At
                         <SortIcon field="createdAt" />
-                      </button>
+                      </Button>
                     </th>
                     <th className="text-left py-3 px-4 text-white/70 font-medium">
-                      <button
+                      <Button
                         onClick={() => handleSort("roleName")}
                         className="flex items-center gap-2 hover:text-white transition-colors"
                       >
                         Role
                         <SortIcon field="roleName" />
-                      </button>
+                      </Button>
                     </th>
                     <th className="text-left py-3 px-4 text-white/70 font-medium">
                       Actions

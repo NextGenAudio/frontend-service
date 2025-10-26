@@ -1,23 +1,10 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import { MusicProvider } from "./utils/music-context";
 import { SidebarProvider } from "./utils/sidebar-context";
 import { AudioCtxProvider } from "./utils/audio-context";
 import { EntityProvider } from "./utils/entity-context";
-import { Theme } from "@radix-ui/themes";
 import { ThemeProvider } from "./utils/theme-context";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: "SoneX",

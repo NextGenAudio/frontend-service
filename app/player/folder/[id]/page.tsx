@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
 import { useFileHandling } from "@/app/utils/entity-handling-context";
+import  AlertBar from "@/app/components/alert-bar";
 import Cookies from "js-cookie";
 import axios from "axios";
 
@@ -46,15 +47,17 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
     songQueue,
     setSongQueue,
   } = useMusicContext();
-
+  const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
   const [isHeaderCompact, setIsHeaderCompact] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
   const { theme, setTheme } = useTheme();
-  const router = useRouter();
 
+  // Alert state for showing success/error messages
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<"success" | "error">("success");
   // Get theme-specific colors
   const themeColors = getGeneralThemeColors(theme.primary);
   const [hoveredSong, setHoveredSong] = useState<string | null>(null);
@@ -404,9 +407,6 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                   <div className="w-32 h-32 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 flex items-center justify-center">
                     <Music className={`w-16 h-16 ${themeColors.text}/60`} />
                   </div>
-                  <div className="absolute -top-2 -right-2">
-                    <Play className="w-8 h-8 text-white/40 animate-bounce" />
-                  </div>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">
                   No songs found
@@ -415,9 +415,6 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                   This folder is empty. Upload some music files to get started!
                 </p>
                 <div className="flex flex-col items-center gap-2 text-white/50">
-                  {/* <p className="text-sm">
-                    💡 Tip: Drag and drop music files to add them to this folder
-                  </p> */}
                 </div>
               </div>
             ) : (

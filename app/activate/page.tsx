@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { useSearchParams, useRouter } from "next/navigation"
+import { Button } from "@radix-ui/themes"
 
 const USER_MANAGEMENT_SERVICE_URL = process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL
 
@@ -21,13 +22,13 @@ export default function ActivatePage() {
 
     const activateAccount = async () => {
       try {
-        const res = await axios.get(`${USER_MANAGEMENT_SERVICE_URL}/sonex/v1/auth/activate?token=${token}`)
+        await axios.get(`${USER_MANAGEMENT_SERVICE_URL}/sonex/v1/auth/activate?token=${token}`)
         setMessage("Account activated successfully!")
         setStatus("success")
         // Redirect after success
         setTimeout(() => router.push("/login"), 3000)
       } catch (error: any) {
-        setMessage("Activation failed. Please contact support.")
+        setMessage("Activation failed. Please contact support." + (error.response?.data?.message ? `(${error.response.data.message})` : ""))
         setStatus("error")
       }
     }
@@ -101,13 +102,13 @@ export default function ActivatePage() {
           </div>
 
           {/* Action Button */}
-          <button
+          <Button
             onClick={() => router.push("/login")}
             disabled={status === "loading"}
             className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 via-orange-400 to-red-500 text-white font-semibold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {status === "loading" ? "Activating..." : status === "success" ? "Go to Login" : "Try Again"}
-          </button>
+          </Button>
 
           {/* Support Link */}
           <p className="text-center text-white/60 text-sm mt-6">

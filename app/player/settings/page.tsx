@@ -94,7 +94,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="h-screen pb-80 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
+    <div className="h-screen pb-96 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
       {/* Background Image */}
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-0">
         <div

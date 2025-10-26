@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
+import { Button } from "@radix-ui/themes";
 
 interface PlaylistOptionsDropdownProps {
   playlistId: number;
@@ -99,7 +100,7 @@ export function PlaylistOptionsDropdown({
 
         <div className="relative z-10 py-2">
           {/* Play */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onPlay)}
           >
@@ -107,10 +108,10 @@ export function PlaylistOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Play playlist
-          </button>
+          </Button>
 
           {/* Shuffle */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onShuffle)}
           >
@@ -118,13 +119,13 @@ export function PlaylistOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Shuffle play
-          </button>
+          </Button>
 
           {/* Divider */}
           <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
           {/* Add Songs */}
-          <button
+          <Button
             className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
             onClick={() => handleOptionClick(onAddSongs)}
           >
@@ -132,20 +133,7 @@ export function PlaylistOptionsDropdown({
               className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
             />
             Add songs
-          </button>
-
-          {/* Like/Unlike */}
-          {/* <button
-            className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
-            onClick={() => handleOptionClick(onToggleLike)}
-          >
-            <Heart
-              className={`h-4 w-4 group-hover:scale-110 transition-transform ${
-                isLiked ? "text-red-400 fill-red-400" : themeColors.text
-              }`}
-            />
-            {isLiked ? "Remove from liked" : "Add to liked"}
-          </button> */}
+          </Button>
 
           {/* Owner-only options */}
           {isOwner && (
@@ -154,7 +142,7 @@ export function PlaylistOptionsDropdown({
               {/* <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" /> */}
 
               {/* Edit Details */}
-              <button
+              <Button
                 className={`w-full px-4 py-3 text-left text-sm text-white ${themeColors.hoverBg} hover:${themeColors.text} transition-all duration-200 flex items-center gap-3 group`}
                 onClick={() => handleOptionClick(onEdit)}
               >
@@ -162,7 +150,7 @@ export function PlaylistOptionsDropdown({
                   className={`h-4 w-4 ${themeColors.text} group-hover:scale-110 transition-transform`}
                 />
                 Edit details
-              </button>
+              </Button>
 
               {/* Rename */}
               {/* <button
@@ -267,13 +255,13 @@ export function PlaylistOptionsDropdown({
               {/* Divider */}
               <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-              <button
+              <Button
                 className="w-full px-4 py-3 text-left text-sm text-white hover:bg-red-500/20 hover:text-red-300 transition-all duration-200 flex items-center gap-3 group"
                 onClick={() => handleOptionClick(onDelete)}
               >
                 <Trash2 className="h-4 w-4 text-red-400 group-hover:scale-110 transition-transform" />
                 Delete playlist
-              </button>
+              </Button>
             </>
           )}
         </div>

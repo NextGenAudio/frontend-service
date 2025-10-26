@@ -237,9 +237,6 @@ export default function FavoritePage() {
                 <div className="w-32 h-32 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 flex items-center justify-center">
                   <Heart className={`w-16 h-16 ${themeColors.text}/60`} />
                 </div>
-                <div className="absolute -top-2 -right-2">
-                  <Music className="w-8 h-8 text-white/40 animate-bounce" />
-                </div>
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">
                 No favorites yet

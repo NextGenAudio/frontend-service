@@ -24,6 +24,8 @@ import { useSidebar } from "../utils/sidebar-context";
 import { useMusicContext } from "../utils/music-context";
 import clsx from "clsx";
 import { SuggestedPlaylists } from "./suggested-playlists";
+import { useRouter } from "next/navigation";
+import { Button } from "@radix-ui/themes";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -36,7 +38,7 @@ export function MusicPlayerHome() {
   const [recentMusics, setRecentMusics] = useState<Song[]>([]);
   const [trendingMusics, setTrendingMusics] = useState<Song[]>([]);
   const [mostPlayedMusics, setMostPlayedMusics] = useState<Song[]>([]);
-  const { setDetailPanel, player } = useSidebar();
+  const { setDetailPanel, player , setQueue,setPlayer ,queue} = useSidebar();
   const {
     setSelectSong,
     setPlayingSong,
@@ -45,8 +47,7 @@ export function MusicPlayerHome() {
     setIsPlaying,
     setSongList,
   } = useMusicContext();
-
-  const { setPlayer } = useSidebar();
+  const router = useRouter();
   useEffect(() => {
     const fetchRecentMusics = async () => {
       try {
@@ -242,7 +243,7 @@ export function MusicPlayerHome() {
     <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
       <div className="fixed -top-32 left-1/2 transform -translate-x-1/2 z-0">
         <div
-          className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-90"
+          className="w-[1500px] h-[1000px] bg-contain bg-no-repeat bg-center opacity-80"
           style={{ backgroundImage: "url('/assets/sonex-wall.webp')" }}
         />
       </div>
@@ -326,11 +327,11 @@ export function MusicPlayerHome() {
               <History className={`w-6 h-6 ${themeColors.text}`} />
               Recently Played
             </h2>
-            <button
+            <Button
               className={`${themeColors.text} ${themeColors.hover} transition-colors`}
             >
               View All
-            </button>
+            </Button>
           </div>
           <div className="grid grid-cols-5 gap-4">
             {recentMusics.map((track) => (
@@ -391,11 +392,11 @@ export function MusicPlayerHome() {
               <TrendingUp className={`w-6 h-6 ${themeColors.text}`} />
               Trending Now
             </h2>
-            <button
+            <Button
               className={`${themeColors.text} ${themeColors.hover} transition-colors`}
             >
               View All
-            </button>
+            </Button>
           </div>
           <div className="grid grid-cols-4 gap-4">
             {trendingMusics.slice(0, 8).map((track, index) => (
@@ -481,11 +482,11 @@ export function MusicPlayerHome() {
               <Headphones className={`w-6 h-6 ${themeColors.text}`} />
               Most Played
             </h2>
-            <button
+            <Button
               className={`${themeColors.text} ${themeColors.hover} transition-colors`}
             >
               View All
-            </button>
+            </Button>
           </div>
           <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
             <div className="space-y-3">
@@ -573,7 +574,7 @@ export function MusicPlayerHome() {
 
                   {/* Play Button */}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSongDoubleClick(track);
@@ -586,7 +587,7 @@ export function MusicPlayerHome() {
                         className="w-4 h-4 text-white"
                         fill="currentColor"
                       />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -603,21 +604,21 @@ export function MusicPlayerHome() {
             `grid grid-cols-3 gap-4 ${player ? "pb-96" : "pb-64"}`
           )}
         >
-          <button
+          <Button
             className={`bg-gradient-to-r ${theme.preview} backdrop-blur-xl rounded-2xl p-6 hover:scale-105 transition-all duration-300 shadow-lg`}
             onClick={handleShufflePlay}
           >
             <Shuffle className="w-8 h-8 text-white mb-2" />
             <p className="text-white font-semibold">Shuffle Play</p>
-          </button>
-          <button className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
+          </Button>
+          <Button onClick={()=>router.push("/player/favorite")} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
             <Heart className={`w-8 h-8 ${themeColors.text} mb-2`} />
             <p className="text-white font-semibold">Liked Songs</p>
-          </button>
-          <button className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
-            <SkipForward className={`w-8 h-8 ${themeColors.text} mb-2`} />
+          </Button>
+          <Button onClick={()=>setQueue(!queue)} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
+            <SkipForward className={`w-8 h-8 ${themeColors.text} mb-2`}  />
             <p className="text-white font-semibold">Queue</p>
-          </button>
+          </Button>
         </div>
       </div>
     </div>

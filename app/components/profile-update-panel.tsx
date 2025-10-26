@@ -316,8 +316,7 @@ export function ProfileUpdatePanel({
                     className="object-cover"
                   />
                   <div className="absolute inset-0 flex items-center justify-center z-20 hover:opacity-100 opacity-0">
-                    <button
-                      type="button"
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         setBackdropImage(null);
@@ -327,7 +326,7 @@ export function ProfileUpdatePanel({
                       aria-label="Remove backdrop"
                     >
                       <X className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}
@@ -338,12 +337,12 @@ export function ProfileUpdatePanel({
                 onChange={handleBackdropSelect}
                 className="hidden"
               />
-              <button
+              <Button
                 onClick={() => backdropFileInputRef.current?.click()}
                 className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors flex items-center justify-center"
               >
                 <Upload className="w-6 h-6 text-white opacity-0 hover:opacity-100 transition-opacity" />
-              </button>
+              </Button>
             </div>
             <p className="text-xs text-white/50">
               Drag and drop or click to upload backdrop
@@ -374,8 +373,7 @@ export function ProfileUpdatePanel({
                   className="object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center hover:opacity-100 opacity-0 z-20">
-                  <button
-                    type="button"
+                  <Button
                     onClick={(e) => {
                       e.stopPropagation();
                       setProfileImage(null);
@@ -385,7 +383,7 @@ export function ProfileUpdatePanel({
                     aria-label="Remove profile photo"
                   >
                     <X className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </>
             ) : (
@@ -400,12 +398,12 @@ export function ProfileUpdatePanel({
               onChange={handleFileSelect}
               className="hidden"
             />
-            <button
+            <Button
               onClick={() => fileInputRef.current?.click()}
               className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors flex items-center justify-center"
             >
               <Upload className="w-6 h-6 text-white opacity-0 hover:opacity-100 transition-opacity" />
-            </button>
+            </Button>
           </div>
           <p className="text-xs text-white/50">
             Drag and drop or click to upload
@@ -492,19 +490,7 @@ export function ProfileUpdatePanel({
             </div>
           )}
           {/* Location */}
-          {/* <div>
-            <label className="text-sm font-semibold text-white/90 block mb-2">
-              Location
-            </label>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-orange-400/50 focus:bg-white/10 transition-all"
-              placeholder="City, Country"
-            />
-          </div> */}
+
 
           {/* Website, Genre, Spotify, Social Media (Artist only) */}
           {userData?.role?.roleName === "artist" && (
@@ -582,13 +568,13 @@ export function ProfileUpdatePanel({
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-4 border-t border-white/10">
-          <button
+          <Button
             onClick={() => setProfileUpdate && setProfileUpdate(false)}
             className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg text-white font-medium transition-all"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={isSaving}
             className={`flex-1 px-4 py-2 ${themeColors.solidBg} ${themeColors.solidBgHover} disabled:opacity-50 rounded-lg text-white font-medium transition-all flex items-center justify-center gap-2`}
@@ -604,7 +590,7 @@ export function ProfileUpdatePanel({
                 Save Changes
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
