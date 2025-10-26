@@ -68,7 +68,10 @@ export class AudioManager {
       const audioElements: HTMLAudioElement[] = [];
       const originalCreateElement = document.createElement.bind(document);
 
-      document.createElement = function (tagName: string, options?: any) {
+      document.createElement = function (
+        tagName: string,
+        options?: ElementCreationOptions
+      ) {
         const element = originalCreateElement(tagName, options);
 
         if (tagName.toLowerCase() === "audio") {
@@ -163,7 +166,7 @@ export class AudioManager {
           }
         }, 50);
       },
-      onloaderror: (id: number, error: any) => {
+      onloaderror: (id: number, error: unknown) => {
         console.error("🎵 AudioManager: Load error", error);
 
         // Ensure cleanup on error
@@ -187,7 +190,11 @@ export class AudioManager {
    */
   private getAudioElement(howl: Howl): HTMLAudioElement | null {
     try {
-      return (howl as any)._sounds?.[0]?._node || null;
+      // Howler's _sounds is typed as any, but we can type it more safely
+      const sounds = (
+        howl as unknown as { _sounds?: Array<{ _node?: HTMLAudioElement }> }
+      )._sounds;
+      return sounds?.[0]?._node || null;
     } catch (error) {
       console.warn("🎵 AudioManager: Could not get audio element", error);
       return null;

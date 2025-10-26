@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState } from "react";
-import { useMusicContext } from "./music-context";
 
 const EntityHandlingContext = createContext<EntityHandlingContextType | null>(null);
 

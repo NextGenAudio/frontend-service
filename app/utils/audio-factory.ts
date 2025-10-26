@@ -68,7 +68,7 @@ export class AudioFactory {
         src: audio.src,
       });
       return audio;
-    } as any;
+    } as unknown as typeof Audio;
 
     console.log("🎵 AudioFactory: CORS override enabled");
   }

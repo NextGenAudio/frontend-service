@@ -1,5 +1,4 @@
 "use client";
-import { Shuffle } from "lucide-react";
 import React, { useRef } from "react";
 
 import { createContext, useState, useContext } from "react";
@@ -27,7 +26,7 @@ export interface Song {
   musicArt?: string;
   // duration: number;
   source?: string;
-  metadata: any;
+  metadata: Record<string, any> | null;
   liked?: boolean;
   genre?: string;
   mood?: string;

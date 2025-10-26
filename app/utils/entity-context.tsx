@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { createContext, useState, useContext } from "react";
 
@@ -21,8 +21,8 @@ export interface Playlist {
   createdAt?: string;
   updatedAt?: string;
   role?: number;
-  musics?: any[]; // Add musics property
-  tracks?: any[]; // Add tracks property
+  musics?: unknown[]; // Add musics property
+  tracks?: unknown[]; // Add tracks property
 }
 
 type EntityContextType = {
@@ -55,22 +55,16 @@ export function EntityProvider({ children }: { children: React.ReactNode }) {
   );
   const [entityDescription, setEntityDescription] = useState("");
 
-  const [folderList, setFolderList] = useState<any[]>([]);
-  const [playlistList, setPlaylistList] = useState<any[]>([]);
-  const [playingSongDuration, setPlayingSongDuration] = useState(0);
-  const soundRef = useRef<Howl | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const dataArrayRef = useRef<Uint8Array | null>(null);
-  const [repeatMode, setRepeatMode] = useState(0);
-  const [liked, setliked] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [folderList, setFolderList] = useState<Folder[]>([]);
+  const [playlistList, setPlaylistList] = useState<Playlist[]>([]);
+  // Removed unused variables: playingSongDuration, setPlayingSongDuration, soundRef, analyserRef, dataArrayRef, repeatMode, setRepeatMode, liked, setliked, currentTime, setCurrentTime
 
   // Load from localStorage after hydration
   useEffect(() => {
     setIsHydrated(true);
 
     // Helper function to safely load from localStorage
-    const loadFromStorage = (key: string, defaultValue: any) => {
+    const loadFromStorage = (key: string, defaultValue: unknown) => {
       try {
         const stored = localStorage.getItem(key);
         return stored ? JSON.parse(stored) : defaultValue;

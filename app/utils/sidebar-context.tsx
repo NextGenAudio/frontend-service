@@ -43,16 +43,14 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   );
   const [profile, setProfile] = useState(false);
   const [playlist, setPlaylist] = useState(false);
-  const soundRef = useRef<Howl | null>(null);
   const [queue, setQueue] = useState(false);
   const [collaborators, setCollaborators] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
   const [profileUpdate, setProfileUpdate] = useState(false);
 
   useEffect(() => {
     try {
       localStorage.setItem("visualizer", String(visualizer));
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, [visualizer]);
@@ -63,7 +61,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
       const raw = localStorage.getItem("visualizer");
       if (raw === null) return true;
       return raw === "true";
-    } catch (e) {
+    } catch {
       return true;
     }
   }

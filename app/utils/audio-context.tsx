@@ -14,8 +14,13 @@ export function AudioCtxProvider({ children }: { children: ReactNode }) {
 
   // Lazy initialize AudioContext
   if (!audioCtxRef.current && typeof window !== "undefined") {
-    audioCtxRef.current = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+    const WebkitAudioCtor = (window as unknown as {
+      webkitAudioContext?: typeof AudioContext;
+    }).webkitAudioContext;
+    const AudioCtor = (window as unknown as { AudioContext?: typeof AudioContext }).AudioContext || WebkitAudioCtor;
+    if (AudioCtor) {
+      audioCtxRef.current = new AudioCtor();
+    }
   }
 
   return (
