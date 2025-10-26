@@ -10,10 +10,11 @@ import Image from "next/image";
 import ProfileAvatar from "../components/profile-avatar";
 import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
   const [userData, setUserData] = useState<any>(null);
-
+  const router = useRouter();
   useEffect(() => {
     const cookie = Cookies.get("sonex_user");
     if (cookie) {
@@ -33,7 +34,7 @@ const Header = () => {
         <div className="bg-black/30 backdrop-blur-xl border-b border-white/20 shadow-lg">
           <div className="max-w-7xl mx-auto px-6 py-5">
             <nav className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push("/")}>
                 <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center shadow-lg backdrop-blur-sm border border-white/20">
                   <Music className="w-5 h-5 text-white" />
                 </div>

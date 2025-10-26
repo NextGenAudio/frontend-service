@@ -132,7 +132,7 @@ export function SearchBar() {
   }, []);
 
   return (
-    <div className="mx-4 relative" ref={searchRef}>
+    <div className="mx-4 relative z-[9999]" ref={searchRef}>
       <div className="flex items-center gap-4 bg-slate-700/40 backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2 shadow-2xl">
         {/* Search Section */}
         <div className="flex-1 flex items-center gap-3">

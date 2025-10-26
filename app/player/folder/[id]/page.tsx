@@ -276,8 +276,6 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/10 to-gray-800/20 backdrop-blur-xl " />
       {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
 
-      {searchBar && <SearchBar />}
-
       <div className="pt-3 relative z-10 h-full flex flex-col">
         <div
           className="h-fit p-5 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"

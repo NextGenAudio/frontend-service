@@ -26,6 +26,7 @@ import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { ProfileUpdatePanel } from "../components/profile-update-panel";
+import { SearchBar } from "../components/search-bar";
 
 
 const MUSIC_LIBRARY_SERVICE_URL =
@@ -42,6 +43,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     detailPanel,
     visualizer,
     queue,
+    searchBar,
     collaborators,
   } = useSidebar();
 
@@ -407,6 +409,13 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                     >
                       {/* <ProfileDropdown /> */}
                       {visualizer && <AudioVisualizer />}
+                    </ResizablePanel>
+                  )}
+                  {searchBar && (
+                    <ResizablePanel defaultSize={10} minSize={8} maxSize={15}>
+                      <div className="z-50">
+                        <SearchBar />
+                      </div>
                     </ResizablePanel>
                   )}
 

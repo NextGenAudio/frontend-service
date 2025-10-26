@@ -121,13 +121,6 @@ export default function FavoritePage() {
         </div>
       </div>
 
-      {/* Fixed SearchBar */}
-      {searchBar && (
-        <div className="relative z-30 flex-shrink-0">
-          <SearchBar />
-        </div>
-      )}
-
       {/* Fixed Header */}
       <div className="relative z-20 flex-shrink-0 pt-5">
         <div className="p-4 border-b border-white/10">

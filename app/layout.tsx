@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import AuthProvider from "./auth/Provider";
 import { MusicProvider } from "./utils/music-context";
 import { SidebarProvider } from "./utils/sidebar-context";
 import { AudioCtxProvider } from "./utils/audio-context";
@@ -41,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
+
           <ThemeProvider>
             <SidebarProvider>
               <AudioCtxProvider>
@@ -51,7 +50,6 @@ export default function RootLayout({
               </AudioCtxProvider>
             </SidebarProvider>
           </ThemeProvider>
-        </AuthProvider>
       </body>
     </html>
   );
