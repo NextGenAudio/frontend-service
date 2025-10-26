@@ -55,16 +55,31 @@ interface ArtistRequest {
   email: string;
   createdAt: Date;
   artistName: string;
-  genre: string;
-  bio: string;
+  primaryGenre: string;
+  artistBio: string;
   website?: string;
   instagram?: string;
   spotify?: string;
   youtube?: string;
   soundcloud?: string;
   portfolio?: string;
+  sampleWork : string;
   submittedDate: string;
   status: { id: number; name: string };
+  profile: {
+    profileId : number
+    firstName: string;
+    lastName : string;
+    profileImageURL : string;
+    email: string;
+    isActive : string;
+    role : {
+      roleName : string
+    }
+    updatedAt : Date
+    
+
+  }
 }
 
 export default function ArtistRequestsAdmin() {
@@ -128,10 +143,9 @@ export default function ArtistRequestsAdmin() {
   };
 
   const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
-    const res = axios.put(
+    axios.put(
       `${USER_MANAGEMENT_SERVICE_URL}/requests/${requestId}/status?statusId=${requestStatus[newStatus]}`
     );
-    console.log("Status Update Response", res.data);
     setRequests(
       requests.map((req) =>
         req.id === requestId
@@ -527,7 +541,7 @@ export default function ArtistRequestsAdmin() {
                       Artist Name
                     </div>
                     <div className="text-xl font-bold text-white">
-                      {selectedRequest.stageName}
+                      {selectedRequest.artistName}
                     </div>
                   </div>
                   <div>
