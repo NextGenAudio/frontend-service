@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { getGeneralThemeColors } from "../lib/theme-colors";
 import Cookies from "js-cookie";
-import { getFullName } from "../player/profile/page";
+import { getFullName } from "@/app/lib/name-utils";
 import { Button } from "@radix-ui/themes";
 
 export function ProfileDropdown() {

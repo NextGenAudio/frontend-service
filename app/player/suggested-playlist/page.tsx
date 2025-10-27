@@ -297,7 +297,7 @@ function SuggestedPlaylistContent() {
 
                 {/* Song Rows */}
                 <div className="space-y-1">
-                  {filteredSongs.map((song, index) => (
+                  {filteredSongs.map((song) => (
                     <div
                       key={song.id}
                       className={clsx(
@@ -367,7 +367,7 @@ function SuggestedPlaylistContent() {
                       </div>
 
                       <div className="col-span-1 flex items-center justify-center text-white/60">
-                        {song.metadata?.track_length
+                        {typeof song.metadata?.track_length === "number"
                           ? formatDuration(song.metadata.track_length)
                           : "--:--"}
                       </div>

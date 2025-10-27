@@ -1,9 +1,7 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
 import {
-  MoreHorizontal,
   Play,
-  UserPlus,
   MicVocal,
   Globe,
   Youtube,
@@ -22,15 +20,10 @@ import Cookies from "js-cookie";
 import axios from "axios";
 
 import {
-  Music,
-  Github,
   Twitter,
-  Mail,
   Instagram,
   Facebook,
-  Linkedin,
 } from "lucide-react";
-import { Edit3 } from "lucide-react";
 import { useSidebar } from "@/app/utils/sidebar-context";
 import { useMusicContext, Song } from "@/app/utils/music-context";
 
@@ -39,11 +32,7 @@ const USER_MANAGEMENT_SERVICE_URL =
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
-export function getFullName(firstName: string, lastName: string) {
-  return `${firstName?.charAt(0).toUpperCase()}${firstName?.slice(1)} ${lastName
-    ?.charAt(0)
-    .toUpperCase()}${lastName?.slice(1)}`;
-}
+import { getFullName } from "@/app/lib/name-utils";
 
 export default function ProfilePage() {
   const { theme } = useTheme();

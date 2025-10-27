@@ -1,19 +1,16 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect} from "react";
 import {
   ArrowLeft,
   Search,
   Music,
   Clock,
   Plus,
-  ImageIcon,
-  X,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
 import { Badge } from "@/app/components/ui/badge";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import axios from "axios";
@@ -22,7 +19,6 @@ import { getGeneralThemeColors } from "../../../lib/theme-colors";
 import clsx from "clsx";
 import { useSidebar } from "../../../utils/sidebar-context";
 import AlertBar from "../../../components/alert-bar";
-import Image from "next/image";
 import { useFileHandling } from "../../../utils/entity-handling-context";
 import { useEntityContext } from "@/app/utils/entity-context";
 
@@ -70,7 +66,7 @@ const PlaylistUpdatePage = () => {
   const { theme } = useTheme();
   const themeColors = getGeneralThemeColors(theme.primary);
   const { player } = useSidebar();
-  const { playlistCreateRefresh, setPlaylistCreateRefresh } = useFileHandling();
+  const { setPlaylistCreateRefresh } = useFileHandling();
 
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [selectedSongs, setSelectedSongs] = useState<Song[]>([]);
@@ -104,8 +100,15 @@ const PlaylistUpdatePage = () => {
       const playlistData = idStr
         ? playlistList.find((p) => p.id === parseInt(idStr)) || null
         : null;
-      setPlaylist(playlistData);
-      setSelectedSongs(playlistData?.musics || playlistData?.tracks || []);
+      // playlistList items come from the external entity-context and may have musics typed as unknown[];
+      // cast the found item to the local Playlist type and assert musics/tracks as Song[].
+      const typedPlaylist = playlistData ? (playlistData as unknown as Playlist) : null;
+      setPlaylist(typedPlaylist);
+      setSelectedSongs(
+        (typedPlaylist?.musics as Song[] | undefined) ||
+          (typedPlaylist?.tracks as Song[] | undefined) ||
+          []
+      );
       setInitialLoading(false);
     } catch (error) {
       console.error("Failed to fetch playlist:", error);

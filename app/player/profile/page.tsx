@@ -1,36 +1,19 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
-import {
-  MoreHorizontal,
-  Play,
-  Heart,
-  UserPlus,
-  MicVocal,
-  Edit3,
-  SquarePen,
-} from "lucide-react";
+import { Play, UserPlus, MicVocal, SquarePen } from "lucide-react";
 import ProfileAvatar from "../../components/profile-avatar";
-import { useSession } from "next-auth/react";
 import { useTheme } from "../../utils/theme-context";
 import { getGeneralThemeColors } from "../../lib/theme-colors";
 import Image from "next/image";
 import { useEntityContext } from "@/app/utils/entity-context";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useSidebar } from "../../utils/sidebar-context";
 
-const USER_MANAGEMENT_SERVICE_URL =
-  process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
-
-export function getFullName(firstName: string, lastName: string) {
-  return `${firstName?.charAt(0).toUpperCase()}${firstName?.slice(1)} ${lastName
-    ?.charAt(0)
-    .toUpperCase()}${lastName?.slice(1)}`;
-}
+import { getFullName } from "@/app/lib/name-utils";
 
 export default function ProfilePage() {
-  // const { status, data: session } = useSession();
   const { theme } = useTheme();
   const { playlistList } = useEntityContext();
   const themeColors = getGeneralThemeColors(theme.primary);
@@ -51,16 +34,6 @@ export default function ProfilePage() {
   }, []);
 
   const router = useRouter();
-
-  const topArtists = [
-    { name: "The Weeknd", image: "/the-weeknd-artist-photo.png" },
-    { name: "Billie Eilish", image: "/billie-eilish-artist-photo.png" },
-    { name: "Drake", image: "/drake-artist-photo.png" },
-    { name: "Taylor Swift", image: "/taylor-swift-artist-photo.png" },
-    { name: "Post Malone", image: "/post-malone-artist-photo.png" },
-    { name: "Ariana Grande", image: "/ariana-grande-artist-photo.png" },
-    { name: "Ed Sheeran", image: "/ed-sheeran-artist-photo.png" },
-  ];
 
   return (
     <div className="h-screen relative text-white overflow-y-auto custom-scrollbar">

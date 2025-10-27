@@ -1,13 +1,10 @@
 import React from "react";
 import { FolderCreate } from "@/app/components/folder-create";
 
-
-const page = () => {
+export default function Page() {
   return (
     <div>
       <FolderCreate />
     </div>
   );
-};
-
-export default page;
+}

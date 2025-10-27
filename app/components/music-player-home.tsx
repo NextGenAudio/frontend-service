@@ -564,10 +564,10 @@ export function MusicPlayerHome() {
                   {/* Duration */}
                   <div className="text-white/50 text-sm">
                     {track.metadata?.track_length
-                      ? `${Math.floor(track.metadata.track_length / 60)}:${
-                          Math.floor(track.metadata.track_length % 60) < 10
-                            ? "0" + Math.floor(track.metadata.track_length % 60)
-                            : Math.floor(track.metadata.track_length % 60)
+                      ? `${Math.floor(Number(track.metadata?.track_length) / 60)}:${
+                          Math.floor(Number(track.metadata?.track_length) % 60) < 10
+                            ? "0" + Math.floor(Number(track.metadata?.track_length) % 60)
+                            : Math.floor(Number(track.metadata?.track_length) % 60)
                         }`
                       : "3:24"}
                   </div>

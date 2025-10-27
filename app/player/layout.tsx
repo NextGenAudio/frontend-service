@@ -18,7 +18,7 @@ import { CollaboratorsPanel } from "../components/collaborators-panel";
 import { EntityHandlingProvider } from "../utils/entity-handling-context";
 import AudioVisualizer from "../components/audio-visualizer";
 import { ProfileDropdown } from "../components/profile-dropdown";
-import { useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";
@@ -26,12 +26,11 @@ import Cookies from "js-cookie";
 import { ProfileUpdatePanel } from "../components/profile-update-panel";
 import { SearchBar } from "../components/search-bar";
 
-
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
-  const { theme} = useTheme();
+  const { theme } = useTheme();
   const {
     player,
     profileUpdate,
@@ -115,7 +114,13 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   }, [playingSong?.id, songList]); // Dependencies: when song or list changes
 
   useEffect(() => {
+    // Only update the global playing song when the selected song is the one
+    // that should be played (i.e. when selectSong.id matches playingSongId).
+    // This prevents a mere selection (viewing details) from causing playback
+    // to switch if the user previously started playback.
     if (!selectSong) return;
+    // Only proceed when the selected song is the one intended to play
+    if (!playingSong || selectSong.id !== playingSong.id) return;
 
     const url = `${MUSIC_LIBRARY_SERVICE_URL}/files/download/${selectSong.id}`;
     console.log("Song URL:", url);
@@ -132,7 +137,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         URL.revokeObjectURL(playingSong.source);
       }
     };
-  }, [selectSong?.id]);
+  }, [selectSong?.id, playingSong?.id]);
 
   function handleSongDoubleClick(song: any) {
     setPlayingSongId(song.id);
@@ -406,7 +411,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                   {searchBar && (
                     <ResizablePanel defaultSize={10} minSize={8} maxSize={15}>
                       <div className="relative z-50">
-                        <SearchBar  />
+                        <SearchBar />
                       </div>
                     </ResizablePanel>
                   )}

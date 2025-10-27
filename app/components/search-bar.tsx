@@ -229,7 +229,7 @@ export function SearchBar() {
                         <Heart className="w-4 h-4 text-white/60 hover:text-red-400" />
                       </button>
                       <span className="text-white/50 text-xs font-mono">
-                        {song.metadata.track_length}
+                        {String(song.metadata?.track_length ?? "")}
                       </span>
                     </div>
                   </div>

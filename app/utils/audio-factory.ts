@@ -10,7 +10,9 @@ export interface AudioConfig {
 }
 
 export class AudioFactory {
-  private static originalAudio: typeof Audio = window.Audio; // Initialize immediately
+  // Don't access `window` at module evaluation time — that breaks SSR/prerender.
+  // Lazily capture the original Audio constructor when first needed.
+  private static originalAudio: typeof Audio | null = null;
   private static isOverridden = false;
 
   /**
@@ -20,6 +22,17 @@ export class AudioFactory {
     src?: string,
     config: AudioConfig = {}
   ): HTMLAudioElement {
+    if (typeof window === "undefined") {
+      throw new Error(
+        "AudioFactory.createCorsAudio can only be used in the browser"
+      );
+    }
+
+    // Lazily initialize originalAudio reference if not set
+    if (!this.originalAudio) {
+      this.originalAudio = window.Audio;
+    }
+
     // Always use the original Audio constructor to avoid circular reference
     const audio = new this.originalAudio();
 
@@ -51,6 +64,14 @@ export class AudioFactory {
    * This is used during Howler.js initialization
    */
   static enableCorsOverride(config: AudioConfig = {}): void {
+    if (typeof window === "undefined") {
+      // No-op on server
+      console.warn(
+        "AudioFactory.enableCorsOverride called on server — ignored"
+      );
+      return;
+    }
+
     if (this.isOverridden) {
       console.log(
         "🎵 AudioFactory: CORS override already enabled, keeping active"
@@ -58,7 +79,10 @@ export class AudioFactory {
       return;
     }
 
-    // originalAudio is already saved at class initialization
+    // Capture the original Audio constructor lazily
+    if (!this.originalAudio) {
+      this.originalAudio = window.Audio;
+    }
     this.isOverridden = true;
 
     window.Audio = function (src?: string) {
@@ -77,6 +101,11 @@ export class AudioFactory {
    * Restores the original Audio constructor
    */
   static disableCorsOverride(): void {
+    if (typeof window === "undefined") {
+      // No-op on server
+      return;
+    }
+
     if (!this.isOverridden || !this.originalAudio) {
       console.warn("🎵 AudioFactory: No CORS override to disable");
       return;

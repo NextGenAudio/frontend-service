@@ -496,14 +496,15 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                         {song.listenCount}
                       </span>
                       <span className="col-span-1 text-center text-white/70 truncate">
-                        {song?.metadata.track_length / 60
-                          ? `${Math.floor(song?.metadata.track_length / 60)}:${
-                              Math.floor(song?.metadata.track_length % 60) < 10
-                                ? "0" +
-                                  Math.floor(song?.metadata.track_length % 60)
-                                : Math.floor(song?.metadata.track_length % 60)
-                            }`
-                          : "0:00"}
+                        {(() => {
+                          const length = song?.metadata?.track_length ?? 0;
+                          if (length > 0) {
+                            const mins = Math.floor(length / 60);
+                            const secs = Math.floor(length % 60);
+                            return `${mins}:${secs < 10 ? "0" + secs : secs}`;
+                          }
+                          return "0:00";
+                        })()}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

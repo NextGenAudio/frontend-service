@@ -17,8 +17,8 @@ import { clsx } from "clsx";
 import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
-import { set } from "react-hook-form";
 import { Song } from "@/app/utils/music-context";
+import Cookies from "js-cookie";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -38,7 +38,7 @@ export default function FavoritePage() {
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
   );
-  const { searchBar, player, setPlayer, setDetailPanel } = useSidebar();
+  const { player, setPlayer, setDetailPanel } = useSidebar();
 
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
@@ -74,12 +74,18 @@ export default function FavoritePage() {
   };
 
   useEffect(() => {
+    const sonexUserCookie = Cookies.get("sonex_token");
     const fetchFavorites = async () => {
       try {
         setLoading(true);
         const res = await fetch(`${MUSIC_LIBRARY_SERVICE_URL}/files/favorite`, {
           method: "GET",
           credentials: "include",
+          headers: {
+            ...(sonexUserCookie
+              ? { Authorization: `Bearer ${sonexUserCookie}` }
+              : {}),
+          },
         });
         const data = await res.json();
 
@@ -330,13 +336,16 @@ export default function FavoritePage() {
                     {song.listenCount}
                   </span>
                   <span className="col-span-1 text-center text-white/70 truncate">
-                    {song?.metadata.track_length / 60
-                      ? `${Math.floor(song.metadata.track_length / 60)}:${
-                          Math.floor(song.metadata.track_length % 60) < 10
-                            ? "0" + Math.floor(song.metadata.track_length % 60)
-                            : Math.floor(song.metadata.track_length % 60)
-                        }`
-                      : "0:00"}
+                    {(() => {
+                      const length = song?.metadata?.track_length ?? 0;
+                      return length
+                        ? `${Math.floor(length / 60)}:${
+                            Math.floor(length % 60) < 10
+                              ? "0" + Math.floor(length % 60)
+                              : Math.floor(length % 60)
+                          }`
+                        : "0:00";
+                    })()}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

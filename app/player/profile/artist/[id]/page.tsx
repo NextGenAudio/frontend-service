@@ -39,16 +39,11 @@ const USER_MANAGEMENT_SERVICE_URL =
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
-export function getFullName(firstName: string, lastName: string) {
-  return `${firstName?.charAt(0).toUpperCase()}${firstName?.slice(1)} ${lastName
-    ?.charAt(0)
-    .toUpperCase()}${lastName?.slice(1)}`;
-}
 
 export default function ArtistPage({ params }: { params: { id: string } }) {
   const { theme } = useTheme();
   const entityContext = useEntityContext();
-  const { setProfileUpdate, setCollaborators, setDetailPanel, setQueue } =
+  const { setDetailPanel } =
     useSidebar();
   const {
     setSelectSongId,
@@ -228,11 +223,6 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                 <ProfileAvatar w={48} h={48} />
               )}
             </div>
-            {/* <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/30 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" /> */}
-            {/* <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-orange-500/90 px-6 py-2 rounded-full text-white font-semibold text-sm shadow-lg border-2 border-white/20">
-                <MicVocal className="inline-block w-3 h-3 mr-2 -mt-1" />
-                Artist
-              </div> */}
           </div>
           <div className="flex-1 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div className="flex-1">
@@ -245,10 +235,6 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
                 {artistData?.artistName || "Artist Name"}
               </h1>
               <div className="flex items-center gap-3 text-white/90 text-lg font-medium mb-4">
-                {/* <span>
-                  {getFullName(userData?.firstName, userData?.lastName)}
-                </span>
-                <span className="text-white/60">•</span> */}
                 <span>{publishedSongs.length} Songs</span>
               </div>
               {artistData?.artistBio && (

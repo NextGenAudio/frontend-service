@@ -1,13 +1,12 @@
 import React from "react";
 
 import { MusicUpload } from "../../components/music-upload";
-const page = () => {
+
+export default function Page() {
   return (
     <div>
       <MusicUpload />
     </div>
   );
-};
-
-export default page;
+}
 

@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { SearchBar } from "@/app/components/search-bar";
 import { useSidebar } from "@/app/utils/sidebar-context";
 import { useMusicContext } from "@/app/utils/music-context";
 import { clsx } from "clsx";
@@ -23,7 +22,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
 import { useFileHandling } from "@/app/utils/entity-handling-context";
-import  AlertBar from "@/app/components/alert-bar";
 import Cookies from "js-cookie";
 import axios from "axios";
 
@@ -492,14 +490,15 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                         {song.listenCount || 0}
                       </span>
                       <span className="col-span-1 text-center text-white/70 truncate">
-                        {song?.metadata.track_length / 60
-                          ? `${Math.floor(song?.metadata.track_length / 60)}:${
-                              Math.floor(song?.metadata.track_length % 60) < 10
-                                ? "0" +
-                                  Math.floor(song?.metadata.track_length % 60)
-                                : Math.floor(song?.metadata.track_length % 60)
-                            }`
-                          : "0:00"}
+                        {(() => {
+                          const raw = song?.metadata?.track_length;
+                          const lengthSec =
+                            typeof raw === "number" ? raw : Number(raw ?? 0);
+                          if (!lengthSec) return "0:00";
+                          const mins = Math.floor(lengthSec / 60);
+                          const secs = Math.floor(lengthSec % 60);
+                          return `${mins}:${secs < 10 ? "0" + secs : secs}`;
+                        })()}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

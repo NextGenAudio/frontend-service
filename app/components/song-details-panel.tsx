@@ -47,39 +47,53 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
   const { selectSong, setSelectSong, selectSongId } = useMusicContext();
 
   useEffect(() => {
-    const fetchSongDetails = async () => {
-      if (song?.id) {
-        setliked(song.liked ? true : false);
-        try {
-          const response = await axios.get(
-            `${MUSIC_LIBRARY_SERVICE_URL}/files/music/${song.id}`,
-            {
-              withCredentials: true,
-            }
-          );
-          console.log("🔍 Fetched detailed song data:", response.data);
+    // Prevent race conditions when multiple rapid selections occur.
+    // We track a local `active` flag that is set to false in the cleanup
+    // so any in-flight fetch won't apply stale results once a new song is selected.
+    let active = true;
 
-          setMood(response.data?.mood || "Unknown");
-          setGenre(response.data?.genre || "Unknown");
-          setUploadedAt(response.data?.uploadedAt || "Unknown");
-          // Merge the current song data with the fetched detailed data
-          // This preserves all existing fields and adds/updates with API data
+    const fetchSongDetails = async () => {
+      if (!song?.id) return;
+
+      // reflect immediate like state from provided song
+      setliked(song.liked ? true : false);
+
+      try {
+        const response = await axios.get(
+          `${MUSIC_LIBRARY_SERVICE_URL}/files/music/${song.id}`,
+          { withCredentials: true }
+        );
+
+        if (!active) return; // stale, ignore
+
+        console.log("🔍 Fetched detailed song data:", response.data);
+
+        setMood(response.data?.mood || "Unknown");
+        setGenre(response.data?.genre || "Unknown");
+        setUploadedAt(response.data?.uploadedAt || "Unknown");
+
+        // Only update the global selection if the currently selected song
+        // still matches the one we fetched for. This prevents stale fetches
+        // from overwriting a newer selection.
+        if (selectSong && selectSong.id === song.id) {
           setSelectSong({
-            ...song,
-            // Ensure these specific fields are updated
+            ...selectSong,
             mood: response.data?.mood,
             genre: response.data?.genre,
             uploadedAt: response.data?.uploadedAt,
           });
-        } catch (err) {
-          console.error("Failed to fetch song details:", err);
-          // Don't show alert for failed API calls in production
-          console.warn("Song details fetch failed, using existing data");
         }
+      } catch (err) {
+        console.error("Failed to fetch song details:", err);
+        console.warn("Song details fetch failed, using existing data");
       }
     };
 
     fetchSongDetails();
+
+    return () => {
+      active = false;
+    };
   }, [song?.id]); // Depend on song.id, not selectSongId
 
   const handleLikeClick = async () => {
