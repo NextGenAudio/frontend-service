@@ -18,7 +18,16 @@ jest.mock("next/navigation", () => ({
   usePathname: () => "/mock-path",
   useSearchParams: () => new URLSearchParams(),
 }));
-
+// Prevent real network calls during tests
+jest.mock("axios", () => ({
+  get: jest.fn(() => Promise.resolve({ data: [] })),
+  post: jest.fn(() => Promise.resolve({ data: {} })),
+  put: jest.fn(() => Promise.resolve({ data: {} })),
+  delete: jest.fn(() => Promise.resolve({ data: {} })),
+}));
+const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+// render...
+spy.mockRestore();
 describe("LibraryPanel", () => {
   it("renders without crashing", () => {
     render(

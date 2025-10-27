@@ -1,3 +1,19 @@
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+    pathname: "/",
+    route: "/",
+    query: {},
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+  }),
+  usePathname: () => "/",
+  useSearchParams: () => ({ get: () => null }),
+}));
+
 import { render } from "@testing-library/react";
 import { MusicPlayerHome } from "../music-player-home";
 import { Theme } from "@radix-ui/themes";

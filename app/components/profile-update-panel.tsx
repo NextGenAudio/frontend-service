@@ -79,12 +79,20 @@ export function ProfileUpdatePanel({
   useEffect(() => {
     const cookie = Cookies.get("sonex_user");
     let userDataTemp: any;
+    // Prefer cookie-based user data but fall back to the profile prop for tests
     if (cookie) {
       userDataTemp = JSON.parse(cookie);
+    } else if (profile) {
+      userDataTemp = profile;
+    }
+
+    if (userDataTemp) {
       setUserData(userDataTemp);
       setFormData(userDataTemp);
     }
-    if (userDataTemp.role?.roleName === "artist") {
+
+    // Use safe optional chaining to avoid reading properties off undefined
+    if (userDataTemp?.role?.roleName === "artist") {
       const fetchArtistData = async () => {
         try {
           const res = await axios.get(
@@ -490,7 +498,6 @@ export function ProfileUpdatePanel({
             </div>
           )}
           {/* Location */}
-
 
           {/* Website, Genre, Spotify, Social Media (Artist only) */}
           {userData?.role?.roleName === "artist" && (
