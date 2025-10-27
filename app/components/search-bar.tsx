@@ -183,11 +183,9 @@ export function SearchBar() {
       </div>
 
       {showSuggestions &&
-        typeof window !== "undefined" &&
-        createPortal(
+      
           <div
             className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl max-h-96 overflow-y-auto"
-            style={popupStyle}
           >
             {/* Music Results Section */}
             {suggestions.length > 0 && (
@@ -277,9 +275,8 @@ export function SearchBar() {
                 </div>
               </>
             )}
-          </div>,
-          document.body
-        )}
+          </div>
+        }
     </div>
   );
 }

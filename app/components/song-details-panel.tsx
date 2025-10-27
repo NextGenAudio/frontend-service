@@ -274,12 +274,14 @@ export const SongDetailsPanel = ({ song }: GlassSongDetailsPanelProps) => {
                     {song?.metadata?.year || "Unknown"}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
-                  <span className="text-white/60">Bitrate</span>
-                  <span className="text-white/80 font-medium">
-                    {(song?.metadata?.bitrate / 1000).toFixed(0)} kbps
-                  </span>
-                </div>
+                {song?.metadata?.bitrate > 0 && (
+                  <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
+                    <span className="text-white/60">Bitrate</span>
+                    <span className="text-white/80 font-medium">
+                      {(song?.metadata?.bitrate / 1000).toFixed(0)} kbps
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors duration-200">
                   <span className="text-white/60">Sample Rate</span>
                   <span className="text-white/80 font-medium">

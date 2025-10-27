@@ -116,74 +116,105 @@ export default function ProfilePage() {
         </div>
 
         {/* Created Playlists or Empty Profile Insight */}
-        {playlistList.length > 0 ? (
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Created Playlists</h2>
-              <Button
-                variant="ghost"
-                className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
-              >
-                Show all
-              </Button>
-            </div>
-            <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
-              {playlistList.map(
-                (playlist, index) =>
-                  playlist.role === 0 && (
-                    <div key={index} className="group cursor-pointer">
-                      <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
-                        <div className="relative mb-4">
-                          <Image
-                            src={
-                              playlist.playlistArt || "/assets/music-icon.webp"
-                            }
-                            alt={playlist.name}
-                            width={256}
-                            height={256}
-                            className="w-full aspect-square object-cover rounded-xl"
-                          />
-                          <div
-                            className={`absolute inset-0 bg-gradient-to-br ${theme.preview} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
-                          />
-                          <Button
-                            size="icon"
-                            className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                            onClick={() =>
-                              router.push(`/player/playlist/${playlist.id}`)
-                            }
-                          >
-                            <Play className="w-5 h-5" />
-                          </Button>
+        <div className="mb-12">
+          {(() => {
+            const visiblePlaylists = Array.isArray(playlistList)
+              ? playlistList.filter((p) => p && p.role === 0)
+              : [];
+
+            if (visiblePlaylists.length > 0) {
+              return (
+                <>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold">Created Playlists</h2>
+                    <Button
+                      variant="ghost"
+                      className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
+                    >
+                      Show all
+                    </Button>
+                  </div>
+                  <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
+                    {visiblePlaylists.map((playlist, index) => (
+                      <div
+                        key={playlist.id ?? index}
+                        className="group cursor-pointer"
+                      >
+                        <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
+                          <div className="relative mb-4">
+                            <Image
+                              src={
+                                playlist.playlistArt ||
+                                "/assets/music-icon.webp"
+                              }
+                              alt={playlist.name}
+                              width={256}
+                              height={256}
+                              className="w-full aspect-square object-cover rounded-xl"
+                            />
+                            <div
+                              className={`absolute inset-0 bg-gradient-to-br ${theme.preview} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
+                            />
+                            <Button
+                              size="icon"
+                              className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
+                              onClick={() =>
+                                router.push(`/player/playlist/${playlist.id}`)
+                              }
+                            >
+                              <Play className="w-5 h-5" />
+                            </Button>
+                          </div>
+                          <h3 className="font-semibold text-white mb-1">
+                            {playlist.name}
+                          </h3>
+                          <p className="text-sm text-white/60">
+                            {playlist.musicCount} songs
+                          </p>
                         </div>
-                        <h3 className="font-semibold text-white mb-1">
-                          {playlist.name}
-                        </h3>
-                        <p className="text-sm text-white/60">
-                          {playlist.musicCount} songs
-                        </p>
                       </div>
-                    </div>
-                  )
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="mb-6">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-500/20 to-slate-500/20 opacity-50 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-                <UserPlus className="w-12 h-12 text-white/60" />
+                    ))}
+                  </div>
+                </>
+              );
+            }
+
+            // No playlists -> generated empty state
+            return (
+              <div className="flex items-center justify-center py-24 px-6">
+                <div className="max-w-3xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center">
+                  <div className="mx-auto mb-6 w-28 h-28 rounded-full flex items-center justify-center bg-gradient-to-br from-orange-500/20 to-red-500/10">
+                    <UserPlus className="w-12 h-12 text-white/60" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    No profile insight yet
+                  </h3>
+                  <p className="text-white/70 text-lg mb-6 max-w-md mx-auto">
+                    You haven't created any playlists or activity yet. Start
+                    exploring and create your first playlist or upload your
+                    music to share it with listeners.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button
+                      onClick={() => router.push("/player/beAnArtist")}
+                      className={`inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold text-sm ${themeColors.solidBg} text-white hover:opacity-90 transition`}
+                    >
+                      Be an artist
+                    </button>
+
+                    <button
+                      onClick={() => router.push("/player/playlist/new")}
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-md font-medium text-sm bg-white/5 text-white border border-white/10 hover:bg-white/10 transition"
+                    >
+                      Create a playlist
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">
-              No profile insight yet
-            </h3>
-            <p className="text-white/70 text-lg mb-6 max-w-md mx-16">
-              You haven't created any playlists or activity yet. Start exploring
-              and create your first playlist!
-            </p>
-          </div>
-        )}
+            );
+          })()}
+        </div>
         {/* Top Artists */}
         {/* <div className="mb-12">
           <div className="flex items-center justify-between mb-6">

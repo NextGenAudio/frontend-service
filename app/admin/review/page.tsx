@@ -35,6 +35,8 @@ import {
 import { Badge } from "@/app/components/ui/badge";
 import { Textarea } from "@/app/components/ui/textarea";
 import axios from "axios";
+import Cookies from "js-cookie";
+import AlertBar from "@/app/components/alert-bar";
 import Image from "next/image";
 type RequestStatus = "pending" | "approved" | "rejected";
 
@@ -63,23 +65,21 @@ interface ArtistRequest {
   youtube?: string;
   soundcloud?: string;
   portfolio?: string;
-  sampleWork : string;
+  sampleWork: string;
   submittedDate: string;
   status: { id: number; name: string };
   profile: {
-    profileId : number
+    profileId: number;
     firstName: string;
-    lastName : string;
-    profileImageURL : string;
+    lastName: string;
+    profileImageURL: string;
     email: string;
-    isActive : string;
-    role : {
-      roleName : string
-    }
-    updatedAt : Date
-    
-
-  }
+    isActive: string;
+    role: {
+      roleName: string;
+    };
+    updatedAt: Date;
+  };
 }
 
 export default function ArtistRequestsAdmin() {
@@ -91,6 +91,8 @@ export default function ArtistRequestsAdmin() {
   );
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  // Alert state for showing success/error messages
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -143,22 +145,43 @@ export default function ArtistRequestsAdmin() {
   };
 
   const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
-    axios.put(
-      `${USER_MANAGEMENT_SERVICE_URL}/requests/${requestId}/status?statusId=${requestStatus[newStatus]}`
-    );
-    setRequests(
-      requests.map((req) =>
-        req.id === requestId
-          ? { ...req, status: { ...req.status, name: newStatus } }
-          : req
-      )
-    );
-    if (selectedRequest?.id === requestId) {
-      setSelectedRequest({
-        ...selectedRequest,
-        status: { ...selectedRequest.status, name: newStatus },
-      });
-    }
+    (async () => {
+      const sonexToken = Cookies.get("sonex_token");
+      try {
+        await axios.put(
+          `${USER_MANAGEMENT_SERVICE_URL}/requests/${requestId}/status?statusId=${requestStatus[newStatus]}`,
+          null,
+          {
+            headers: {
+              ...(sonexToken ? { Authorization: `Bearer ${sonexToken}` } : {}),
+            },
+            withCredentials: true,
+          }
+        );
+
+        // optimistic UI already applied below; show success alert
+        setAlertMessage && setAlertMessage("✅ Request status updated");
+      } catch (err) {
+        console.error("Failed to change status:", err);
+        setAlertMessage &&
+          setAlertMessage("❌ Failed to update request status");
+      }
+
+      // Update local UI optimistically (keeps existing behavior)
+      setRequests(
+        requests.map((req) =>
+          req.id === requestId
+            ? { ...req, status: { ...req.status, name: newStatus } }
+            : req
+        )
+      );
+      if (selectedRequest?.id === requestId) {
+        setSelectedRequest({
+          ...selectedRequest,
+          status: { ...selectedRequest.status, name: newStatus },
+        });
+      }
+    })();
   };
 
   const handleViewDetails = (request: ArtistRequest) => {
@@ -669,6 +692,9 @@ export default function ArtistRequestsAdmin() {
           )}
         </DialogContent>
       </Dialog>
+      {alertMessage && (
+        <AlertBar message={alertMessage} setMessage={setAlertMessage} />
+      )}
     </div>
   );
 }

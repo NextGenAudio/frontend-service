@@ -22,11 +22,7 @@ export class AudioFactory {
     src?: string,
     config: AudioConfig = {}
   ): HTMLAudioElement {
-    if (typeof window === "undefined") {
-      throw new Error(
-        "AudioFactory.createCorsAudio can only be used in the browser"
-      );
-    }
+    
 
     // Lazily initialize originalAudio reference if not set
     if (!this.originalAudio) {
@@ -64,13 +60,7 @@ export class AudioFactory {
    * This is used during Howler.js initialization
    */
   static enableCorsOverride(config: AudioConfig = {}): void {
-    if (typeof window === "undefined") {
-      // No-op on server
-      console.warn(
-        "AudioFactory.enableCorsOverride called on server — ignored"
-      );
-      return;
-    }
+    
 
     if (this.isOverridden) {
       console.log(
@@ -101,10 +91,7 @@ export class AudioFactory {
    * Restores the original Audio constructor
    */
   static disableCorsOverride(): void {
-    if (typeof window === "undefined") {
-      // No-op on server
-      return;
-    }
+  
 
     if (!this.isOverridden || !this.originalAudio) {
       console.warn("🎵 AudioFactory: No CORS override to disable");

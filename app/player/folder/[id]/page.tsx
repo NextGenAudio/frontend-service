@@ -18,12 +18,14 @@ import { useEntityContext } from "@/app/utils/entity-context";
 import { SongOptionsDropdown } from "@/app/components/song-options-dropdown";
 import { useTheme } from "@/app/utils/theme-context";
 import { getGeneralThemeColors } from "@/app/lib/theme-colors";
+import AlertBar from "@/app/components/alert-bar";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Song } from "@/app/utils/music-context";
 import { useFileHandling } from "@/app/utils/entity-handling-context";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { SearchBar } from "@/app/components/search-bar";
 
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
@@ -201,6 +203,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
 
       if (response.ok) {
         console.log("Song deleted successfully");
+        setAlertMessage("✅ Song deleted successfully");
         // Trigger refresh for other components that might need to update
         setSongUploadRefresh((prev) => prev + 1);
       } else {
@@ -210,6 +213,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         // Rollback the optimistic update if the API call failed
         setSongList(songList);
         setCache((prev) => new Map(prev).set(folderId, songList));
+        setAlertMessage("❌ Failed to delete song");
       }
     } catch (err) {
       console.error("Error deleting song:", err);
@@ -218,6 +222,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       setSongList(songList);
       const folderId = params.id;
       setCache((prev) => new Map(prev).set(folderId, songList));
+      setAlertMessage("❌ Error deleting song");
     }
   };
 
@@ -249,8 +254,10 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
         }
       );
       console.log("Publish response:", response.data);
+      setAlertMessage("✅ Song published successfully");
     } catch (err) {
       console.error("Error publishing song:", err);
+      setAlertMessage("❌ Error publishing song");
     }
   }
 
@@ -276,7 +283,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
       {/* Glass background with gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/10 to-gray-800/20 backdrop-blur-xl " />
       {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
-
+      {searchBar && <SearchBar />}
       <div className="pt-3 relative z-10 h-full flex flex-col">
         <div
           className="h-fit p-5 cursor-pointer group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"
@@ -412,8 +419,7 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
                 <p className="text-white/70 text-lg mb-6 max-w-md">
                   This folder is empty. Upload some music files to get started!
                 </p>
-                <div className="flex flex-col items-center gap-2 text-white/50">
-                </div>
+                <div className="flex flex-col items-center gap-2 text-white/50"></div>
               </div>
             ) : (
               /* Songs List */
@@ -574,6 +580,12 @@ export default function FolderPanel({ params }: { params: { id: number } }) {
             </div>
           </div>
         </ScrollArea>
+        {alertMessage && (
+          <AlertBar
+            message={alertMessage as string}
+            setMessage={setAlertMessage}
+          />
+        )}
       </div>
     </div>
   );

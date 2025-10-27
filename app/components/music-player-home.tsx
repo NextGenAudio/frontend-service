@@ -26,6 +26,7 @@ import clsx from "clsx";
 import { SuggestedPlaylists } from "./suggested-playlists";
 import { useRouter } from "next/navigation";
 import { Button } from "@radix-ui/themes";
+import { SearchBar } from "./search-bar";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -38,7 +39,7 @@ export function MusicPlayerHome() {
   const [recentMusics, setRecentMusics] = useState<Song[]>([]);
   const [trendingMusics, setTrendingMusics] = useState<Song[]>([]);
   const [mostPlayedMusics, setMostPlayedMusics] = useState<Song[]>([]);
-  const { setDetailPanel, player , setQueue,setPlayer ,queue} = useSidebar();
+  const { setDetailPanel, player, setQueue, setPlayer, queue, searchBar } = useSidebar();
   const {
     setSelectSong,
     setPlayingSong,
@@ -247,6 +248,7 @@ export function MusicPlayerHome() {
           style={{ backgroundImage: "url('/assets/sonex-wall.webp')" }}
         />
       </div>
+      {searchBar && <SearchBar />}
       <div className="relative z-10 p-8 pt-96 space-y-8">
         {/* Hero Section */}
         <div className="relative">
@@ -564,10 +566,19 @@ export function MusicPlayerHome() {
                   {/* Duration */}
                   <div className="text-white/50 text-sm">
                     {track.metadata?.track_length
-                      ? `${Math.floor(Number(track.metadata?.track_length) / 60)}:${
-                          Math.floor(Number(track.metadata?.track_length) % 60) < 10
-                            ? "0" + Math.floor(Number(track.metadata?.track_length) % 60)
-                            : Math.floor(Number(track.metadata?.track_length) % 60)
+                      ? `${Math.floor(
+                          Number(track.metadata?.track_length) / 60
+                        )}:${
+                          Math.floor(
+                            Number(track.metadata?.track_length) % 60
+                          ) < 10
+                            ? "0" +
+                              Math.floor(
+                                Number(track.metadata?.track_length) % 60
+                              )
+                            : Math.floor(
+                                Number(track.metadata?.track_length) % 60
+                              )
                         }`
                       : "3:24"}
                   </div>
@@ -611,12 +622,18 @@ export function MusicPlayerHome() {
             <Shuffle className="w-8 h-8 text-white mb-2" />
             <p className="text-white font-semibold">Shuffle Play</p>
           </Button>
-          <Button onClick={()=>router.push("/player/favorite")} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
+          <Button
+            onClick={() => router.push("/player/favorite")}
+            className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300"
+          >
             <Heart className={`w-8 h-8 ${themeColors.text} mb-2`} />
             <p className="text-white font-semibold">Liked Songs</p>
           </Button>
-          <Button onClick={()=>setQueue(!queue)} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
-            <SkipForward className={`w-8 h-8 ${themeColors.text} mb-2`}  />
+          <Button
+            onClick={() => setQueue(!queue)}
+            className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300"
+          >
+            <SkipForward className={`w-8 h-8 ${themeColors.text} mb-2`} />
             <p className="text-white font-semibold">Queue</p>
           </Button>
         </div>

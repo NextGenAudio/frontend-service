@@ -77,10 +77,6 @@ export const Sidebar = () => {
   //   }
   // }, []);
 
-  if (status === "loading") {
-    return null;
-  }
-
   const handleToggleButton = (label: string) => {
     console.log(`Clicked on ${label}`);
 

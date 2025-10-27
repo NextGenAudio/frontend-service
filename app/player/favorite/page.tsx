@@ -38,7 +38,7 @@ export default function FavoritePage() {
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
   );
-  const { player, setPlayer, setDetailPanel } = useSidebar();
+  const { player, setPlayer, setDetailPanel, searchBar } = useSidebar();
 
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
@@ -110,6 +110,7 @@ export default function FavoritePage() {
 
   return (
     <div className="relative h-full flex flex-col">
+      {searchBar && <SearchBar />}
       {/* Dynamic Background with Heart Pattern - Fixed */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/20 to-gray-800/20 backdrop-blur-xl" />
       <div className="absolute inset-0 opacity-5">

@@ -21,8 +21,10 @@ import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import { useTheme } from "@/app/utils/theme-context";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
-const USER_MANAGEMENT_SERVICE_URL = process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL
+import Cookies from "js-cookie";
+const USER_MANAGEMENT_SERVICE_URL =
+  process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
+import AlertBar from "@/app/components/alert-bar";
 
 export default function ArtistRequestForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -43,14 +45,40 @@ export default function ArtistRequestForm() {
     sampleWork: "",
   });
   const router = useRouter();
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    const res = axios.post(`${USER_MANAGEMENT_SERVICE_URL}/requests`, formData);
-    console.log("[v0] Artist request submitted:", formData);
-    setIsSubmitted(true);
+
+    // Try to parse sonex_user cookie which is stored as JSON string
+    const raw = Cookies.get("sonex_user");
+    let profileId: string | undefined;
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        // cookie shape may vary; try a couple of likely places
+        profileId =
+          parsed?.profileId ??
+          parsed?.User?.profileId ??
+          parsed?.user?.profileId;
+      } catch (err) {
+        console.warn("Failed to parse sonex_user cookie", err);
+      }
+    }
+
+    try {
+      const url = `${USER_MANAGEMENT_SERVICE_URL}/requests${
+        profileId ? `?profileId=${encodeURIComponent(profileId)}` : ""
+      }`;
+  const res = await axios.post(url, formData, { withCredentials: true });
+  console.log("[v0] Artist request submitted:", res?.data ?? formData);
+  // show alert first, then show the submitted UI after a short delay
+  setAlertMessage("✅ Request submitted");
+  setTimeout(() => setIsSubmitted(true), 1000);
+    } catch (err) {
+      console.error("Failed to submit artist request:", err);
+      // Keep isSubmitted false so user can retry; consider showing a toast/alert here
+    }
   };
 
   const handleChange = (

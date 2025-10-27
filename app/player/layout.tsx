@@ -68,12 +68,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
   // Get AudioManager instance
   const audioManager = AudioManager.getInstance();
-  useEffect(() => {
-    const userCookie = Cookies.get("sonex_user");
-    if (status === "unauthenticated" && !userCookie) {
-      router.push("/login");
-    }
-  }, [status, router]);
 
   // Remove this from the selectSong useEffect and create a separate one
   useEffect(() => {
@@ -406,13 +400,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
                     >
                       {/* <ProfileDropdown /> */}
                       {visualizer && <AudioVisualizer />}
-                    </ResizablePanel>
-                  )}
-                  {searchBar && (
-                    <ResizablePanel defaultSize={10} minSize={8} maxSize={15}>
-                      <div className="relative z-50">
-                        <SearchBar />
-                      </div>
                     </ResizablePanel>
                   )}
 

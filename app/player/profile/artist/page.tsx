@@ -1,13 +1,6 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
-import {
-  Play,
-  MicVocal,
-  Globe,
-  Youtube,
-  SquarePen,
-  User,
-} from "lucide-react";
+import { Play, MicVocal, Globe, Youtube, SquarePen, User } from "lucide-react";
 import ProfileAvatar from "../../../components/profile-avatar";
 import { useTheme } from "../../../utils/theme-context";
 import { getGeneralThemeColors } from "../../../lib/theme-colors";
@@ -19,11 +12,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-import {
-  Twitter,
-  Instagram,
-  Facebook,
-} from "lucide-react";
+import { Twitter, Instagram, Facebook } from "lucide-react";
 import { useSidebar } from "@/app/utils/sidebar-context";
 import { useMusicContext, Song } from "@/app/utils/music-context";
 
@@ -79,8 +68,7 @@ export default function ProfilePage() {
     fetchArtistData();
   }, [userData]);
 
-  const backdropUrl =
-    artistData?.artistImageURL || "/assets/artist-backdrop.jpg";
+  const backdropUrl = artistData?.artistImageURL || "";
 
   // Fetch published songs for this artist
   useEffect(() => {
@@ -357,86 +345,105 @@ export default function ProfilePage() {
         </div>
       ) : (
         <div className="relative z-10 p-8 pt-0 max-w-full mx-auto">
-          {/* Published Songs Section */}
+          {/* Published Songs + Playlists Section (render only when there is visible content) */}
           <div className="mb-12">
-            {publishedSongs.length > 0 || playlistList.length > 0 ? (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className={`text-2xl font-bold ${themeColors.text}`}>
-                    Published Songs
-                  </h2>
-                </div>
-                <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
-                  {publishedSongs.map((song, idx) => (
-                    <div key={song.id || idx} className="group cursor-pointer">
-                      <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
-                        <div className="relative mb-4">
-                          <Image
-                            src={
-                              song.music.artworkURL ||
-                              song.music.metadata.cover_art ||
-                              "/assets/music-icon.webp"
-                            }
-                            alt={song.music.title || "Song"}
-                            width={256}
-                            height={256}
-                            className="w-full aspect-square object-cover rounded-xl"
-                          />
-                          <div
-                            className={`absolute inset-0 bg-gradient-to-br ${themeColors.solidBg} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
-                          />
-                          <Button
-                            size="icon"
-                            className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSongPlayButton(song.music);
-                            }}
-                          >
-                            <Play className="w-5 h-5" />
-                          </Button>
-                          {/* Double click anywhere on card also plays, and opens details */}
-                          <div
-                            className="absolute inset-0"
-                            onDoubleClick={(e) => {
-                              e.stopPropagation();
-                              handleSongDoubleClick(song.music);
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        </div>
-                        <h3 className="font-semibold text-white mb-1">
-                          {song.music.title ||
-                            song.music.filename ||
-                            "Untitled"}
-                        </h3>
-                        <p className="text-sm text-white/60">
-                          {song.artistName || "Artist"}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {(() => {
+              const visiblePlaylists = Array.isArray(playlistList)
+                ? playlistList.filter((p) => p && p.role === 0)
+                : [];
+              const hasPublished =
+                Array.isArray(publishedSongs) && publishedSongs.length > 0;
+              const hasPlaylists = visiblePlaylists.length > 0;
 
-                {/* Created Playlists or Empty Profile Insight */}
-                {playlistList.length > 0 && (
-                  <div className="mb-12">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className={`text-2xl font-bold ${themeColors.text}`}>
-                        Created Playlists
-                      </h2>
-                      <Button
-                        variant="ghost"
-                        className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
-                      >
-                        Show all
-                      </Button>
-                    </div>
-                    <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
-                      {playlistList.map(
-                        (playlist, index) =>
-                          playlist.role === 0 && (
-                            <div key={index} className="group cursor-pointer">
+              if (hasPublished || hasPlaylists) {
+                return (
+                  <>
+                    {hasPublished && (
+                      <>
+                        <div className="flex items-center justify-between mb-6">
+                          <h2
+                            className={`text-2xl font-bold ${themeColors.text}`}
+                          >
+                            Published Songs
+                          </h2>
+                        </div>
+                        <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
+                          {publishedSongs.map((song, idx) => (
+                            <div
+                              key={song.id || idx}
+                              className="group cursor-pointer"
+                            >
+                              <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
+                                <div className="relative mb-4">
+                                  <Image
+                                    src={
+                                      song.music.artworkURL ||
+                                      song.music.metadata.cover_art ||
+                                      "/assets/music-icon.webp"
+                                    }
+                                    alt={song.music.title || "Song"}
+                                    width={256}
+                                    height={256}
+                                    className="w-full aspect-square object-cover rounded-xl"
+                                  />
+                                  <div
+                                    className={`absolute inset-0 bg-gradient-to-br ${themeColors.solidBg} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300`}
+                                  />
+                                  <Button
+                                    size="icon"
+                                    className={`absolute bottom-2 right-2 bg-gradient-to-r ${themeColors.solidBg} text-white rounded-full w-12 h-12 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:opacity-90 hover:ring-2 hover:ring-white/40`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSongPlayButton(song.music);
+                                    }}
+                                  >
+                                    <Play className="w-5 h-5" />
+                                  </Button>
+                                  <div
+                                    className="absolute inset-0"
+                                    onDoubleClick={(e) => {
+                                      e.stopPropagation();
+                                      handleSongDoubleClick(song.music);
+                                    }}
+                                    style={{ cursor: "pointer" }}
+                                  />
+                                </div>
+                                <h3 className="font-semibold text-white mb-1">
+                                  {song.music.title ||
+                                    song.music.filename ||
+                                    "Untitled"}
+                                </h3>
+                                <p className="text-sm text-white/60">
+                                  {song.artistName || "Artist"}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {hasPlaylists && (
+                      <div className="mb-12">
+                        <div className="flex items-center justify-between mb-6">
+                          <h2
+                            className={`text-2xl font-bold ${themeColors.text}`}
+                          >
+                            Created Playlists
+                          </h2>
+                          <Button
+                            variant="ghost"
+                            className="text-white/60 hover:text-white hover:bg-white/10 rounded-full"
+                          >
+                            Show all
+                          </Button>
+                        </div>
+                        <div className="flex overflow-x-auto gap-6 custom-scrollbar pb-4">
+                          {visiblePlaylists.map((playlist, index) => (
+                            <div
+                              key={playlist.id ?? index}
+                              className="group cursor-pointer"
+                            >
                               <div className="bg-white/10 w-64 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300 hover:shadow-2xl">
                                 <div className="relative mb-4">
                                   <Image
@@ -472,32 +479,34 @@ export default function ProfilePage() {
                                 </p>
                               </div>
                             </div>
-                          )
-                      )}
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              }
+
+              // No visible content -> render generated empty state
+              return (
+                <div className="flex items-center justify-center py-24 px-6">
+                  <div className="max-w-3xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center">
+                    <div className="mx-auto mb-6 w-28 h-28 rounded-full flex items-center justify-center bg-gradient-to-br from-orange-500/20 to-red-500/10">
+                      <MicVocal className="w-12 h-12 text-orange-400" />
                     </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-24 text-center">
-                <div className="mb-6">
-                  <div
-                    className={`w-24 h-24 rounded-full ${themeColors.solidBg}/20 opacity-70 backdrop-blur-sm ${themeColors.border} flex items-center justify-center`}
-                  >
-                    <MicVocal className={`text-white w-12 h-12`} />
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      No activity yet
+                    </h3>
+                    <p className="text-white/70 mb-6 max-w-xl mx-auto">
+                      We couldn't find any published songs or created playlists
+                      for this artist. When you're ready, upload your first
+                      track or create a playlist to get started and grow your
+                      audience.
+                    </p>
                   </div>
                 </div>
-                <h3 className={`text-2xl font-bold text-white mb-2`}>
-                  No artist activity yet
-                </h3>
-                <p
-                  className={`text-white/75 text-opacity-80 text-lg mb-6 max-w-md mx-16`}
-                >
-                  You haven't created any playlists or activity yet. Start
-                  sharing your music and grow your audience!
-                </p>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       )}

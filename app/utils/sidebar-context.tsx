@@ -57,7 +57,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
   function getInitialVisualizerState() {
     try {
-      if (typeof window === "undefined") return true;
       const raw = localStorage.getItem("visualizer");
       if (raw === null) return true;
       return raw === "true";

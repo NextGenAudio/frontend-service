@@ -22,6 +22,8 @@ import { getGeneralThemeColors } from "../lib/theme-colors";
 import axios from "axios";
 import AlertBar from "@/app/components/alert-bar";
 import { useParams } from "next/navigation";
+import Cookies from "js-cookie";
+
 
 const USER_MANAGEMENT_SERVICE_URL =
   process.env.NEXT_PUBLIC_USER_MANAGEMENT_SERVICE_URL;
@@ -79,13 +81,16 @@ export const CollaboratorsPanel = () => {
 
   const fetchExistingCollaborators = async () => {
     if (!playlistId) return;
-
+    const sonexUserCookie = Cookies.get("sonex_token");
     setIsLoadingCollaborators(true);
     try {
       const response = await axios.get(
         `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/collaborators`,
         {
           withCredentials: true,
+          headers: {
+            Authorization: sonexUserCookie ? `Bearer ${sonexUserCookie}` : "",
+          },
         }
       );
 
@@ -123,13 +128,16 @@ export const CollaboratorsPanel = () => {
     }
 
     setIsSearching(true);
-
+    const sonexUserCookie = Cookies.get("sonex_token");
     try {
       // Call backend search endpoint
       const response = await axios.get(
         `${USER_MANAGEMENT_SERVICE_URL}/sonex/v1/auth/search-profile`,
         {
           params: { search: searchQuery },
+          headers: {
+            Authorization: sonexUserCookie ? `Bearer ${sonexUserCookie}` : "",
+          },
         }
       );
 
@@ -200,7 +208,7 @@ export const CollaboratorsPanel = () => {
     const role = selectedRole[profileId] || 1; // Default to role 1 (viewer) if not selected
 
     setIsAddingCollaborator(true);
-
+    const sonexUserCookie = Cookies.get("sonex_token");
     try {
       const response = await axios.post(
         `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${playlistId}/add-collaborator`,
@@ -211,6 +219,9 @@ export const CollaboratorsPanel = () => {
             role: role,
           },
           withCredentials: true,
+          headers: {
+            Authorization: sonexUserCookie ? `Bearer ${sonexUserCookie}` : "",
+          },
         }
       );
 
@@ -249,7 +260,7 @@ export const CollaboratorsPanel = () => {
     }
 
     setIsAddingCollaborator(true);
-
+    const sonexUserCookie = Cookies.get("sonex_token");
     try {
       const response = await axios.delete(
         `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/remove-collaborator/${playlistId}`,
@@ -258,6 +269,9 @@ export const CollaboratorsPanel = () => {
             userId: profileId,
           },
           withCredentials: true,
+          headers: {
+            Authorization: sonexUserCookie ? `Bearer ${sonexUserCookie}` : "",
+          },
         }
       );
 
