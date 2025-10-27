@@ -39,7 +39,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [upload, setUpload] = useState(false);
   const [createFolder, setCreateFolder] = useState(false);
   const [visualizer, setVisualizer] = useState<boolean>(
-    getInitialVisualizerState()
+    true
   );
   const [profile, setProfile] = useState(false);
   const [playlist, setPlaylist] = useState(false);
@@ -47,23 +47,23 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [collaborators, setCollaborators] = useState(false);
   const [profileUpdate, setProfileUpdate] = useState(false);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("visualizer", String(visualizer));
-    } catch {
-      // ignore
-    }
-  }, [visualizer]);
+  // useEffect(() => {
+  //   try {
+  //     localStorage.setItem("visualizer", String(visualizer));
+  //   } catch {
+  //     // ignore
+  //   }
+  // }, [visualizer]);
 
-  function getInitialVisualizerState() {
-    try {
-      const raw = localStorage.getItem("visualizer");
-      if (raw === null) return true;
-      return raw === "true";
-    } catch {
-      return true;
-    }
-  }
+  // function getInitialVisualizerState() {
+  //   try {
+  //     const raw = localStorage.getItem("visualizer");
+  //     if (raw === null) return true;
+  //     return raw === "true";
+  //   } catch {
+  //     return true;
+  //   }
+  // }
 
   return (
     <SidebarContext.Provider

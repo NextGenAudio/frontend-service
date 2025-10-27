@@ -35,6 +35,7 @@ import { useTheme } from "../utils/theme-context";
 import { PlaylistSelectionDropdown } from "./playlist-selection-dropdown";
 import { Song } from "../utils/music-context";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { metadata } from "../layout";
 import AlertBar from "./alert-bar";
 
@@ -293,6 +294,11 @@ export const FloatingPlayerControls = ({
 
   const handleAddToPlaylist = async (playlistIds: number[]) => {
     if (!song) return;
+    const token = Cookies.get("sonex_token");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
       const response = await axios.post(
@@ -300,9 +306,7 @@ export const FloatingPlayerControls = ({
         { playlistIds: playlistIds },
         {
           withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
         }
       );
 
@@ -319,6 +323,11 @@ export const FloatingPlayerControls = ({
 
   const handleRemoveFromPlaylist = async (playlistIds: number[]) => {
     if (!song) return;
+    const token = Cookies.get("sonex_token");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
       const response = await axios.post(
@@ -326,9 +335,7 @@ export const FloatingPlayerControls = ({
         { playlistIds: playlistIds },
         {
           withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
         }
       );
 

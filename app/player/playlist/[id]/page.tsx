@@ -23,6 +23,8 @@ import { getGeneralThemeColors } from "@/app/lib/theme-colors";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Song } from "@/app/utils/music-context";
+import axios from "axios";
+import AlertBar from "@/app/components/alert-bar";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -50,6 +52,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const { isPlaying, setIsPlaying } = useMusicContext();
   const [openDropdownSongId, setOpenDropdownSongId] = useState<string | null>(
     null
@@ -57,16 +60,10 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   const [playlistCollaborators, setPlaylistCollaborators] = useState<
     Collaborator[]
   >([]);
-  const { entityName, entityArt, entityDescription } =
-    useEntityContext();
+  const { entityName, entityArt, entityDescription } = useEntityContext();
   const { songList, setSongList } = useMusicContext();
-  const {
-    player,
-    setPlayer,
-    setDetailPanel,
-    collaborators,
-    setCollaborators,
-  } = useSidebar();
+  const { player, setPlayer, setDetailPanel, collaborators, setCollaborators } =
+    useSidebar();
   const router = useRouter();
   const handleSongSingleClick = (song: Song) => {
     setSelectSongId(song.id);
@@ -174,33 +171,41 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
     console.log("🎵 Song queue updated:", songQueue);
   }, [songQueue]);
 
-  const removeSongFromPlaylist = async (songId: string) => {
+  const handleRemoveFromPlaylist = async (playlistIds: number[]) => {
+    // playlistIds is expected to contain the song id as the first element
+    if (!playlistIds || playlistIds.length === 0) return;
+    const songId = playlistIds[0];
+
+    const token = Cookies.get("sonex_token");
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
     try {
-      const sonexUserCookie = Cookies.get("sonex_token");
-      const response = await fetch(
-        `${PLAYLIST_SERVICE_URL}/playlist-service/playlists/${params.id}/tracks?musicIds=${songId}`,
+      const response = await axios.post(
+        `${PLAYLIST_SERVICE_URL}/playlist-service/music/remove-playlist-ids/${songId}`,
+        { playlistIds: [params.id] },
         {
-          method: "DELETE",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            ...(sonexUserCookie
-              ? { Authorization: `Bearer ${sonexUserCookie}` }
-              : {}),
-          },
+          withCredentials: true,
+          headers,
         }
       );
 
-      if (response.ok) {
-        console.log("Song removed from playlist successfully");
-        // Update state to remove song from UI
-        setSongList(songList.filter((song) => song.id !== songId));
+      if (response.status === 200) {
+        console.log(`Song removed from playlist: ${playlistIds}`);
+        // Remove song from local UI and show alert
+        setSongList(
+          songList.filter((s: Song) => String(s.id) !== String(songId))
+        );
+        setAlertMessage("Song removed from playlist");
+        // Auto-hide after 3s
+        setTimeout(() => setAlertMessage(null), 3000);
       } else {
-        const errorText = await response.text();
-        console.error("Failed to remove song from playlist:", errorText);
+        console.error("Failed to remove song from playlist");
       }
-    } catch (err) {
-      console.error("Error removing song from playlist:", err);
+    } catch (error) {
+      console.error("Error removing song from playlist:", error);
     }
   };
   const deleteSong = async (songId: string) => {
@@ -241,8 +246,6 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
       {/* Glass background with gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/10 to-gray-800/20 backdrop-blur-xl " />
       {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
-
-
 
       <div className="pt-3 relative z-10 h-full flex flex-col">
         <div
@@ -562,7 +565,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
                         });
                       }}
                       onRemoveFromPlaylist={() => {
-                        removeSongFromPlaylist(song.id);
+                        handleRemoveFromPlaylist([Number(song.id)]);
                         setOpenDropdownSongId(null);
                       }}
                       onDelete={() => {
@@ -590,6 +593,9 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
           </div>
         </ScrollArea>
       </div>
+      {alertMessage && (
+        <AlertBar message={alertMessage} setMessage={setAlertMessage} />
+      )}
     </div>
   );
 }

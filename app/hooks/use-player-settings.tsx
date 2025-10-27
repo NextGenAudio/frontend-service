@@ -6,25 +6,24 @@ export const usePlayerSettings = () => {
 
   // Initialize with localStorage values or defaults
   const [volume, setVolume] = useState(() => {
-    if (typeof window === "undefined") return 50;
     const saved = localStorage.getItem("volume");
     return saved !== null ? Number(saved) : 50;
   });
 
   const [isMuted, setIsMuted] = useState(() => {
-    if (typeof window === "undefined") return false;
+
     const saved = localStorage.getItem("isMuted");
     return saved !== null ? saved === "true" : false;
   });
 
   const [isRepeat, setIsRepeat] = useState(() => {
-    if (typeof window === "undefined") return false;
+
     const saved = localStorage.getItem("isRepeat");
     return saved !== null ? saved === "true" : false;
   });
 
   const [progress, setProgress] = useState(() => {
-    if (typeof window === "undefined") return 0;
+
     const saved = localStorage.getItem("progress");
     return saved !== null ? Number(saved) : 0;
   });

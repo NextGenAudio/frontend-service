@@ -151,12 +151,18 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     console.log("Song Queue after shift (newQueue)", newQueue);
     if (!newQueue.length || !playingSong) return;
     const currentIndex = newQueue.findIndex((s) => s.id === playingSong?.id);
-
+    
+    const sonexUserCookie = Cookies.get("sonex_token");
     if (newQueue.length < 2) {
       axios
         .get(
           `${MUSIC_LIBRARY_SERVICE_URL}/files/recommendations?genre=${playingSong?.genre},mood=${playingSong?.mood},artist=${playingSong?.artist}`,
-          { withCredentials: true }
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: sonexUserCookie ? `Bearer ${sonexUserCookie}` : "",
+            },
+          }
         )
         .then((response) => {
           const recommended = response.data as Song[];
@@ -191,6 +197,11 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         })
         .catch((error) => {
           console.error("Failed to fetch recommendations:", error);
+          if (error?.response) {
+            console.error("recommendations response status:", error.response.status);
+            console.error("recommendations response headers:", error.response.headers);
+            console.error("recommendations response data:", error.response.data);
+          }
         });
       return; // ✅ Important: return here to avoid playing song twice
     }
@@ -211,18 +222,29 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   // Update listen count and last listened timestamp
   const updateListenedSong = (listenedSong: Song) => {
     listenedSong.lastListenedAt = new Date(); // Update local object
-
+    const sonexUserCookie = Cookies.get("sonex_token");
     listenedSong.listenCount = (listenedSong.listenCount || 0) + 1;
     axios
       .post(
         `${MUSIC_LIBRARY_SERVICE_URL}/files/${listenedSong.id}/listen_count?count=${listenedSong.listenCount}`,
-        { withCredentials: true }
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: sonexUserCookie ? `Bearer ${sonexUserCookie}` : "",
+          },
+        }
       )
       .then((response) => {
         console.log("Listen timestamp updated:", response.data);
       })
       .catch((err) => {
         console.error("Failed to update listen timestamp", err);
+        if (err?.response) {
+          console.error("listen_count response status:", err.response.status);
+          console.error("listen_count response headers:", err.response.headers);
+          console.error("listen_count response data:", err.response.data);
+        }
       });
 
     console.log("Updated listen count:", listenedSong.listenCount);

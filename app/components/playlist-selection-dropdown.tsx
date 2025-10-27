@@ -8,6 +8,7 @@ import { useEntityContext } from "../utils/entity-context";
 import { Playlist } from "../utils/entity-context";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { Button } from "./ui/button";
 
 const PLAYLIST_SERVICE_URL = process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL;
@@ -83,17 +84,37 @@ export function PlaylistSelectionDropdown({
   // };
   useEffect(() => {
     async function fetchAddedPlaylistIds() {
-      const response = await axios.get(
-        `${PLAYLIST_SERVICE_URL}/playlist-service/music/playlist-ids/${songId}`,
-        {
-          withCredentials: true,
-        }
-      );
+      if (!PLAYLIST_SERVICE_URL || !songId) return;
+      setLoading(true);
+      try {
+        const token = Cookies.get("sonex_token");
+        const response = await axios.get(
+          `${PLAYLIST_SERVICE_URL}/playlist-service/music/playlist-ids/${songId}`,
+          {
+            withCredentials: true,
+            headers: {
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          }
+        );
 
-      const addedPlaylistIds: number[] = response.data;
-      console.log("Added playlist IDs:", addedPlaylistIds);
-      setAddedPlaylistIds(addedPlaylistIds);
-      setDatabasePlaylistIds(addedPlaylistIds);
+        const added: number[] = Array.isArray(response.data)
+          ? response.data
+          : [];
+        console.log("Added playlist IDs:", added);
+        setAddedPlaylistIds(added);
+        setDatabasePlaylistIds(added);
+      } catch (err) {
+        console.error("Failed to fetch added playlist ids:", err);
+        const status = (err as any)?.response?.status;
+        if (status === 403) {
+          onShowAlert?.("⚠️ Unauthorized (403) - please sign in or check permissions.");
+        } else {
+          onShowAlert?.("❌ Failed to load playlist info");
+        }
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchAddedPlaylistIds();
