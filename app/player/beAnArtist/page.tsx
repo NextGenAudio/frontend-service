@@ -70,11 +70,11 @@ export default function ArtistRequestForm() {
       const url = `${USER_MANAGEMENT_SERVICE_URL}/requests${
         profileId ? `?profileId=${encodeURIComponent(profileId)}` : ""
       }`;
-  const res = await axios.post(url, formData, { withCredentials: true });
-  console.log("[v0] Artist request submitted:", res?.data ?? formData);
-  // show alert first, then show the submitted UI after a short delay
-  setAlertMessage("✅ Request submitted");
-  setTimeout(() => setIsSubmitted(true), 1000);
+      const res = await axios.post(url, formData, { withCredentials: true });
+      console.log("[v0] Artist request submitted:", res?.data ?? formData);
+      // show alert first, then show the submitted UI after a short delay
+      setAlertMessage("✅ Request submitted");
+      setTimeout(() => setIsSubmitted(true), 1000);
     } catch (err) {
       console.error("Failed to submit artist request:", err);
       // Keep isSubmitted false so user can retry; consider showing a toast/alert here
