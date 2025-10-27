@@ -102,7 +102,6 @@ const Header = () => {
                     <Button
                       onClick={() => {
                         Cookies.remove("sonex_user");
-                        localStorage.clear();
                         sessionStorage.clear();
                         window.location.href = "/login";
                       }}

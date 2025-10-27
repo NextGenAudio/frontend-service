@@ -39,7 +39,8 @@ export function MusicPlayerHome() {
   const [recentMusics, setRecentMusics] = useState<Song[]>([]);
   const [trendingMusics, setTrendingMusics] = useState<Song[]>([]);
   const [mostPlayedMusics, setMostPlayedMusics] = useState<Song[]>([]);
-  const { setDetailPanel, player, setQueue, setPlayer, queue, searchBar } = useSidebar();
+  const { setDetailPanel, player, setQueue, setPlayer, queue, searchBar } =
+    useSidebar();
   const {
     setSelectSong,
     setPlayingSong,
@@ -323,204 +324,50 @@ export function MusicPlayerHome() {
         </div>
 
         {/* Recently Played */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-              <History className={`w-6 h-6 ${themeColors.text}`} />
-              Recently Played
-            </h2>
-            <Button
-              className={`${themeColors.text} ${themeColors.hover} transition-colors`}
-            >
-              View All
-            </Button>
-          </div>
-          <div className="grid grid-cols-5 gap-4">
-            {recentMusics.map((track) => (
-              <div
-                key={track.id}
-                className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
-                onMouseEnter={() => setActiveCard(Number(track.id))}
-                onMouseLeave={() => setActiveCard(null)}
-                onClick={() => handleSongSingleClick(track)}
+        {recentMusics.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <History className={`w-6 h-6 ${themeColors.text}`} />
+                Recently Played
+              </h2>
+              <Button
+                className={`${themeColors.text} ${themeColors.hover} transition-colors`}
               >
-                <div className="relative mb-4">
-                  <Image
-                    src={
-                      track.musicArt ||
-                      track.artworkURL ||
-                      track.metadata?.cover_art ||
-                      "/placeholder.svg"
-                    }
-                    alt={track.filename}
-                    className="w-full aspect-square rounded-xl object-cover"
-                    width={256}
-                    height={256}
-                  />
-                  <div
-                    className={`absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center transition-opacity duration-300 ${
-                      activeCard === Number(track.id)
-                        ? "opacity-100"
-                        : "opacity-0"
-                    }`}
-                  >
-                    <Play
-                      className="w-8 h-8 text-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSongDoubleClick(track);
-                        setPlayer(true);
-                        setIsPlaying(true);
-                      }}
-                    />
-                  </div>
-                </div>
-                <h3 className="font-semibold text-white truncate">
-                  {track.title}
-                </h3>
-                <p className="text-white/70 text-sm truncate">{track.artist}</p>
-                <p className="text-white/50 text-xs mt-1">
-                  {track.metadata?.track_length}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Trending Musics */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-              <TrendingUp className={`w-6 h-6 ${themeColors.text}`} />
-              Trending Now
-            </h2>
-            <Button
-              className={`${themeColors.text} ${themeColors.hover} transition-colors`}
-            >
-              View All
-            </Button>
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {trendingMusics.slice(0, 8).map((track, index) => (
-              <div
-                key={track.id}
-                className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group cursor-pointer relative"
-                onMouseEnter={() => setActiveCard(Number(track.id))}
-                onMouseLeave={() => setActiveCard(null)}
-                onClick={() => handleSongSingleClick(track)}
-              >
-                {/* Trending Badge */}
-                <div
-                  className={`absolute -top-2 -right-2 z-10 bg-gradient-to-r ${themeColors.gradient} text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg`}
-                >
-                  #{index + 1}
-                </div>
-
-                <div className="relative mb-4">
-                  <Image
-                    src={
-                      track.artworkURL ||
-                      track.metadata?.cover_art ||
-                      "/placeholder.svg"
-                    }
-                    alt={track.filename}
-                    className="w-full aspect-square rounded-xl object-cover"
-                    width={256}
-                    height={256}
-                  />
-                  <div
-                    className={`absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center transition-opacity duration-300 ${
-                      activeCard === Number(track.id)
-                        ? "opacity-100"
-                        : "opacity-0"
-                    }`}
-                  >
-                    <Play
-                      className="w-8 h-8 text-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSongDoubleClick(track);
-                        setPlayer(true);
-                        setIsPlaying(true);
-                      }}
-                    />
-                  </div>
-                </div>
-                <h3 className="font-semibold text-white truncate">
-                  {track.title}
-                </h3>
-                <p className="text-white/70 text-sm truncate">{track.artist}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-1">
-                    <ReactStars
-                      count={5}
-                      value={track.yscore || 0}
-                      size={18}
-                      color1="#6b7280"
-                      color2="#fbbf24"
-                      edit={false}
-                      half={true}
-                    />
-                    <span className="text-xs text-white/60 ml-1">
-                      ({track.yscore?.toFixed(1) || 0})
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3 text-green-400" />
-                    <span className="text-xs text-green-400 font-medium">
-                      {track.xscore || Math.floor(Math.random() * 1000) + 100}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Most Played */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-              <Headphones className={`w-6 h-6 ${themeColors.text}`} />
-              Most Played
-            </h2>
-            <Button
-              className={`${themeColors.text} ${themeColors.hover} transition-colors`}
-            >
-              View All
-            </Button>
-          </div>
-          <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
-            <div className="space-y-3">
-              {mostPlayedMusics.slice(0, 6).map((track, index) => (
+                View All
+              </Button>
+            </div>
+            <div className="grid grid-cols-5 gap-4">
+              {recentMusics.map((track) => (
                 <div
                   key={track.id}
-                  className="flex items-center space-x-4 p-4 rounded-xl hover:bg-white/10 transition-all duration-300 cursor-pointer group"
+                  className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group cursor-pointer"
+                  onMouseEnter={() => setActiveCard(Number(track.id))}
+                  onMouseLeave={() => setActiveCard(null)}
                   onClick={() => handleSongSingleClick(track)}
                 >
-                  {/* Rank */}
-                  <div
-                    className={`flex items-center justify-center w-10 h-10 bg-gradient-to-r ${themeColors.gradient} rounded-full text-white font-bold text-sm shadow-lg`}
-                  >
-                    {index + 1}
-                  </div>
-
-                  {/* Album Art */}
-                  <div className="relative">
+                  <div className="relative mb-4">
                     <Image
                       src={
+                        track.musicArt ||
                         track.artworkURL ||
                         track.metadata?.cover_art ||
                         "/placeholder.svg"
                       }
                       alt={track.filename}
-                      className="w-12 h-12 rounded-lg object-cover"
-                      width={48}
-                      height={48}
+                      className="w-full aspect-square rounded-xl object-cover"
+                      width={256}
+                      height={256}
                     />
-                    <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div
+                      className={`absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center transition-opacity duration-300 ${
+                        activeCard === Number(track.id)
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                    >
                       <Play
-                        className="w-4 h-4 text-white"
+                        className="w-8 h-8 text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSongDoubleClick(track);
@@ -530,83 +377,245 @@ export function MusicPlayerHome() {
                       />
                     </div>
                   </div>
+                  <h3 className="font-semibold text-white truncate">
+                    {track.title}
+                  </h3>
+                  <p className="text-white/70 text-sm truncate">
+                    {track.artist}
+                  </p>
+                  <p className="text-white/50 text-xs mt-1">
+                    {track.metadata?.track_length}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* Trending Musics */}
+        {trendingMusics.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <TrendingUp className={`w-6 h-6 ${themeColors.text}`} />
+                Trending Now
+              </h2>
+              <Button
+                className={`${themeColors.text} ${themeColors.hover} transition-colors`}
+              >
+                View All
+              </Button>
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              {trendingMusics.slice(0, 8).map((track, index) => (
+                <div
+                  key={track.id}
+                  className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 group cursor-pointer relative"
+                  onMouseEnter={() => setActiveCard(Number(track.id))}
+                  onMouseLeave={() => setActiveCard(null)}
+                  onClick={() => handleSongSingleClick(track)}
+                >
+                  {/* Trending Badge */}
+                  <div
+                    className={`absolute -top-2 -right-2 z-10 bg-gradient-to-r ${themeColors.gradient} text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg`}
+                  >
+                    #{index + 1}
+                  </div>
 
-                  {/* Song Info */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-white truncate">
-                      {track.title}
-                    </h4>
-                    <div className="flex items-center gap-2">
-                      <p className="text-white/70 text-sm truncate">
-                        {track.artist}
-                      </p>
+                  <div className="relative mb-4">
+                    <Image
+                      src={
+                        track.artworkURL ||
+                        track.metadata?.cover_art ||
+                        "/placeholder.svg"
+                      }
+                      alt={track.filename}
+                      className="w-full aspect-square rounded-xl object-cover"
+                      width={256}
+                      height={256}
+                    />
+                    <div
+                      className={`absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center transition-opacity duration-300 ${
+                        activeCard === Number(track.id)
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                    >
+                      <Play
+                        className="w-8 h-8 text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSongDoubleClick(track);
+                          setPlayer(true);
+                          setIsPlaying(true);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <h3 className="font-semibold text-white truncate">
+                    {track.title}
+                  </h3>
+                  <p className="text-white/70 text-sm truncate">
+                    {track.artist}
+                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-1">
                       <ReactStars
                         count={5}
                         value={track.yscore || 0}
-                        size={15}
+                        size={18}
                         color1="#6b7280"
                         color2="#fbbf24"
                         edit={false}
                         half={true}
                       />
-                      <span className="text-xs text-white/50">
-                        ({(track.yscore || 0).toFixed(1)})
+                      <span className="text-xs text-white/60 ml-1">
+                        ({track.yscore?.toFixed(1) || 0})
                       </span>
                     </div>
-                  </div>
-
-                  {/* Play Count */}
-                  <div className="flex items-center space-x-2">
-                    <Headphones className="w-4 h-4 text-white/60" />
-                    <span className="text-white/60 text-sm font-medium">
-                      {track.listenCount || 0}
-                    </span>
-                  </div>
-
-                  {/* Duration */}
-                  <div className="text-white/50 text-sm">
-                    {track.metadata?.track_length
-                      ? `${Math.floor(
-                          Number(track.metadata?.track_length) / 60
-                        )}:${
-                          Math.floor(
-                            Number(track.metadata?.track_length) % 60
-                          ) < 10
-                            ? "0" +
-                              Math.floor(
-                                Number(track.metadata?.track_length) % 60
-                              )
-                            : Math.floor(
-                                Number(track.metadata?.track_length) % 60
-                              )
-                        }`
-                      : "3:24"}
-                  </div>
-
-                  {/* Play Button */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSongDoubleClick(track);
-                        setPlayer(true);
-                        setIsPlaying(true);
-                      }}
-                      className={`w-8 h-8 rounded-full bg-gradient-to-r ${themeColors.gradient} flex items-center justify-center hover:scale-110 transition-transform shadow-lg`}
-                    >
-                      <Play
-                        className="w-4 h-4 text-white"
-                        fill="currentColor"
-                      />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3 text-green-400" />
+                      <span className="text-xs text-green-400 font-medium">
+                        {track.xscore || Math.floor(Math.random() * 1000) + 100}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        )}
+        {/* Most Played */}
+        {mostPlayedMusics.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <Headphones className={`w-6 h-6 ${themeColors.text}`} />
+                Most Played
+              </h2>
+              <Button
+                className={`${themeColors.text} ${themeColors.hover} transition-colors`}
+              >
+                View All
+              </Button>
+            </div>
+            <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6">
+              <div className="space-y-3">
+                {mostPlayedMusics.slice(0, 6).map((track, index) => (
+                  <div
+                    key={track.id}
+                    className="flex items-center space-x-4 p-4 rounded-xl hover:bg-white/10 transition-all duration-300 cursor-pointer group"
+                    onClick={() => handleSongSingleClick(track)}
+                  >
+                    {/* Rank */}
+                    <div
+                      className={`flex items-center justify-center w-10 h-10 bg-gradient-to-r ${themeColors.gradient} rounded-full text-white font-bold text-sm shadow-lg`}
+                    >
+                      {index + 1}
+                    </div>
 
+                    {/* Album Art */}
+                    <div className="relative">
+                      <Image
+                        src={
+                          track.artworkURL ||
+                          track.metadata?.cover_art ||
+                          "/placeholder.svg"
+                        }
+                        alt={track.filename}
+                        className="w-12 h-12 rounded-lg object-cover"
+                        width={48}
+                        height={48}
+                      />
+                      <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Play
+                          className="w-4 h-4 text-white"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSongDoubleClick(track);
+                            setPlayer(true);
+                            setIsPlaying(true);
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Song Info */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-white truncate">
+                        {track.title}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-white/70 text-sm truncate">
+                          {track.artist}
+                        </p>
+                        <ReactStars
+                          count={5}
+                          value={track.yscore || 0}
+                          size={15}
+                          color1="#6b7280"
+                          color2="#fbbf24"
+                          edit={false}
+                          half={true}
+                        />
+                        <span className="text-xs text-white/50">
+                          ({(track.yscore || 0).toFixed(1)})
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Play Count */}
+                    <div className="flex items-center space-x-2">
+                      <Headphones className="w-4 h-4 text-white/60" />
+                      <span className="text-white/60 text-sm font-medium">
+                        {track.listenCount || 0}
+                      </span>
+                    </div>
+
+                    {/* Duration */}
+                    <div className="text-white/50 text-sm">
+                      {track.metadata?.track_length
+                        ? `${Math.floor(
+                            Number(track.metadata?.track_length) / 60
+                          )}:${
+                            Math.floor(
+                              Number(track.metadata?.track_length) % 60
+                            ) < 10
+                              ? "0" +
+                                Math.floor(
+                                  Number(track.metadata?.track_length) % 60
+                                )
+                              : Math.floor(
+                                  Number(track.metadata?.track_length) % 60
+                                )
+                          }`
+                        : "3:24"}
+                    </div>
+
+                    {/* Play Button */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSongDoubleClick(track);
+                          setPlayer(true);
+                          setIsPlaying(true);
+                        }}
+                        className={`w-8 h-8 rounded-full bg-gradient-to-r ${themeColors.gradient} flex items-center justify-center hover:scale-110 transition-transform shadow-lg`}
+                      >
+                        <Play
+                          className="w-4 h-4 text-white"
+                          fill="currentColor"
+                        />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         {/* Suggested Playlists */}
+
         <SuggestedPlaylists />
 
         {/* Quick Actions */}

@@ -23,7 +23,7 @@ import ProfileAvatar from "./profile-avatar";
 import { useSidebar } from "../utils/sidebar-context";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
-import { usePlayerSettings } from "../hooks/use-player-settings";
+
 import { useMusicContext } from "../utils/music-context";
 
 export const Sidebar = () => {

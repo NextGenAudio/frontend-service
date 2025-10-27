@@ -50,6 +50,10 @@ export const FloatingPlayerControls = ({
   song: Song | null;
   handleNextClick: (playedSong: Song) => void;
 }) => {
+  const [isClient, setIsClient] = useState(false);
+  const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
+    usePlayerSettings();
+
   const [isShuffle, setIsShuffle] = useState(false);
 
   // const [progress, setProgress] = useState(0);
@@ -71,8 +75,6 @@ export const FloatingPlayerControls = ({
   const toggleRepeat = () => setRepeatMode((repeatMode + 1) % 3);
   const toggleMute = () => setIsMuted(!isMuted);
 
-  const { volume, setVolume, isMuted, setIsMuted, isRepeat, setIsRepeat } =
-    usePlayerSettings();
   const {
     isPlaying,
     setIsPlaying,
@@ -208,6 +210,15 @@ export const FloatingPlayerControls = ({
       }
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // ✅ Hooks always run, but UI waits until hydration
+  if (!isClient) {
+    return <div style={{ visibility: "hidden" }} />;
+  }
 
   const handleLikeClick = async () => {
     const newLikeStatus = !liked; // Calculate the new status first

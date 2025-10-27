@@ -1,60 +1,59 @@
+"use client";
 import { useState, useEffect } from "react";
 import { useSidebar } from "../utils/sidebar-context";
 
 export const usePlayerSettings = () => {
-  const { player } = useSidebar();
+  const [isClient, setIsClient] = useState(false);
 
-  // Initialize with localStorage values or defaults
-  const [volume, setVolume] = useState(() => {
-    const saved = localStorage.getItem("volume");
-    return saved !== null ? Number(saved) : 50;
-  });
+  // Stable defaults
+  const [volume, setVolume] = useState(50);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-  const [isMuted, setIsMuted] = useState(() => {
-
-    const saved = localStorage.getItem("isMuted");
-    return saved !== null ? saved === "true" : false;
-  });
-
-  const [isRepeat, setIsRepeat] = useState(() => {
-
-    const saved = localStorage.getItem("isRepeat");
-    return saved !== null ? saved === "true" : false;
-  });
-
-  const [progress, setProgress] = useState(() => {
-
-    const saved = localStorage.getItem("progress");
-    return saved !== null ? Number(saved) : 0;
-  });
-
-  // Save whenever values change
+  // ✅ Mark when client-side rendering begins
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("volume", String(volume));
-    }
-  }, [volume]);
+    setIsClient(true);
+  }, []);
 
+  // ✅ Load from localStorage only after hydration
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("isMuted", String(isMuted));
-    }
-  }, [isMuted]);
+    if (!isClient) return;
+
+    const storedVolume = localStorage.getItem("volume");
+    const storedMuted = localStorage.getItem("isMuted");
+    const storedRepeat = localStorage.getItem("isRepeat");
+    const storedProgress = localStorage.getItem("progress");
+
+    if (storedVolume !== null) setVolume(Number(storedVolume));
+    if (storedMuted !== null) setIsMuted(storedMuted === "true");
+    if (storedRepeat !== null) setIsRepeat(storedRepeat === "true");
+    if (storedProgress !== null) setProgress(Number(storedProgress));
+  }, [isClient]);
+
+  // ✅ Save changes
+  useEffect(() => {
+    if (!isClient) return;
+    localStorage.setItem("volume", String(volume));
+  }, [volume, isClient]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("isRepeat", String(isRepeat));
-    }
-  }, [isRepeat]);
+    if (!isClient) return;
+    localStorage.setItem("isMuted", String(isMuted));
+  }, [isMuted, isClient]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("progress", String(progress));
-    }
-  }, [progress]);
+    if (!isClient) return;
+    localStorage.setItem("isRepeat", String(isRepeat));
+  }, [isRepeat, isClient]);
 
+  useEffect(() => {
+    if (!isClient) return;
+    localStorage.setItem("progress", String(progress));
+  }, [progress, isClient]);
 
   return {
+    isClient,
     volume,
     setVolume,
     isMuted,

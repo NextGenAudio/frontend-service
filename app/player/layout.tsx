@@ -30,6 +30,9 @@ const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
 
 const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+  const [isClient, setIsClient] = useState(false);
+  const { volume, isMuted } = usePlayerSettings();
+
   const { theme } = useTheme();
   const {
     player,
@@ -59,9 +62,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     setSongQueue,
     shuffleQueue,
   } = useMusicContext();
-
-  const { volume, isMuted } = usePlayerSettings();
-  const router = useRouter();
 
   // Add state to track if we're using recommendations
   const [usingRecommendations, setUsingRecommendations] = useState(false);
@@ -151,7 +151,7 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     console.log("Song Queue after shift (newQueue)", newQueue);
     if (!newQueue.length || !playingSong) return;
     const currentIndex = newQueue.findIndex((s) => s.id === playingSong?.id);
-    
+
     const sonexUserCookie = Cookies.get("sonex_token");
     if (newQueue.length < 2) {
       axios
@@ -198,9 +198,18 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         .catch((error) => {
           console.error("Failed to fetch recommendations:", error);
           if (error?.response) {
-            console.error("recommendations response status:", error.response.status);
-            console.error("recommendations response headers:", error.response.headers);
-            console.error("recommendations response data:", error.response.data);
+            console.error(
+              "recommendations response status:",
+              error.response.status
+            );
+            console.error(
+              "recommendations response headers:",
+              error.response.headers
+            );
+            console.error(
+              "recommendations response data:",
+              error.response.data
+            );
           }
         });
       return; // ✅ Important: return here to avoid playing song twice
@@ -388,6 +397,15 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       }
     }
   }, [isPlaying, soundRef.current]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // ✅ Hooks always run, but UI waits until hydration
+  if (!isClient) {
+    return <div style={{ visibility: "hidden" }} />;
+  }
 
   return (
     <div className="relative h-screen overflow-hidden ">

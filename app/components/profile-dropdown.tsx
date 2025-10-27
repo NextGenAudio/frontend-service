@@ -117,7 +117,6 @@ export function ProfileDropdown() {
                 Cookies.remove("sonex_token");
                 Cookies.remove("sonex_user");
                 // Remove localStorage/sessionStorage tokens if any
-                localStorage.clear();
                 sessionStorage.clear();
                 // Optionally sign out from NextAuth
                 signOut({ redirect: false });
