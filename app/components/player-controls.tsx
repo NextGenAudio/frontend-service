@@ -12,8 +12,6 @@ import {
   VolumeX,
   Heart,
   Plus,
-  Settings,
-  BarChart3,
   List,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";

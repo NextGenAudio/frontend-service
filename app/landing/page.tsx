@@ -25,7 +25,7 @@ import Header from "../components/header";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
-export function Landing() {
+export default function Landing() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
