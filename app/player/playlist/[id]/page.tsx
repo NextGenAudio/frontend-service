@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { Song } from "@/app/utils/music-context";
 import axios from "axios";
 import AlertBar from "@/app/components/alert-bar";
+import { SearchBar } from "@/app/components/search-bar";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -62,7 +63,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
   >([]);
   const { entityName, entityArt, entityDescription } = useEntityContext();
   const { songList, setSongList } = useMusicContext();
-  const { player, setPlayer, setDetailPanel, collaborators, setCollaborators } =
+  const { player, setPlayer, setDetailPanel, collaborators, setCollaborators, searchBar } =
     useSidebar();
   const router = useRouter();
   const handleSongSingleClick = (song: Song) => {
@@ -246,7 +247,7 @@ export default function PlaylistPanel({ params }: { params: { id: number } }) {
       {/* Glass background with gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-slate-500/10 to-gray-800/20 backdrop-blur-xl " />
       {/* <div className="inset-0 bg-white/5 backdrop-blur-sm" /> */}
-
+      {searchBar && <SearchBar/>}
       <div className="pt-3 relative z-10 h-full flex flex-col">
         <div
           className="h-fit p-5  group transition-all duration-700 ease-out border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl overflow-hidden"

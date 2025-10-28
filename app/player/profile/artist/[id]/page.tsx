@@ -94,7 +94,7 @@ export default function ArtistPage({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   const backdropUrl =
-    artistData?.artistImageURL || "/assets/artist-backdrop.jpg";
+    artistData?.artistImageURL || "/assets/artist-backdrop.png";
 
   // Fetch published songs for this artist
   useEffect(() => {

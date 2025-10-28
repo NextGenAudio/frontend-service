@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useSidebar } from "../../utils/sidebar-context";
-
+import { SearchBar } from "@/app/components/search-bar";
 import { getFullName } from "@/app/lib/name-utils";
 
 export default function ProfilePage() {
@@ -18,7 +18,7 @@ export default function ProfilePage() {
   const { playlistList } = useEntityContext();
   const themeColors = getGeneralThemeColors(theme.primary);
   const [userData, setUserData] = useState<any>(null);
-  const { setProfileUpdate, setCollaborators, setDetailPanel, setQueue } =
+  const { setProfileUpdate, setCollaborators, setDetailPanel, setQueue, searchBar } =
     useSidebar();
   useEffect(() => {
     const cookie = Cookies.get("sonex_user");
@@ -37,7 +37,9 @@ export default function ProfilePage() {
 
   return (
     <div className="h-screen relative text-white overflow-y-auto custom-scrollbar">
+      {searchBar && (<SearchBar />)}
       <div className="relative z-10 p-8">
+        
         {/* Profile Header */}
         <div className="mb-12">
           <div className="flex items-end gap-8 mb-8">
@@ -319,5 +321,5 @@ export default function ProfilePage() {
         </div> */}
       </div>
     </div>
-  );
+        );
 }

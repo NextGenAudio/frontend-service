@@ -34,7 +34,6 @@ function SuggestedPlaylistContent() {
   const genre = searchParams.get("genre") || "";
   const playlistName = searchParams.get("name") || "Suggested Playlist";
 
-  const [songList, setSongList] = useState<Song[]>([]);
   const [filteredSongs, setFilteredSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,7 +50,8 @@ function SuggestedPlaylistContent() {
     isPlaying,
     setIsPlaying,
     playingSong,
-    setSongList: setGlobalSongList,
+    setSongList,
+    songList,
   } = useMusicContext();
 
   const { setPlayer } = useSidebar();
@@ -111,7 +111,7 @@ function SuggestedPlaylistContent() {
     handleSongClick(song);
     setPlayingSongId(song.id);
     setPlayingSong(song);
-    setGlobalSongList(songList);
+    setSongList(songList);
 
     const newScore = (song?.xscore ?? 0) + 1;
     const sonexUserCookie = Cookies.get("sonex_token");

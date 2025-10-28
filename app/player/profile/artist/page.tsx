@@ -68,7 +68,7 @@ export default function ProfilePage() {
     fetchArtistData();
   }, [userData]);
 
-  const backdropUrl = artistData?.artistImageURL || "";
+  const backdropUrl = artistData?.artistImageURL || "assets/artist-backdrop.png";
 
   // Fetch published songs for this artist
   useEffect(() => {
@@ -490,7 +490,7 @@ export default function ProfilePage() {
               // No visible content -> render generated empty state
               return (
                 <div className="flex items-center justify-center py-24 px-6">
-                  <div className="max-w-3xl w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center">
+                  <div className="max-w-3xl w-fullbackdrop-blur-xl borderrounded-2xl p-8 text-center">
                     <div className="mx-auto mb-6 w-28 h-28 rounded-full flex items-center justify-center bg-gradient-to-br from-orange-500/20 to-red-500/10">
                       <MicVocal className="w-12 h-12 text-orange-400" />
                     </div>

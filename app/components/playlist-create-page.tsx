@@ -2,15 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import {
-  ArrowLeft,
-  Search,
-  Music,
-  Clock,
-  Plus,
-  ImageIcon,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Search, Music, Clock, ImageIcon, X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
@@ -24,6 +16,7 @@ import { useSidebar } from "../utils/sidebar-context";
 import AlertBar from "./alert-bar";
 import Image from "next/image";
 import { useFileHandling } from "../utils/entity-handling-context";
+import Cookies from "js-cookie";
 
 // Backend service URLs
 const PLAYLIST_SERVICE_URL = `${process.env.NEXT_PUBLIC_PLAYLIST_SERVICE_URL}/playlist-service/playlists`;
@@ -65,6 +58,7 @@ export function PlaylistCreatePage() {
   const [artworkFile, setArtworkFile] = useState<UploadedFile | null>(null);
   const [selectedSongs, setSelectedSongs] = useState<Song[]>([]);
   const [availableSongs, setAvailableSongs] = useState<Song[]>([]);
+  const [songsLoading, setSongsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   // Remove step state since we're showing everything on one page
@@ -75,22 +69,31 @@ export function PlaylistCreatePage() {
 
   useEffect(() => {
     if (step === 2) {
-    const fetchAvailableSongs = async () => {
-      try {
-        const response = await axios.get(
-          `${MUSIC_LIBRARY_SERVICE_URL}/files/list`,
-          {
-            withCredentials: true,
-          }
-        );
-        setAvailableSongs(response.data);
-      } catch (error) {
-        console.error("Failed to fetch songs:", error);
-        setMessage("❌ Failed to load songs");
-      }
-    };
-    fetchAvailableSongs();
-  }
+      const fetchAvailableSongs = async () => {
+        setSongsLoading(true);
+        try {
+          const sonexUserCookie = Cookies.get("sonex_token");
+          const authHeader = sonexUserCookie
+            ? { Authorization: `Bearer ${sonexUserCookie}` }
+            : {};
+
+          const response = await axios.get(
+            `${MUSIC_LIBRARY_SERVICE_URL}/files/list`,
+            {
+              withCredentials: true,
+              headers: { ...authHeader },
+            }
+          );
+          setAvailableSongs(response.data);
+        } catch (error) {
+          console.error("Failed to fetch songs:", error);
+          setMessage("❌ Failed to load songs");
+        } finally {
+          setSongsLoading(false);
+        }
+      };
+      fetchAvailableSongs();
+    }
   }, [step]);
 
   // Handle drag-drop for artwork
@@ -152,15 +155,17 @@ export function PlaylistCreatePage() {
       for (let [key, value] of formDataToSend.entries()) {
         console.log(key, value);
       }
+      const sonexUserCookie = Cookies.get("sonex_token");
+      const authHeader = sonexUserCookie
+        ? { Authorization: `Bearer ${sonexUserCookie}` }
+        : {};
 
       const playlistResponse = await axios.post(
         `${PLAYLIST_SERVICE_URL}/create`,
         formDataToSend,
         {
           withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { ...authHeader, "Content-Type": "multipart/form-data" },
         }
       );
 
@@ -175,15 +180,16 @@ export function PlaylistCreatePage() {
       // Step 2: Add selected songs to the new playlist
       if (selectedSongs.length > 0) {
         const songIds = selectedSongs.map((song) => parseInt(song.id));
-
+        const sonexUserCookie = Cookies.get("sonex_token");
+        const authHeader2 = sonexUserCookie
+          ? { Authorization: `Bearer ${sonexUserCookie}` }
+          : {};
         await axios.post(
           `${PLAYLIST_SERVICE_URL}/${playlistId}/tracks`,
           { fileIds: songIds },
           {
             withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { ...authHeader2, "Content-Type": "application/json" },
           }
         );
       }
@@ -214,6 +220,7 @@ export function PlaylistCreatePage() {
       setPlaylistCreateRefresh((old) => old + 1); // trigger refresh in playlist list
     } finally {
       setLoading(false);
+      resetForm();
     }
   };
 
@@ -414,72 +421,93 @@ export function PlaylistCreatePage() {
                       </div>
 
                       <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                        {filteredSongs.map((song) => {
-                          const isSelected = selectedSongs.some(
-                            (s) => s.id === song.id
-                          );
-                          return (
-                            <div
-                              key={song.id}
-                              onClick={() => toggleSongSelection(song)}
-                              className={`flex items-center justify-between p-5 rounded-xl cursor-pointer transition-all duration-200 ${
-                                isSelected
-                                  ? `${themeColors.hoverBg} border ${themeColors.border} shadow-lg`
-                                  : "bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10"
-                              }`}
-                            >
-                              <div className="flex items-center space-x-4 flex-1 min-w-0">
-                                <div
-                                  className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                                    isSelected
-                                      ? `bg-gradient-to-r ${themeColors.gradient} scale-110`
-                                      : "bg-white/10"
-                                  }`}
-                                >
-                                  <Music
-                                    className={`w-7 h-7 ${
-                                      isSelected
-                                        ? "text-white"
-                                        : "text-gray-400"
-                                    }`}
-                                  />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-white font-medium text-lg truncate">
-                                    {song.title || song.filename}
-                                  </p>
-                                  <p className="text-gray-400 text-base truncate">
-                                    {song.artist || "Unknown Artist"}
-                                  </p>
-                                  {song.album && (
-                                    <p className="text-gray-500 text-sm truncate">
-                                      {song.album}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-4 flex-shrink-0">
-                                <span className="text-gray-400 text-base flex items-center">
-                                  <Clock className="w-4 h-4 mr-2" />
-                                  {formatDuration(
-                                    song.metadata?.track_length || 0
-                                  )}
-                                </span>
-                                <div
-                                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                                    isSelected
-                                      ? `${themeColors.border} bg-gradient-to-r ${themeColors.gradient}`
-                                      : `border-gray-400 ${themeColors.hover}`
-                                  }`}
-                                >
-                                  {isSelected && (
-                                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                                  )}
-                                </div>
-                              </div>
+                        {songsLoading ? (
+                          /* Loading State */
+                          <div className="flex flex-col items-center justify-center py-20">
+                            <div className="relative w-16 h-16">
+                              <Music
+                                className={`w-8 h-8 ${themeColors.text} animate-pulse absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
+                              />
+                              <div
+                                className={`w-16 h-16 border-4 ${themeColors.border} border-t-current rounded-full animate-spin`}
+                              />
                             </div>
-                          );
-                        })}
+                            <p className="text-white/70 mt-4 text-lg">
+                              Loading songs...
+                            </p>
+                          </div>
+                        ) : filteredSongs.length === 0 ? (
+                          <div className="text-gray-400 text-center py-8">
+                            No songs found.
+                          </div>
+                        ) : (
+                          filteredSongs.map((song) => {
+                            const isSelected = selectedSongs.some(
+                              (s) => s.id === song.id
+                            );
+                            return (
+                              <div
+                                key={song.id}
+                                onClick={() => toggleSongSelection(song)}
+                                className={`flex items-center justify-between p-5 rounded-xl cursor-pointer transition-all duration-200 ${
+                                  isSelected
+                                    ? `${themeColors.hoverBg} border ${themeColors.border} shadow-lg`
+                                    : "bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10"
+                                }`}
+                              >
+                                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                                  <div
+                                    className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                                      isSelected
+                                        ? `bg-gradient-to-r ${themeColors.gradient} scale-110`
+                                        : "bg-white/10"
+                                    }`}
+                                  >
+                                    <Music
+                                      className={`w-7 h-7 ${
+                                        isSelected
+                                          ? "text-white"
+                                          : "text-gray-400"
+                                      }`}
+                                    />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-white font-medium text-lg truncate">
+                                      {song.title || song.filename}
+                                    </p>
+                                    <p className="text-gray-400 text-base truncate">
+                                      {song.artist || "Unknown Artist"}
+                                    </p>
+                                    {song.album && (
+                                      <p className="text-gray-500 text-sm truncate">
+                                        {song.album}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-4 flex-shrink-0">
+                                  <span className="text-gray-400 text-base flex items-center">
+                                    <Clock className="w-4 h-4 mr-2" />
+                                    {formatDuration(
+                                      song.metadata?.track_length || 0
+                                    )}
+                                  </span>
+                                  <div
+                                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                                      isSelected
+                                        ? `${themeColors.border} bg-gradient-to-r ${themeColors.gradient}`
+                                        : `border-gray-400 ${themeColors.hover}`
+                                    }`}
+                                  >
+                                    {isSelected && (
+                                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
                   </div>

@@ -18,13 +18,11 @@ import { CollaboratorsPanel } from "../components/collaborators-panel";
 import { EntityHandlingProvider } from "../utils/entity-handling-context";
 import AudioVisualizer from "../components/audio-visualizer";
 import { ProfileDropdown } from "../components/profile-dropdown";
-import { useRouter } from "next/navigation";
 import { useTheme } from "../utils/theme-context";
 import { AudioManager } from "../utils/audio-manager";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { ProfileUpdatePanel } from "../components/profile-update-panel";
-import { SearchBar } from "../components/search-bar";
 
 const MUSIC_LIBRARY_SERVICE_URL =
   process.env.NEXT_PUBLIC_MUSIC_LIBRARY_SERVICE_URL;
@@ -41,7 +39,6 @@ const Home = ({ children }: Readonly<{ children: React.ReactNode }>) => {
     detailPanel,
     visualizer,
     queue,
-    searchBar,
     collaborators,
   } = useSidebar();
 
